@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "60094301623",
+    "project_id": "food-savvy-fbeab",
+    "storage_bucket": "food-savvy-fbeab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60094301623:android:346ce2480cd182bfab1432",
+        "android_client_info": {
+          "package_name": "com.example.fyp2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvYA-EyDx8C_8-cg9AmRXjLUR6_qVx4XE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
