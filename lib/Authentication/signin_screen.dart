@@ -4,6 +4,7 @@ import 'package:fyp2/Authentication/signup_screen.dart';
 import 'package:fyp2/landing_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../API/api.dart';
+import '../Admin CRUD/admin_page.dart';
 
 class signInScreen extends StatefulWidget {
   signInScreen({Key? key}) : super(key: key);
@@ -21,6 +22,7 @@ class _signInScreenState extends State<signInScreen> {
   String error_pwd = "";
   String? errorMessage;
   bool isLoading = false;
+  bool? adminStatus;
 
   @override
   void initState() {
@@ -29,8 +31,10 @@ class _signInScreenState extends State<signInScreen> {
   }
 
   void checkLoginStatus() async {
+    adminStatus = Api.adminStatus;
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    print("IS LOGGED IN IS $isLoggedIn");
 
     if (isLoggedIn) {
       saveLoginState();
@@ -291,6 +295,15 @@ class _signInScreenState extends State<signInScreen> {
     );
   }
 
+  Future<void> checkAdminStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('isAdmin') == true) {
+      adminStatus = true;
+    } else {
+      adminStatus = false;
+    }
+  }
+
   void signIn(String email, String password) async {
     if (_formSignInKey.currentState!.validate()) {
       setState(() {
@@ -306,15 +319,27 @@ class _signInScreenState extends State<signInScreen> {
       setState(() {
         isLoading = false;
       });
-
       if (checkStatus) {
-        saveLoginState();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyHomePage(),
-          ),
-        );
+        await checkAdminStatus();
+        bool checkStatus1 = adminStatus as bool;
+        print("ADMIN STATUS IS $adminStatus");
+        if (checkStatus1) {
+          print("HELLO");
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminPage(),
+            ),
+          );
+        } else {
+          saveLoginState();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MyHomePage(),
+            ),
+          );
+        }
       } else {
         // Handle login failure
         showDialog(

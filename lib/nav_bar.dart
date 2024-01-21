@@ -25,8 +25,9 @@ class _navBarState extends State<navBar> {
   }
   void _logoutUser() async {
     try {
-      // Clear local login state
-      removeStatus();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isAdmin', false);
+      await prefs.setBool('isLoggedIn', false);
       // Navigate to the login screen (replace SignInScreen with your actual login screen)
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -36,12 +37,6 @@ class _navBarState extends State<navBar> {
     } catch (e) {
       print("Error logging out: $e");
     }
-  }
-
-  Future<void> removeStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isAdmin', false);
-    await prefs.setBool('isLoggedIn', false);
   }
 
   Future<void> checkAdminStatus() async {
@@ -57,46 +52,6 @@ class _navBarState extends State<navBar> {
   @override
   Widget build(BuildContext context) {
     checkAdminStatus();
-    if(adminStatus==true){
-      return Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              title: const Text('Recipe Controls' , style: TextStyle(color : Colors.black)),
-              leading: Icon(Icons.more_horiz, color: primary[200]),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AdminPage(),
-                    ));
-              },
-            ),
-            ListTile(
-              title: const Text('Grocery Controls' , style: TextStyle(color : Colors.black)),
-              leading: Icon(Icons.settings_outlined , color:primary[200],),
-              onTap: () {
-                print("HEHE");
-              }
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => AddRecipe(),
-                //     ));            },
-            ),
-            ListTile(
-              title: const Text("Logout"),
-              leading: Icon(Icons.logout_rounded, color: primary[200]),
-
-              onTap: () {
-                _logoutUser();
-              },
-            ),
-
-          ],
-        ),
-      );
-    }else{
       return Drawer(
         child: ListView(
           children: [
@@ -113,7 +68,6 @@ class _navBarState extends State<navBar> {
             ListTile(
               title: const Text("Logout"),
               leading: Icon(Icons.logout_rounded, color: primary[200]),
-
               onTap: () {
                 _logoutUser();
               },
@@ -122,7 +76,5 @@ class _navBarState extends State<navBar> {
           ],
         ),
       );
-    }
-
   }
 }

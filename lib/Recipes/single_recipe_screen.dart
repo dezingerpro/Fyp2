@@ -104,7 +104,7 @@ class RecipeIngredients extends StatelessWidget {
                         ),
                         Card(
                           elevation: 5,
-                          margin: EdgeInsets.symmetric(vertical: 8.0),
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15.0),
                           ),
