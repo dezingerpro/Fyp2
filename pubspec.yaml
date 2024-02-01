@@ -25,6 +25,9 @@ dependencies:
   dropdown_search: ^5.0.6
   youtube_player_flutter: ^8.1.2
   flutter_rating_bar: ^4.0.1
+  glassmorphism: ^3.0.0
+
+
 
 
 dev_dependencies:
@@ -47,6 +50,8 @@ flutter:
     - assets/images06.png
     - assets/recipes.png
     - assets/delivery.png
+    - assets/welcome.png
+    - assets/signupimage.png
   uses-material-design: true
 
   fonts:

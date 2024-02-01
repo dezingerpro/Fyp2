@@ -17,7 +17,7 @@ class _AdminPageState extends State<AdminPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.purple,
+          backgroundColor: Colors.purple.shade300,
           title: const Text('Karachi'), actions: const [
         SizedBox(
           width: 10,

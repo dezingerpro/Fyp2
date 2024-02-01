@@ -36,9 +36,10 @@ class _MyRecipeAppState extends State<MyRecipeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.purple,
+          backgroundColor: Colors.purple.shade200,
           title: Text("Choose Recipe to Update"),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),

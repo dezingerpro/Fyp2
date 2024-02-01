@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:fyp2/glasseff.dart';
 import '../API/api.dart';
 import '../Models/ingredients_model.dart';
 import '../Models/main_ingredient_model.dart';
@@ -26,7 +27,6 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
   List<String> mainIngredients = [];
   List<String> ingredients = [];
 
-
   @override
   void initState() {
     super.initState();
@@ -45,7 +45,8 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
         TextEditingController(text: ingredient['ingredientName']))
         .toList();
     ingredientQtyControllers = widget.recipe.ringredients
-        .map((ingredient) => TextEditingController(text: ingredient['quantity']))
+        .map((ingredient) =>
+        TextEditingController(text: ingredient['quantity']))
         .toList();
   }
 
@@ -144,172 +145,197 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.purple.shade200,
         title: Text('Update Recipe'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Recipe Name
-              TextFormField(
-                controller: recipeNameController,
-                decoration: InputDecoration(labelText: 'Recipe Name'),
-              ),
-              SizedBox(height: 20),
+      body: GlassContainer(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        borderRadius: BorderRadius.circular(0),
+        blur: 10,
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Recipe Name
+                _buildTextFormField(
+                  controller: recipeNameController,
+                  labelText: 'Recipe Name',
+                ),
+                SizedBox(height: 20),
 
-              // Recipe Main Ingredient
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Main Ingredient"),
-                  SizedBox(
-                    width: 250,
-                    child: DropdownSearch(
-                      // recipe = Api.getRecipe();
+                // Recipe Main Ingredient
+                _buildMainIngredientDropdown(),
 
-                      items: mainIngredients,
-                      dropdownBuilder: (context, selectedItem) {
-                        return Text(
-                          selectedItem ?? recipeMainIngController.text,
-                          style: TextStyle(fontSize: 16),
-                        );
-                      },
-                      compareFn: (item1, item2) {
-                        return true;
-                      },
-                      onChanged: (value){
-                        recipeMainIngController.text = value;
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Main Ingredient is required';
-                        }
-                        return null;
-                      },
-                      popupProps: PopupProps.menu(
-                          isFilterOnline: true,
-                          showSearchBox: true,
-                          showSelectedItems: true,
-                          searchFieldProps: TextFieldProps(
-                            controller: recipeMainIngController,
-                          )),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
+                SizedBox(height: 20),
 
-              // Recipe Rating
-              TextFormField(
-                controller: recipeRatingController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Recipe Rating'),
-              ),
-              SizedBox(height: 20),
+                // Recipe Rating
+                _buildTextFormField(
+                  controller: recipeRatingController,
+                  labelText: 'Recipe Rating',
+                  keyboardType: TextInputType.number,
+                ),
+                SizedBox(height: 20),
 
-              // Recipe Image Link
-              TextFormField(
-                controller: recipeImageController,
-                decoration: InputDecoration(labelText: 'Recipe Image Link'),
-              ),
-              SizedBox(height: 20),
+                // Recipe Image Link
+                _buildTextFormField(
+                  controller: recipeImageController,
+                  labelText: 'Recipe Image Link',
+                ),
+                SizedBox(height: 20),
 
+                // Recipe Link
+                _buildTextFormField(
+                  controller: recipeLinkController,
+                  labelText: 'Recipe Link',
+                ),
+                SizedBox(height: 20),
 
-              // Recipe Link
-              TextFormField(
-                controller: recipeLinkController,
-                decoration: InputDecoration(labelText: 'Recipe Link'),
-              ),
-              SizedBox(height: 20),
-
-              // Ingredients section
-              Text(
-                'Ingredients:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Column(
-                children: List.generate(
-                  ingredientNameControllers.length,
-                      (index) => Row(
-                    children: [
-                      Column(
-                       //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          const Text("Ingredient: "),
-                          SizedBox(
-                            width: 180,
-                            child: DropdownSearch(
-                              // recipe = Api.getRecipe();
-                              items: ingredients,
-                              dropdownBuilder: (context, selectedItem) {
-                                return Text(
-                                  selectedItem ?? ingredientNameControllers[index].text,
-                                  style: TextStyle(fontSize: 16),
-                                );
-                              },
-                              compareFn: (item1, item2) {
-                                return true;
-                              },
-                              onChanged: (value){
-                                ingredientNameControllers[index].text = value;
-                              },
-                              popupProps: const PopupProps.menu(
-                                isFilterOnline: true,
-                                showSearchBox: true,
-                                showSelectedItems: true,
+                // Ingredients section
+                Text(
+                  'Ingredients:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Column(
+                  children: List.generate(
+                    ingredientNameControllers.length,
+                        (index) => Row(
+                      children: [
+                        Column(
+                          children: [
+                            const Text("Ingredient: "),
+                            SizedBox(
+                              width: 180,
+                              child: DropdownSearch(
+                                items: ingredients,
+                                dropdownBuilder: (context, selectedItem) {
+                                  return Text(
+                                    selectedItem ?? ingredientNameControllers[index].text,
+                                    style: TextStyle(fontSize: 16),
+                                  );
+                                },
+                                compareFn: (item1, item2) {
+                                  return true;
+                                },
+                                onChanged: (value){
+                                  ingredientNameControllers[index].text = value;
+                                },
+                                popupProps: const PopupProps.menu(
+                                  isFilterOnline: true,
+                                  showSearchBox: true,
+                                  showSelectedItems: true,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-
-
-                      // Expanded(
-                      //   child: TextFormField(
-                      //     controller: ingredientNameControllers[index],
-                      //     decoration: InputDecoration(labelText: 'Ingredient Name'),
-                      //   ),
-                      // ),
-
-
-                      SizedBox(width: 20),
-                      Expanded(
-                        child: TextFormField(
-                          controller: ingredientQtyControllers[index],
-                          decoration: InputDecoration(labelText: 'Quantity'),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                ).toList(),
-              ),
+                        SizedBox(width: 20),
+                        Expanded(
+                          child: _buildTextFormField(
+                            controller: ingredientQtyControllers[index],
+                            labelText: 'Quantity',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ).toList(),
+                ),
 
-              // Update and Cancel buttons
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: updateRecipe,
-                    child: Text('Update'),
-                  ),
-                  SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Navigate back without updating
-                    },
-                    child: Text('Cancel'),
-                  ),
-                ],
-              ),
-            ],
+                // Update and Cancel buttons
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    _buildElevatedButton(
+                      onPressed: updateRecipe,
+                      label: 'Update',
+                    ),
+                    SizedBox(width: 20),
+                    _buildElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Navigate back without updating
+                      },
+                      label: 'Cancel',
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String labelText,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
+      validator: validator,
+      keyboardType: keyboardType,
+    );
+  }
+
+  Widget _buildMainIngredientDropdown() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text("Main Ingredient"),
+        SizedBox(
+          width: 200,
+          child: DropdownSearch(
+            items: mainIngredients,
+            dropdownBuilder: (context, selectedItem) {
+              return Text(
+                selectedItem ?? recipeMainIngController.text,
+                style: TextStyle(fontSize: 16),
+              );
+            },
+            compareFn: (item1, item2) {
+              return true;
+            },
+            onChanged: (value){
+              recipeMainIngController.text = value;
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Main Ingredient is required';
+              }
+              return null;
+            },
+            popupProps: PopupProps.menu(
+              isFilterOnline: true,
+              showSearchBox: true,
+              showSelectedItems: true,
+              searchFieldProps: TextFieldProps(
+                controller: recipeMainIngController,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildElevatedButton({
+    required VoidCallback onPressed,
+    required String label,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: Text(label),
+    );
+  }
+
   Future<void> fetchIngredients() async {
     List<Ingredient> Ing = await Api.fetchIngredients();
     setState(() {

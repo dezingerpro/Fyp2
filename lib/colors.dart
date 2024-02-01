@@ -21,3 +21,13 @@ const MaterialColor primary = MaterialColor(_primaryPrimaryValue, <int, Color>{
   700: Color(0xFFB49CFF),
 });
  const int _primaryAccentValue = 0xFFEEE8FF;
+
+ // Define your colors in a separate file or within the same file
+ class AppColors {
+   static const mirror = Color.fromRGBO(255, 255, 255, 0.7);
+   static const primaryColor = Color.fromRGBO(78, 0, 241, 0.28);
+   static const accentColor = const Color(0xFF4CAF50);
+   static const backgroundColor = const Color(0xFFECEFF1);
+   static const textColor = const Color(0xFF424242);
+   static const buttonColor = const Color(0xFFFFC107);
+ }

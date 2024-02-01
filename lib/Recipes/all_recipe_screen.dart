@@ -93,7 +93,7 @@ class _FoodRecipesScreenState extends State<FoodRecipesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.purple,
+          backgroundColor: Colors.purple[100],
         title: const Text('Food Recipes'),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),

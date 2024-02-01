@@ -62,7 +62,15 @@ class _Splash_ScreenState extends State<Splash_Screen>
               image: DecorationImage(
                 image: AssetImage('assets/home.png',),
                 fit: BoxFit.cover,
-              )
+              ),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                Colors.purple.shade200, // Use the desired purple shade here
+              ],
+            ),
           ),
           width: double.infinity,
           height: double.infinity,

@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.purple[200],
         title: const Text('Shabbirabad, Karachi'),
         actions: const [
           Padding(
@@ -246,6 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
+            SizedBox(height: 15,),
             // Row with clickable tiles for "Food Recipes" and "Shop Grocery"
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
@@ -253,32 +254,49 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      // Handle Food Recipes tile click action
-                      // For example, navigate to FoodRecipesScreen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FoodRecipesScreen()),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.43,
-                        height: MediaQuery.of(context).size.width * 0.5,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.red),
-                        child: Center(
-                          child: Text(
-                            "Food Recipes",
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  onTap: () {
+              // Navigate to FoodRecipe screen when tapped
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => FoodRecipesScreen()),
+            );
+    },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.04),
+        width: MediaQuery.of(context).size.width * 0.42,
+        height: 180,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.white),
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 5,
+              offset: Offset(10, 1),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(left: 10, right: 5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20,),
+              Text('Food Recipes', style: TextStyle(color: Colors.black, fontSize: 18, decoration: TextDecoration.underline),),
+              Text('Recipes of Food That you Love', style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.w200),),
+              // SizedBox(height: 20,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Image(image: AssetImage('assets/recipes.png'), width: 130, height: 80,)
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    ),
                   GestureDetector(
                     onTap: () {
                       // Handle Shop Grocery tile click action
@@ -292,18 +310,35 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(right: 20.0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.43,
-                        height: MediaQuery.of(context).size.width * 0.5,
+                     child: Container(
+                        width: MediaQuery.of(context).size.width * 0.42,
+                        height: 180,
                         decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.white,
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [
+                            BoxShadow(color: Colors.grey, // Color of the shadow
+                              blurRadius: 5, // Spread radius
+                              offset: Offset(10, 1), // Offset of the shadow)
+                            ),],
                         ),
-                        child: Center(
-                          child: Text(
-                            "Shop Grocery",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                        child:Padding(padding: EdgeInsets.only(left: 10,right: 5), child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 20,),
+                            Text('Grocery',style: TextStyle(color: Colors.black,fontSize: 18,decoration: TextDecoration.underline),),
+                            Text('Order Fresh Groceries',style: TextStyle(color: Colors.black,fontSize: 12, fontWeight: FontWeight.w200),),
+                            SizedBox(height: 10,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Image(image: AssetImage('assets/delivery.png'),width: 130,height: 100,),
+                              ],
+                            )
+
+
+                          ] ,)
                         ),
                       ),
                     ),
