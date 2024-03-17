@@ -4,10 +4,15 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fyp2/grocery_screen.dart';
 import 'package:fyp2/Recipes/all_recipe_screen.dart';
 import 'package:fyp2/nav_bar.dart';
+import 'package:fyp2/provider/cart_provider.dart';
+import 'package:fyp2/search_page.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'API/api.dart';
+import 'Models/ingredients_model.dart';
 import 'Models/recipe_model.dart';
 import 'Recipes/single_recipe_screen.dart';
+import 'cart.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -35,10 +40,13 @@ class _MyHomePageState extends State<MyHomePage> {
   int myCurrentIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
+  get focusNode => null;
+
   @override
   void initState() {
     super.initState();
     fetchRecipes();
+    fetchGroceries();
   }
 
   @override
@@ -46,15 +54,48 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purple,
-        title: const Text('Shabbirabad, Karachi'),
-        actions: const [
+        title: Text('Shop Grocery'),
+        actions: [
           Padding(
-            padding: EdgeInsets.all(8.0), // Adjust the padding as needed
-            child: Icon(Icons.shopping_bag_outlined,color: Colors.black,),
+            padding: EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: () => Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => CartPage())),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(Icons.shopping_bag_outlined, color: Colors.black),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Consumer<CartProvider>(
+                      builder: (context, cart, child) {
+                        return Container(
+                          padding: EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 12,
+                            minHeight: 12,
+                          ),
+                          child: Text(
+                            '${cart.totalItemCount}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(
-            width: 10,
-          )
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -63,96 +104,45 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Row(
               children: [
                 Expanded(
-                    child: Autocomplete<Recipe>(
-                  optionsBuilder: (TextEditingValue textEditingValue) {
-                    return filteredRecipes.where((Recipe recipe) {
-                      final nameLower = recipe.rname.toLowerCase();
-                      final queryLower = textEditingValue.text.toLowerCase();
-
-                      return nameLower.contains(queryLower);
-                    });
-                  },
-                  fieldViewBuilder: (BuildContext context,
-                      TextEditingController textEditingController,
-                      FocusNode focusNode,
-                      VoidCallback onFieldSubmitted) {
-                    return TextField(
-                      controller: textEditingController,
-                      focusNode: focusNode,
-                      onChanged: (value) {
-                        filterRecipes(value);
-                      },
-                      onSubmitted: (_) => onFieldSubmitted(),
-                      decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.only(top: 20.0, left: 20),
-                        hintText: "Search for dishes",
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Icon(
-                            Icons.search,
-                            color: Color(0xff7b7b7b),
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to the SearchPage when the search bar is tapped
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => const SearchPage()),
+                      );
+                    },
+                    child: AbsorbPointer(
+                      // Prevents the TextField from being selected
+                      child: TextField(
+                        controller: searchController,
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          contentPadding:
+                              const EdgeInsets.only(top: 20.0, left: 20),
+                          hintText: "Search for dishes",
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Icon(
+                              Icons.search,
+                              color: Color(0xff7b7b7b),
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Color(0xfff7f7f7),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            borderSide: BorderSide.none,
                           ),
                         ),
-                        filled: true,
-                        fillColor: Color(0xfff7f7f7),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
-                          borderSide: BorderSide.none,
+                        style: const TextStyle(
+                          color: Color(0xff707070),
+                          fontSize: 12,
                         ),
                       ),
-                      style: const TextStyle(
-                        color: Color(0xff707070),
-                        fontSize: 12,
-                      ),
-                    );
-                  },
-                  displayStringForOption: (Recipe option) => option.rname,
-                  optionsViewBuilder: (BuildContext context,
-                      AutocompleteOnSelected<Recipe> onSelected,
-                      Iterable<Recipe> options) {
-                    return Container(
-                      margin: EdgeInsets.all(0),
-                      padding: EdgeInsets.only(right: 30),
-                      child: Material(
-                        elevation: 20,
-                        child: ListView.separated(
-                          physics: BouncingScrollPhysics(),
-                          separatorBuilder: (context, index) {//<-- SEE HERE
-                            return Divider(
-                              height: 20,
-                              thickness: 1.2,
-                            );
-                          },
-                          itemCount: options.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final option = options.elementAt(index);
-                            return Container(
-                              child: ListTile(
-                                trailing: Icon(Icons.favorite_border),
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(option.rimage), // Change this to the actual image property of your Recipe model
-                                ),
-                                title: Text(option.rname),
-                                subtitle: Text("Recipe"),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => RecipeIngredients(
-                                        recipe: filteredRecipes[index],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                )),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -287,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => DeliveryScreen()),
+                            builder: (context) => GroceryItemsPage()),
                       );
                     },
                     child: Padding(
@@ -336,8 +326,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         (index) => Card(
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)
-                          ),
+                              borderRadius: BorderRadius.circular(15)),
                           elevation: 4,
                           child: GestureDetector(
                             onTap: () {
@@ -354,21 +343,23 @@ class _MyHomePageState extends State<MyHomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                  height: 100,
-                                  width: 210,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    child: Image.network(
-                                      recipes[index].rimage,
-                                      fit: BoxFit.cover,
+                                    height: 100,
+                                    width: 210,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      child: Image.network(
+                                        recipes[index].rimage,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
-                                ),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(left: 8.0),
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
                                         child: Text(
                                           recipes[index].rname,
                                           style: TextStyle(
@@ -377,25 +368,27 @@ class _MyHomePageState extends State<MyHomePage> {
                                           ),
                                         ),
                                       ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: RatingBar.builder(
-                                initialRating: recipes[index].rratings.toDouble(),
-                                direction: Axis.horizontal,
-                                allowHalfRating: true,
-                                ignoreGestures: true,
-                                itemCount: 5,
-                                itemSize: 20,
-                                itemBuilder: (context, _) => Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                ), onRatingUpdate: (double value) {
-                              },
-                              ),
-                            )
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10.0),
+                                        child: RatingBar.builder(
+                                          initialRating: recipes[index]
+                                              .rratings
+                                              .toDouble(),
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          ignoreGestures: true,
+                                          itemCount: 5,
+                                          itemSize: 20,
+                                          itemBuilder: (context, _) => Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                          ),
+                                          onRatingUpdate: (double value) {},
+                                        ),
+                                      )
                                     ],
                                   ),
-
                                 ],
                               ),
                             ),
@@ -408,36 +401,90 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 20.0, bottom: 20),
+              padding:
+                  const EdgeInsets.only(left: 20.0, bottom: 20, right: 20.0),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Padding(
-                      padding: EdgeInsets.only(left: 5.0),
+                      padding: EdgeInsets.only(left: 5.0, top: 20.0),
                       child: Text(
                         "Shop Grocery",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    SingleChildScrollView(
+                    const SizedBox(height: 15),
+                    Container(
+                      height: 200, // Adjust as needed
+                      child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            for (int i = 0; i <= 10; i++)
-                              Container(
-                                width: 100,
-                                height: 100,
-                                margin: EdgeInsets.only(right: 15),
-                                decoration: BoxDecoration(
-                                    border: Border.all(),
-                                    borderRadius: BorderRadius.circular(25)),
+                        itemCount: groceries.length,
+                        itemBuilder: (context, index) {
+                          final groceryItem = groceries[index];
+                          return Container(
+                            width: 180, // Adjust as needed
+                            margin: EdgeInsets.only(
+                                right: 10), // Space between cards
+                            child: Card(
+                              elevation: 6, // Adds shadow
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                    20), // Clip image with card border radius
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize
+                                      .min, // Avoids taking unnecessary space
+                                  children: [
+                                    Image.network(
+                                      groceryItem.image,
+                                      width: double
+                                          .infinity, // Ensures image takes the full card width
+                                      height: 100,
+                                      fit: BoxFit
+                                          .cover, // Covers the card area with the image
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        groceryItem.name,
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.deepPurple),
+                                        overflow: TextOverflow
+                                            .ellipsis, // Prevents text from overflowing
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0),
+                                      child: ElevatedButton.icon(
+                                        icon: Icon(Icons.add_shopping_cart,
+                                            size: 18),
+                                        label: Text("Add to Cart",
+                                            style: TextStyle(fontSize: 14)),
+                                        onPressed: () {
+                                          _showAddToCartDialog(
+                                              context, groceryItem);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: Colors
+                                              .deepPurple, // Button text color
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                          ],
-                        ))
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ]),
             ),
             Padding(
@@ -461,6 +508,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  List<Ingredient> groceries = [];
+
+  Future<void> fetchGroceries() async {
+    var data = await Api
+        .fetchIngredients(); // This should return JSON data as List<Map<String, dynamic>>
+    setState(() {
+      groceries = data;
+    });
+  }
+
   Future<void> fetchRecipes() async {
     var data = await Api.getRecipeAll();
 
@@ -473,29 +530,64 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // Function to filter recipes based on the search query
-  void filterRecipes(String query) {
-    if (query.isEmpty) {
-      setState(() {
-        filteredRecipes = List.from(recipes);
-      });
-      return;
-    }
+  void _showAddToCartDialog(BuildContext context, Ingredient item) {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    int quantity =
+        cartProvider.getItemQuantity(item.id); // Get the current quantity
 
-    setState(() {
-      filteredRecipes = recipes.where((recipe) {
-        final nameLower = recipe.rname.toLowerCase();
-        final queryLower = query.toLowerCase();
-
-        // Check if the recipe name contains the query
-        if (nameLower.contains(queryLower)) {
-          return true;
-        }
-
-        // Check if any part of the query matches the recipe name
-        final queryParts = queryLower.split(' ');
-        return queryParts.every((part) => nameLower.contains(part));
-      }).toList();
-    });
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              padding: EdgeInsets.all(16),
+              height: 200,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("Select Quantity",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.remove),
+                        onPressed: () => setState(() {
+                          if (quantity > 0)
+                            quantity--; // Allow reducing to 0 for removal
+                        }),
+                      ),
+                      Text(quantity.toString(), style: TextStyle(fontSize: 18)),
+                      IconButton(
+                        icon: Icon(Icons.add),
+                        onPressed: () => setState(() {
+                          quantity++;
+                        }),
+                      ),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (quantity > 0) {
+                        cartProvider.addItem(item,
+                            quantity - cartProvider.getItemQuantity(item.id));
+                      } else {
+                        cartProvider.removeItem(item
+                            .id); // Remove the item if quantity is reduced to 0
+                      }
+                      Navigator.pop(context);
+                    },
+                    child: Text('Update Cart'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

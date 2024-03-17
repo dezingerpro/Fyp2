@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/Splash_Screen.dart';
 import 'package:fyp2/colors.dart';
-
+import 'package:fyp2/provider/cart_provider.dart';
+import 'package:fyp2/provider/grocery_provider.dart'; // Import your GroceryProvider
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: primary,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartProvider()),
+        ChangeNotifierProvider(create: (context) => GroceryProvider()), // Add your GroceryProvider
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: primary, // Ensure 'primary' is defined or use Colors.blue
+        ),
+        home: Splash_Screen(), // Make sure Splash_Screen is correctly implemented
+        debugShowCheckedModeBanner: false,
       ),
-      home: Splash_Screen(),
-      debugShowCheckedModeBanner: false,
     );
   }
-  
 }
-
-

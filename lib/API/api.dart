@@ -9,7 +9,7 @@ import '../Models/main_ingredient_model.dart';
 import '../Models/user_model.dart';
 
 class Api {
-  static const baseUrl = "http://54.255.130.228:2000/api/";
+  static const baseUrl = "http://192.168.18.108:2000/api/";
   static bool ?adminStatus;
 
   //USER REGISTRATION
@@ -121,14 +121,10 @@ class Api {
     var url = Uri.parse("${baseUrl}check_answer");
     print(answer);
     var data = {"uemail": email, "uanswer": answer};
-    print("HELLO");
     try {
-      print("IN TRY");
       final response = await http.post(url, body: data);
-      print("IN TRY");
       if (response.statusCode == 200) {
         print("200");
-        Map<String, dynamic> result = json.decode(response.body);
         return true;
       } else {
         return false;
@@ -265,9 +261,6 @@ class Api {
 
   //Update Recipe
   static updateRecipe(Map data) async {
-    // print("STARTING");
-    // print(data);
-    String? recipe_id = data['_id'];
     var url = Uri.parse("${baseUrl}update_recipe");
     try {
       final res = await http.put(url, body: data);
