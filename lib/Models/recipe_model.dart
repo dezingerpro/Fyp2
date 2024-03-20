@@ -6,6 +6,7 @@ class Recipe {
   final String rimage;
   final String rlink;
   final String rmainingredient; // Added mainIngredient field
+  final String rtype; // Added rtype field for recipe type
 
   Recipe({
     required this.id,
@@ -15,6 +16,7 @@ class Recipe {
     required this.rimage,
     required this.rlink,
     required this.rmainingredient,
+    required this.rtype, // Initialize rtype in the constructor
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Recipe {
       rimage: json['rimage'],
       rlink: json['rlink'],
       rmainingredient: json['rmainingredient'], // Initialize mainIngredient field from JSON
+      rtype: json['rtype'], // Initialize rtype field from JSON
     );
   }
 

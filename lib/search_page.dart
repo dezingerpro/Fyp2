@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:fyp2/API/api.dart'; // Adjust the import path as necessary
+import 'package:fyp2/API/api.dart';
 import 'package:fyp2/Models/recipe_model.dart';
-import 'package:fyp2/Models/ingredients_model.dart'; // Adjust the import path as necessary
+import 'package:fyp2/Models/ingredients_model.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -18,6 +18,7 @@ class _SearchPageState extends State<SearchPage> {
   List<String> selectedIngredients = [];
   String currentIngredient = '';
   List<String> ingredients = [];
+  List<String> availableRecipeNames = [];
   final recipeIngredientNameController = TextEditingController();
 
   @override
@@ -27,10 +28,20 @@ class _SearchPageState extends State<SearchPage> {
     fetchIngredients();
   }
 
+  void sortFilteredRecipes() {
+    setState(() {
+      filteredRecipes.sort((a, b) =>
+          availableRecipeNames.indexOf(a.rname).compareTo(availableRecipeNames.indexOf(b.rname))
+      );
+    });
+  }
+
   Future<void> fetchRecipes() async {
     var data = await Api.getRecipeAll();
     setState(() {
-      recipes = data.map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+      recipes = data
+          .map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson))
+          .toList();
       filteredRecipes = List.from(recipes);
     });
   }
@@ -42,11 +53,20 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void filterRecipes(String query) {
+  void filterRecipes(String query, List<String> availableRecipes) {
     setState(() {
+      // First, filter the recipes to include only those in the availableRecipes list
+      var recipesToShow = recipes
+          .where((recipe) => availableRecipes.contains(recipe.rname))
+          .toList();
+
+      // Next, filter based on the query if it's not empty
       filteredRecipes = query.isEmpty
-          ? recipes
-          : recipes.where((recipe) => recipe.rname.toLowerCase().contains(query.toLowerCase())).toList();
+          ? recipesToShow
+          : recipesToShow
+          .where((recipe) =>
+          recipe.rname.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     });
   }
 
@@ -65,7 +85,7 @@ class _SearchPageState extends State<SearchPage> {
               padding: EdgeInsets.all(16.0),
               child: TextField(
                 controller: searchController,
-                onChanged: (value) => filterRecipes(value),
+                onChanged: (value) => filterRecipes(value, availableRecipeNames),
                 decoration: InputDecoration(
                   labelText: 'Search for dishes...',
                   fillColor: Colors.white,
@@ -77,12 +97,13 @@ class _SearchPageState extends State<SearchPage> {
                   prefixIcon: Icon(Icons.search),
                   suffixIcon: searchController.text.isNotEmpty
                       ? GestureDetector(
-                    child: Icon(Icons.close),
-                    onTap: () {
-                      searchController.clear();
-                      filterRecipes('');
-                    },
-                  )
+                          child: Icon(Icons.close),
+                          onTap: () {
+                            searchController.clear();
+                            filterRecipes('',availableRecipeNames);
+                            Api.sendIngredients(selectedIngredients);
+                          },
+                        )
                       : null,
                 ),
               ),
@@ -98,14 +119,16 @@ class _SearchPageState extends State<SearchPage> {
               dropdownDecoratorProps: DropDownDecoratorProps(
                 dropdownSearchDecoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0), // Adjust the value as needed
+                    borderRadius: BorderRadius.circular(
+                        10.0), // Adjust the value as needed
                   ),
                 ),
               ),
               onChanged: (value) {
                 if (value != null) {
                   setState(() {
-                    currentIngredient = value; // Update currentIngredient with the selected value
+                    currentIngredient =
+                        value; // Update currentIngredient with the selected value
                     recipeIngredientNameController.text = value;
                   });
                 }
@@ -119,7 +142,8 @@ class _SearchPageState extends State<SearchPage> {
                     labelText: "Search",
                     hintText: "Search Ingredients",
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0), // Adjust the value as needed
+                      borderRadius: BorderRadius.circular(
+                          20.0), // Adjust the value as needed
                     ),
                   ),
                   cursorColor: Theme.of(context).primaryColor,
@@ -130,18 +154,28 @@ class _SearchPageState extends State<SearchPage> {
               padding: EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, backgroundColor: Colors.deepPurple, // Text color
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.deepPurple, // Text color
                 ),
                 icon: Icon(Icons.add),
                 label: Text('Add Ingredient'),
-                onPressed: () {
-                  if (currentIngredient.isNotEmpty && !selectedIngredients.contains(currentIngredient)) {
-                    setState(() {
-                      selectedIngredients.add(currentIngredient);
-                      currentIngredient = '';
-                    });
-                  }
-                },
+                  onPressed: () async {
+                    if (currentIngredient.isNotEmpty &&
+                        !selectedIngredients.contains(currentIngredient)) {
+                      setState(() {
+                        selectedIngredients.add(currentIngredient);
+                        currentIngredient = '';
+                      });
+                      // Fetch available recipe names based on the updated selected ingredients
+                      var newAvailableRecipeNames = await Api.sendIngredients(selectedIngredients);
+                      setState(() {
+                        availableRecipeNames = newAvailableRecipeNames;
+                        // Filter recipes to display based on the new list of available recipe names
+                        filterRecipes(searchController.text, availableRecipeNames);
+                      });
+                      sortFilteredRecipes();
+                    }
+                  },
               ),
             ),
             Wrap(
@@ -150,28 +184,41 @@ class _SearchPageState extends State<SearchPage> {
                 return Chip(
                   label: Text(ingredient),
                   deleteIcon: Icon(Icons.close),
-                  onDeleted: () {
-                    setState(() {
-                      selectedIngredients.remove(ingredient);
-                    });
-                  },
+                    onDeleted: () {
+                      setState(() {
+                        selectedIngredients.remove(ingredient);
+                      });
+                      // Re-fetch available recipe names based on the updated selected ingredients
+                      Api.sendIngredients(selectedIngredients).then((newAvailableRecipeNames) {
+                        setState(() {
+                          availableRecipeNames = newAvailableRecipeNames;
+                          // Filter recipes to display based on the new list of available recipe names
+                          filterRecipes(searchController.text, availableRecipeNames);
+                        });
+                      });
+                    },
                 );
               }).toList(),
             ),
             ListView.builder(
-              shrinkWrap: true, // Use it to make ListView scrollable inside Column
-              physics: NeverScrollableScrollPhysics(), // Disables ListView's own scrolling
+              shrinkWrap:
+                  true, // Use it to make ListView scrollable inside Column
+              physics:
+                  NeverScrollableScrollPhysics(), // Disables ListView's own scrolling
               itemCount: filteredRecipes.length,
               itemBuilder: (context, index) {
                 return Card(
                   margin: EdgeInsets.all(10),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(filteredRecipes[index].rimage),
+                      backgroundImage:
+                          NetworkImage(filteredRecipes[index].rimage),
                     ),
-                    title: Text(filteredRecipes[index].rname, style: TextStyle(fontWeight: FontWeight.bold)),
+                    title: Text(filteredRecipes[index].rname,
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text('Click for more details'),
                     onTap: () {
+                      print(filteredRecipes[0].rname);
                       // Implement navigation to recipe details
                     },
                   ),

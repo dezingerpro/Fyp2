@@ -7,6 +7,7 @@ import 'package:fyp2/nav_bar.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:fyp2/search_page.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'API/api.dart';
 import 'Models/ingredients_model.dart';
@@ -250,7 +251,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => FoodRecipesScreen()),
-                      );
+                      ).then((_) {
+                        fetchRecipes(); // Refresh your recipes list
+                      });
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20.0),
@@ -278,7 +281,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => GroceryItemsPage()),
-                      );
+                      ).then((_) {
+                        fetchRecipes(); // Refresh your recipes list
+                      });
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(right: 20.0),
@@ -322,7 +327,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: List.generate(
-                        recipes.length,
+                        filteredRecipes.length,
                         (index) => Card(
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
@@ -332,7 +337,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             onTap: () {
                               MaterialPageRoute(
                                 builder: (context) => RecipeIngredients(
-                                  recipe: recipes[index],
+                                  recipe: filteredRecipes[index],
                                 ),
                               );
                             },
@@ -361,7 +366,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         padding:
                                             const EdgeInsets.only(left: 8.0),
                                         child: Text(
-                                          recipes[index].rname,
+                                          filteredRecipes[index].rname,
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -372,7 +377,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         padding:
                                             const EdgeInsets.only(left: 10.0),
                                         child: RatingBar.builder(
-                                          initialRating: recipes[index]
+                                          initialRating: filteredRecipes[index]
                                               .rratings
                                               .toDouble(),
                                           direction: Axis.horizontal,
@@ -466,7 +471,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             size: 18),
                                         label: Text("Add to Cart",
                                             style: TextStyle(fontSize: 14)),
-                                        onPressed: () {
+                                        onPressed: () async {
                                           _showAddToCartDialog(
                                               context, groceryItem);
                                         },
@@ -519,15 +524,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> fetchRecipes() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isGuest = prefs.getBool('isGuest') ?? true; // Default to true if not set
+
     var data = await Api.getRecipeAll();
 
-    setState(() {
-      recipes = data.map((recipeJson) {
-        return Recipe.fromJson(recipeJson);
-      }).toList();
-
-      filteredRecipes = List.from(recipes);
-    });
+    if (!isGuest) {
+      var recommendedNames = await Api.fetchRecommendedRecipeNames();
+      setState(() {
+        // Map JSON data to Recipe models
+        recipes = data.map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+        // Filter recipes to only include recommended ones
+        filteredRecipes = recipes.where((recipe) => recommendedNames.contains(recipe.rname)).toList();
+      });
+    } else {
+      // For guest users, display any 10 recipes
+      setState(() {
+        // Map JSON data to Recipe models
+        recipes = data.map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+        // Randomly select 10 recipes to display
+        filteredRecipes = (recipes..shuffle()).take(10).toList();
+      });
+    }
   }
 
   void _showAddToCartDialog(BuildContext context, Ingredient item) {

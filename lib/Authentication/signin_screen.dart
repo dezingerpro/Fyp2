@@ -243,6 +243,8 @@ class _signInScreenState extends State<signInScreen> {
                           onPressed: () async {
                             final prefs = await SharedPreferences.getInstance();
                             prefs.setBool('isAdmin', false);
+                            prefs.setBool('isGuest',true); // Default to true if not set
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -324,20 +326,24 @@ class _signInScreenState extends State<signInScreen> {
         bool checkStatus1 = adminStatus as bool;
         print("ADMIN STATUS IS $adminStatus");
         if (checkStatus1) {
-          print("HELLO");
-          Navigator.pushReplacement(
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool('isGuest',false);
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) => AdminPage(),
-            ),
+
+            ),(Route<dynamic> route) => false,
           );
         } else {
           saveLoginState();
-          Navigator.pushReplacement(
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool('isGuest',false);
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) => MyHomePage(),
-            ),
+            ),(Route<dynamic> route) => false,
           );
         }
       } else {

@@ -59,6 +59,8 @@ class Api {
            prefs.setBool('isAdmin', false);
            adminStatus = false;
          }
+         String userId = data['_id']; // Make sure to replace 'userId' with the actual key used in your API response
+         prefs.setString('userId', userId);
          return true;
       }else if(res.statusCode == 402){
         print("PLEASE CHECK YOUR PASSWORD");
@@ -66,7 +68,6 @@ class Api {
         print("PLEASE CHECK YOUR Email");
       }
     }catch(e){
-      print("HELLO4");
       print(e.toString());
     }
     return false;
@@ -167,6 +168,120 @@ class Api {
       return [];
     }
     return [];
+  }
+
+  static Future<bool> updateLastViewedRecipes(String newRecipeName) async {
+    final prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    if (userId == null) {
+      // Handle scenario where there's no user ID (e.g., guest users)
+      return false;
+    }
+
+    List<String> currentLastViewed = await fetchLastViewedRecipes(userId);
+
+    // Remove the recipe if it already exists to avoid duplicates
+    //currentLastViewed.remove(newRecipeName);
+    // Then insert it at the beginning
+    currentLastViewed.insert(0, newRecipeName);
+
+    // Ensure only the last five recipes are kept
+    List<String> updatedLastViewed = currentLastViewed.length > 5
+        ? currentLastViewed.sublist(0, 5)
+        : currentLastViewed;
+
+    // Send the update to the backend
+    var response = await http.post(
+      Uri.parse('${baseUrl}updateLastViewed'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'userId': userId,
+        'lastViewedRecipes': updatedLastViewed,
+      }),
+    );
+
+    return response.statusCode == 200;
+  }
+
+// You need to implement this method to fetch the current last viewed recipes
+  static Future<List<String>> fetchLastViewedRecipes(String userId) async {
+    var url = Uri.parse('${baseUrl}getLastViewedRecipes');
+    var response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({'userId': userId}),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> lastViewedRecipes = jsonDecode(response.body)['lastViewedRecipes'];
+      print(lastViewedRecipes);
+      return lastViewedRecipes.cast<String>();
+    } else {
+      // Handle error or return an empty list
+      print('Failed to fetch last viewed recipes. Status code: ${response.statusCode}.');
+      return [];
+    }
+  }
+
+  //SEND INGREDIENTS
+  static Future<List<String>> sendIngredients(List<String> selectedIngredients) async {
+    var url = Uri.parse('${baseUrl}search_recipes');
+    var response = await http.post(url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"ingredients": selectedIngredients}));
+    List<String> recipeNames = [];
+    if (response.statusCode == 200) {
+      var recommendations = jsonDecode(response.body) as Map<String, dynamic>;
+      // Extracting recipe names into a list
+      var recommendedRecipes = recommendations['recommended_recipes'] as List;
+      recipeNames = recommendedRecipes
+          .map((recipe) => recipe['name'] as String)
+          .toList();
+      // Printing the list of recipe names
+      return recipeNames;
+    } else {
+      // Handle errors
+      print('Request failed with status: ${response.statusCode}.');
+    }
+    return recipeNames; // Return the list of recipe names
+  }
+
+  //FETCH RECOMMENDED RECIPE NAMES
+  static Future<List<String>> fetchRecommendedRecipeNames() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    if (userId == null) {
+      // Handle scenario where there's no user ID (e.g., guest users)
+      return [];
+    }
+    // Your backend endpoint URL
+    final String apiUrl = '${baseUrl}recommended_recipes';
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'userId': userId, // Include userId in the request body
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the JSON response to extract recipe names
+        final List<dynamic> recipeNamesJson = jsonDecode(response.body);
+        final List<String> recipeNames = recipeNamesJson.map((name) => name.toString()).toList();
+        print(recipeNamesJson);
+        print(recipeNames);
+        return recipeNames;
+      } else {
+        // Handle server errors or invalid status codes
+        print('Failed to fetch recommended recipe names. Status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      // Handle network errors or JSON parsing errors
+      print('An error occurred while fetching recommended recipe names: $e');
+      return [];
+    }
   }
 
   //GET MAIN INGREDIENT LIST

@@ -17,7 +17,6 @@ class GroceryProvider with ChangeNotifier {
     try {
       List<Ingredient> fetchedItems = await Api.fetchIngredients();
       _items = fetchedItems;
-      print(_items);
       notifyListeners();
     } catch (e) {
       // Handle any errors here

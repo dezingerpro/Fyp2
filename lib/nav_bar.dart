@@ -28,6 +28,7 @@ class _navBarState extends State<navBar> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isAdmin', false);
       await prefs.setBool('isLoggedIn', false);
+      await prefs.setString('userId', '');
       // Navigate to the login screen (replace SignInScreen with your actual login screen)
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(

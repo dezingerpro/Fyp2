@@ -161,6 +161,8 @@ class _FoodRecipesScreenState extends State<FoodRecipesScreen> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
+                          Api.updateLastViewedRecipes(filteredRecipes[index].rtype);
+                          print("SUCCESSFILLY UPDATED");
                           Navigator.push(
                             context,
                             MaterialPageRoute(
