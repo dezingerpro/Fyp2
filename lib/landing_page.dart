@@ -48,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     fetchRecipes();
     fetchGroceries();
+
   }
 
   @override

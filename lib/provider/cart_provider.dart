@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import '../Models/ingredients_model.dart';
 
@@ -10,9 +12,7 @@ class CartItem {
 
 class CartProvider with ChangeNotifier {
   Map<String, CartItem> _items = {};
-
   Map<String, CartItem> get items => _items;
-
   int get itemCount => _items.length;
 
   // Method to get quantity of an item
@@ -67,4 +67,29 @@ class CartProvider with ChangeNotifier {
     });
     return total;
   }
+
+  Future<void> saveCartToDatabase(String userId) async {
+    final url = Uri.parse('http://192.168.18.108:2000/api/saveUserCart');
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          'userId': userId,
+          'ucart': _items.entries.map((item) => {
+            'ingredientName': item.value.item.name,
+            'quantity': item.value.quantity,
+          }).toList(),
+        }),
+      );
+      if (response.statusCode == 200) {
+        print("Cart saved successfully");
+      } else {
+        print("Failed to save cart, Status Code: ${response.statusCode}");
+      }
+    } catch (error) {
+      print("Error saving cart: $error");
+    }
+  }
+
 }

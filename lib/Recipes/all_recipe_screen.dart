@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 import '../API/api.dart';
 import '../Models/recipe_model.dart';
+import '../cart.dart';
+import '../provider/cart_provider.dart';
+import '../search_page.dart';
 import 'single_recipe_screen.dart';
 import '../nav_bar.dart';
 
@@ -19,6 +23,8 @@ class _FoodRecipesScreenState extends State<FoodRecipesScreen> {
   bool isLoading = false;
 
   Timer? _debounce;
+
+  get focusNode => null;
 
   @override
   void initState() {
@@ -101,39 +107,95 @@ class _FoodRecipesScreenState extends State<FoodRecipesScreen> {
               Navigator.pop(context);
             },
           ),
-        actions: const [
+        actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(Icons.shopping_bag_outlined,color: Colors.black),
+            padding: EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: () => Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => CartPage())),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(Icons.shopping_bag_outlined, color: Colors.black),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Consumer<CartProvider>(
+                      builder: (context, cart, child) {
+                        return Container(
+                          padding: EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 12,
+                            minHeight: 12,
+                          ),
+                          child: Text(
+                            '${cart.totalItemCount}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(width: 10)
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            child: TextField(
-              controller: searchController,
-              onChanged: (value) {
-                filterRecipes(value);
-              },
-              decoration: InputDecoration(
-                labelText: "Search for dishes",
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Color(0xff7b7b7b),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to the SearchPage when the search bar is tapped
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => const SearchPage()),
+                      );
+                    },
+                    child: AbsorbPointer(
+                      // Prevents the TextField from being selected
+                      child: TextField(
+                        controller: searchController,
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          contentPadding:
+                          const EdgeInsets.only(top: 20.0, left: 20),
+                          hintText: "Search for dishes",
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Icon(
+                              Icons.search,
+                              color: Color(0xff7b7b7b),
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Color(0xfff7f7f7),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        style: const TextStyle(
+                          color: Color(0xff707070),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                filled: true,
-                fillColor: Color(0xfff7f7f7),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              style: TextStyle(
-                color: Color(0xff707070),
-                fontSize: 12,
-              ),
+              ],
             ),
           ),
         ),

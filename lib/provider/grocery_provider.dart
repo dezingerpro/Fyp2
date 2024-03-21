@@ -16,20 +16,24 @@ class GroceryProvider with ChangeNotifier {
   Future<void> fetchGroceries() async {
     try {
       List<Ingredient> fetchedItems = await Api.fetchIngredients();
+      print("Fetched items: ${fetchedItems.length}");
       _items = fetchedItems;
+      print(fetchedItems[0]);
       notifyListeners();
     } catch (e) {
-      // Handle any errors here
       print("Failed to fetch groceries: $e");
     }
   }
 
   void searchItems(String query) {
+    print("Searching for: $query");
     if (query.isEmpty) {
       _searchResults = _items;
     } else {
       _searchResults = _items.where((item) => item.name.toLowerCase().contains(query.toLowerCase())).toList();
+      print("Found ${_searchResults.length} items");
     }
     notifyListeners();
   }
+
 }

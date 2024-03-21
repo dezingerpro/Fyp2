@@ -284,6 +284,7 @@ class Api {
     }
   }
 
+
   //GET MAIN INGREDIENT LIST
   static Future<List<MainIngredient>> fetchMainIngredients() async {
     var url = Uri.parse("${baseUrl}get_maining");
@@ -307,6 +308,34 @@ class Api {
     }
   }
 
+  static Future<Ingredient?> fetchIngredientDetails(String ingredientName) async {
+    var url = Uri.parse("${baseUrl}get_ingredient_details");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({'ingredientName': ingredientName}),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        print(data);
+
+        // Assuming the API returns the details for a single ingredient
+        return Ingredient.fromJson(data);
+      } else {
+        print('Failed to load ingredient details. Status Code: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Exception when fetching ingredient details: $error');
+      return null;
+    }
+  }
+
+
+  //fetch ingredients
   static Future<List<Ingredient>> fetchIngredients() async {
     var url = Uri.parse("${baseUrl}get_ingredients");
 
@@ -315,10 +344,13 @@ class Api {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body) as List<dynamic>;
+        print(data);
 
         List<Ingredient> ingredients = data.map((item) {
+          print(item);
           return Ingredient.fromJson(item);
         }).toList();
+
 
         return ingredients;
       } else {

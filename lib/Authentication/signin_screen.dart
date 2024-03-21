@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fyp2/Authentication/forgot_password.dart';
 import 'package:fyp2/Authentication/signup_screen.dart';
 import 'package:fyp2/landing_page.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fyp2/provider/cart_provider.dart';
 import '../API/api.dart';
 import '../Admin CRUD/admin_page.dart';
 
@@ -339,6 +341,7 @@ class _signInScreenState extends State<signInScreen> {
           saveLoginState();
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setBool('isGuest',false);
+          String userId = prefs.getString('userId') as String;
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
