@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'landing_page.dart';
+
 class OrderSummaryPage extends StatelessWidget {
   final List<Map<String, dynamic>> orderItems;
   final double totalPrice;
@@ -42,7 +44,12 @@ class OrderSummaryPage extends StatelessWidget {
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-              Navigator.popUntil(context, ModalRoute.withName('/')); // Navigate back to the home page or another relevant page
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(),
+                ),(Route<dynamic> route) => false,
+              );
             },
             child: Text('Continue Shopping'),
           )
