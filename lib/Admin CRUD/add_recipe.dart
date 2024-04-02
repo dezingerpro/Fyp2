@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp2/Models/main_ingredient_model.dart';
-import 'package:fyp2/colors.dart';
 import '../API/api.dart';
 import '../Models/ingredients_model.dart';
 
