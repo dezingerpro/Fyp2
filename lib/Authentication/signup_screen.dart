@@ -20,6 +20,7 @@ class _signUpScreenState extends State<signUpScreen> {
   final passwordEditingController = new TextEditingController();
   final confirmPasswordEditingController = new TextEditingController();
   final securityQuestionAnswerController = new TextEditingController();
+  final mobileNumber = new TextEditingController();
   final securityQuestions = new TextEditingController();
   final _formSignUpKey = GlobalKey<FormState>();
   String error_message = "";
@@ -218,9 +219,32 @@ class _signUpScreenState extends State<signUpScreen> {
                         },
                       ),
                       SizedBox(height: 5),
+                      TextFormField(
+                        controller: mobileNumber,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          hintText: 'Mobile Number',
+                          prefixIcon: Icon(
+                            Icons.security,
+                            color: Colors.black,
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.length != 10) {
+                            return 'Mobile Number must be 10 digits';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          mobileNumber.text = value!;
+                        },
+                      ),
+                      SizedBox(height: 5),
+                      SizedBox(height: 5),
 
                       DropdownSearch(
-
                           items: questions,
                           dropdownBuilder: (context, selectedItem) {
                             return Text(
@@ -334,7 +358,19 @@ class _signUpScreenState extends State<signUpScreen> {
 
   void signUp(String email, String password) async {
     if (_formSignUpKey.currentState!.validate()) {
-      User user = User(username:firstNameEditingController.text,email: emailEditingController.text,password: passwordEditingController.text,usecurityQuestion: securityQuestions.text,uanswer: securityQuestionAnswerController.text,isAdmin: false, mobileNumber: '', city: '', streetAddress: '', houseDetails: '');
+      User user = User(
+          username:firstNameEditingController.text,
+          email: emailEditingController.text,
+          password: passwordEditingController.text,
+          usecurityQuestion: securityQuestions.text,
+          uanswer: securityQuestionAnswerController.text,
+          isAdmin: false,
+          mobileNumber: mobileNumber.text,
+          city: '',
+          streetAddress: '',
+          houseDetails: '',
+          ucart: []
+      );
       int check = await Api.addUser(user);
       if(check==205){
       showDialog(

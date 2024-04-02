@@ -13,9 +13,10 @@ class Api {
   static const baseUrl = "http://192.168.18.108:2000/api/";
   static bool ?adminStatus;
 
-  //USER REGISTRATIO
+  //USER REGISTRATION
   static Future<int> addUser(User user) async {
     Map<String, dynamic> userData = user.toJson();
+    print(userData);
     userData['isAdmin'] = userData['isAdmin'].toString();
     //print(userData);
     var url = Uri.parse("${baseUrl}add_user");

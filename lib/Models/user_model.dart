@@ -46,7 +46,7 @@ class User {
 
   Map<String, dynamic> toJson() {
     return {
-      '_id': id, // Make sure to include the ID if you want it serialized
+      //'_id': id, // Make sure to include the ID if you want it serialized
       'uname': username,
       'uemail': email,
       'upass': password,
@@ -57,7 +57,6 @@ class User {
       'usecurityQuestion': usecurityQuestion,
       'uanswer': uanswer,
       'isAdmin': isAdmin,
-      'ucart': ucart,
     };
   }
 }
