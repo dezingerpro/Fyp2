@@ -7,18 +7,18 @@ class OrderSummaryPage extends StatelessWidget {
   final double totalPrice;
   final String orderStatus;
 
-  OrderSummaryPage({
-    Key? key,
+  const OrderSummaryPage({
+    super.key,
     required this.orderItems,
     required this.totalPrice,
     required this.orderStatus
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Summary'),
+        title: const Text('Order Summary'),
       ),
       body: Column(
         children: [
@@ -40,7 +40,7 @@ class OrderSummaryPage extends StatelessWidget {
             title: Text('Order Status'),
             subtitle: Text(orderStatus),
           ),
-          Text('Total Price: \$${totalPrice.toStringAsFixed(2)}', style: Theme.of(context).textTheme.headline6),
+          Text('Total Price: \$${totalPrice.toStringAsFixed(2)}', style: Theme.of(context).textTheme.titleLarge),
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
