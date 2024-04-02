@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/Admin%20CRUD/add_recipe.dart';
 import 'package:fyp2/Admin%20CRUD/delete_recipe.dart';
+import 'package:fyp2/Admin%20CRUD/order_management.dart';
 import 'package:fyp2/Recipes/all_recipe_screen.dart';
 import 'package:fyp2/Recipes/allrecipe_list_admin.dart';
 import 'package:fyp2/nav_bar.dart';
@@ -97,6 +98,12 @@ class _AdminPageState extends State<AdminPage> {
                       margin: EdgeInsets.all(8.0),
                       child: InkWell(
                         onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => orderManage(),
+                            ),
+                          );
                         },
                         child: Container(
                           padding: EdgeInsets.all(20),

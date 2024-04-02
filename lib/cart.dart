@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:provider/provider.dart';
+import './checkout_page.dart'; // Make sure to import your CheckoutPage
 
 class CartPage extends StatelessWidget {
   @override
@@ -31,19 +32,30 @@ class CartPage extends StatelessWidget {
           );
         },
       ),
-      // Optionally, display the total amount in the cart
       bottomNavigationBar: Container(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Total:',
+              'Total: \$${cartProvider.totalAmount.toStringAsFixed(2)}',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Text(
-              '\$${cartProvider.totalAmount.toStringAsFixed(2)}',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ElevatedButton(
+              onPressed: cartProvider.itemCount > 0
+                  ? () {
+                // Navigate to the CheckoutPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CheckoutPage()),
+                );
+              }
+                  : null, // Disable the button if the cart is empty
+              child: Text('Checkout'),
+              style: ElevatedButton.styleFrom(
+                onPrimary: Colors.white,
+                primary: cartProvider.itemCount > 0 ? Theme.of(context).primaryColor : Colors.grey,
+              ),
             ),
           ],
         ),

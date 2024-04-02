@@ -69,7 +69,7 @@ class CartProvider with ChangeNotifier {
   }
 
   Future<void> saveCartToDatabase(String userId) async {
-    final url = Uri.parse('http://192.168.18.108:2000/api/saveUserCart');
+    final url = Uri.parse('http://18.142.186.38:2000/api/saveUserCart');
     try {
       final response = await http.post(
         url,
@@ -90,6 +90,24 @@ class CartProvider with ChangeNotifier {
     } catch (error) {
       print("Error saving cart: $error");
     }
+  }
+
+  // Assuming a fixed delivery charge for demonstration. Adjust as needed.
+  double get deliveryCharge => 10.00;
+
+  // Mockup calculation for discount amount
+  double get discountAmount {
+    double total = totalAmount;
+    // Apply a 10% discount for demonstration purposes
+    if (total > 100) { // Example condition for discount
+      return total * 0.1;
+    }
+    return 0.0;
+  }
+
+  // Calculates the final price after applying discounts and adding delivery charges
+  double get finalPrice {
+    return totalAmount - discountAmount + deliveryCharge;
   }
 
 }

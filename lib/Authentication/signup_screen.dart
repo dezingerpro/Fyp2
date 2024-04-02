@@ -334,7 +334,7 @@ class _signUpScreenState extends State<signUpScreen> {
 
   void signUp(String email, String password) async {
     if (_formSignUpKey.currentState!.validate()) {
-      User user = User(username:firstNameEditingController.text,email: emailEditingController.text,password: passwordEditingController.text,usecurityQuestion: securityQuestions.text,uanswer: securityQuestionAnswerController.text,isAdmin: false);
+      User user = User(username:firstNameEditingController.text,email: emailEditingController.text,password: passwordEditingController.text,usecurityQuestion: securityQuestions.text,uanswer: securityQuestionAnswerController.text,isAdmin: false, mobileNumber: '', city: '', streetAddress: '', houseDetails: '');
       int check = await Api.addUser(user);
       if(check==205){
       showDialog(

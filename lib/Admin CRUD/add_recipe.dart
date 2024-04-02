@@ -23,6 +23,7 @@ class _AddRecipeState extends State<AddRecipe> {
   final recipeLinkController = TextEditingController();
   final recipeIngredientNameController = TextEditingController();
   final recipeIngredientQtyController = TextEditingController();
+  final recipeTypeController = TextEditingController(); // Controller for recipe type
   List<String> mainIngredients = [];
   List<String> ingredients = [];
 
@@ -95,6 +96,18 @@ class _AddRecipeState extends State<AddRecipe> {
                   },
                 ),
                 SizedBox(height: 16.0),
+                TextFormField(
+                  controller: recipeTypeController,
+                  decoration: InputDecoration(
+                    labelText: "Recipe Type", // Label for recipe type
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Recipe Type is required'; // Validation message
+                    }
+                    return null;
+                  },
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -326,6 +339,7 @@ class _AddRecipeState extends State<AddRecipe> {
       "rlink": recipeLinkController.text,
       "rimage": recipeImageController.text,
       "ringredients": ringredientsString,
+      "rtype": recipeTypeController.text,
     };
 
     Api.addRecipe(data);

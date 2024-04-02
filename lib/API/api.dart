@@ -6,13 +6,14 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Models/ingredients_model.dart';
 import '../Models/main_ingredient_model.dart';
+import '../Models/order_model.dart';
 import '../Models/user_model.dart';
 
 class Api {
   static const baseUrl = "http://192.168.18.108:2000/api/";
   static bool ?adminStatus;
 
-  //USER REGISTRATION
+  //USER REGISTRATIO
   static Future<int> addUser(User user) async {
     Map<String, dynamic> userData = user.toJson();
     userData['isAdmin'] = userData['isAdmin'].toString();
@@ -38,6 +39,56 @@ class Api {
       print("HI");
       debugPrint(e.toString());
       return 400;
+    }
+  }
+
+  // Method to fetch user by ID
+  static Future<dynamic> fetchUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    if (userId == null) {
+      return null; // Early return if no user ID is found
+    }
+
+    try {
+      final response = await http.get(Uri.parse('${baseUrl}user/$userId'));
+      if (response.statusCode == 200) {
+        return json.decode(response.body); // Return user data
+      } else {
+        print('Failed to load user with status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error occurred while fetching user: $e');
+      return null;
+    }
+  }
+
+  //UPDATE USER
+  static Future<bool> updateUserDetails(Map<String, dynamic> userData) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    if (userId == null) {
+      print("User ID not found");
+      return false;
+    }
+
+    final response = await http.put(
+      Uri.parse('${Api.baseUrl}user/$userId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(userData),
+    );
+
+    if (response.statusCode == 200) {
+      print("User updated successfully");
+      return true;
+    } else {
+      print("Failed to update user. Status code: ${response.statusCode}");
+      return false;
     }
   }
 
@@ -383,6 +434,57 @@ class Api {
       // Handle exceptions
       print('Exception occurred: $e');
       return [];
+    }
+  }
+
+  //place orders
+  static Future<bool> placeOrder(String userId, List<Map<String, dynamic>> items, {String? voucher, String? name, String? phoneNumber, String? address}) async {
+    final url = Uri.parse('${baseUrl}orders');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'userId': userId,
+        'items': items,
+      }),
+    );
+
+    return response.statusCode == 201; // Or another appropriate success code your API uses
+  }
+
+  //fetch orders
+  static Future<List<Order>> fetchOrders() async {
+    final url = Uri.parse('${baseUrl}get_orders'); // Adjust endpoint as needed
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> ordersJson = json.decode(response.body);
+      return ordersJson.map((json) => Order.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load orders');
+    }
+  }
+
+  //update orders
+  static Future<bool> updateOrderStatus(String orderId, String status) async {
+    final response = await http.put(
+      Uri.parse('${baseUrl}update_orders/$orderId/status'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'status': status}),
+    );
+    return response.statusCode == 200;
+  }
+
+  //search by user id orders
+  static Future<List<Order>> fetchUserOrders(String userId) async {
+    final response = await http.get(Uri.parse('${baseUrl}userOrders/$userId'));
+    if (response.statusCode == 200) {
+      List<dynamic> ordersJson = json.decode(response.body);
+      return ordersJson.map((json) => Order.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load orders: ${response.statusCode}');
     }
   }
 
