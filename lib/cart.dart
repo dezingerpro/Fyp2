@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import './checkout_page.dart'; // Make sure to import your CheckoutPage
 
 class CartPage extends StatelessWidget {
+  const CartPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
@@ -47,15 +49,14 @@ class CartPage extends StatelessWidget {
                 // Navigate to the CheckoutPage
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CheckoutPage()),
+                  MaterialPageRoute(builder: (context) => const CheckoutPage()),
                 );
               }
-                  : null, // Disable the button if the cart is empty
-              child: const Text('Checkout'),
+                  : null,
               style: ElevatedButton.styleFrom(
-                onPrimary: Colors.white,
-                primary: cartProvider.itemCount > 0 ? Theme.of(context).primaryColor : Colors.grey,
-              ),
+                foregroundColor: Colors.white, backgroundColor: cartProvider.itemCount > 0 ? Theme.of(context).primaryColor : Colors.grey,
+              ), // Disable the button if the cart is empty
+              child: const Text('Checkout'),
             ),
           ],
         ),
