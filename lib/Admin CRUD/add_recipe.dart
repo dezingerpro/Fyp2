@@ -54,9 +54,9 @@ class _AddRecipeState extends State<AddRecipe> {
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.purple,
-        title: Text("Add Recipe"),
+        title: const Text("Add Recipe"),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -64,7 +64,7 @@ class _AddRecipeState extends State<AddRecipe> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -72,7 +72,7 @@ class _AddRecipeState extends State<AddRecipe> {
               children: [
                 TextFormField(
                   controller: recipeNameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Recipe Name",
                   ),
                   validator: (value) {
@@ -82,10 +82,10 @@ class _AddRecipeState extends State<AddRecipe> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 TextFormField(
                   controller: recipeRatingController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Recipe Rating",
                   ),
                   validator: (value) {
@@ -95,10 +95,10 @@ class _AddRecipeState extends State<AddRecipe> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 TextFormField(
                   controller: recipeTypeController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Recipe Type", // Label for recipe type
                   ),
                   validator: (value) {
@@ -111,7 +111,7 @@ class _AddRecipeState extends State<AddRecipe> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Main Ingredient"),
+                    const Text("Main Ingredient"),
                     SizedBox(
                       width: 250,
                       child: DropdownSearch(
@@ -119,7 +119,7 @@ class _AddRecipeState extends State<AddRecipe> {
                         dropdownBuilder: (context, selectedItem) {
                           return Text(
                             selectedItem ?? "Select Ingredient",
-                            style: TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 16),
                           );
                         },
                         compareFn: (item1, item2) {
@@ -161,10 +161,10 @@ class _AddRecipeState extends State<AddRecipe> {
                     ),
                   ],
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 TextFormField(
                   controller: recipeImageController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Recipe Image Link",
                   ),
                   validator: (value) {
@@ -174,10 +174,10 @@ class _AddRecipeState extends State<AddRecipe> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 TextFormField(
                   controller: recipeLinkController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Recipe Link",
                   ),
                   validator: (value) {
@@ -223,7 +223,7 @@ class _AddRecipeState extends State<AddRecipe> {
                         dropdownBuilder: (context, selectedItem) {
                           return Text(
                             selectedItem ?? "Select Ingredient",
-                            style: TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 16),
                           );
                         },
                         dropdownDecoratorProps: DropDownDecoratorProps(
@@ -260,27 +260,27 @@ class _AddRecipeState extends State<AddRecipe> {
                 ),
                 TextFormField(
                   controller: recipeIngredientQtyController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Ingredient Qty",
                   ),
                 ),
 
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () {
                     addIngredient();
                   },
-                  child: Text("Add Ingredient"),
+                  child: const Text("Add Ingredient"),
                 ),
 
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       addOneRecipe();
                     }
                   },
-                  child: Text("Submit"),
+                  child: const Text("Submit"),
                 ),
               ],
             ),
@@ -313,14 +313,14 @@ class _AddRecipeState extends State<AddRecipe> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Minimum 3 Ingredients Required"),
-            content: Text("Please add at least 3 ingredients to submit."),
+            title: const Text("Minimum 3 Ingredients Required"),
+            content: const Text("Please add at least 3 ingredients to submit."),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
             ],
           );

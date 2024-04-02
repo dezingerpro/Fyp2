@@ -36,19 +36,19 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               height: currentQuantity > 0 ? 250 : 200, // Adjust height if item is already in the cart
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text("Adjust Quantity",
+                  const Text("Adjust Quantity",
                       style:
                       TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.remove),
+                        icon: const Icon(Icons.remove),
                         onPressed: () {
                           if (quantity > 0) {
                             setState(() {
@@ -57,9 +57,9 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                           }
                         },
                       ),
-                      Text(quantity.toString(), style: TextStyle(fontSize: 18)),
+                      Text(quantity.toString(), style: const TextStyle(fontSize: 18)),
                       IconButton(
-                        icon: Icon(Icons.add),
+                        icon: const Icon(Icons.add),
                         onPressed: () {
                           setState(() {
                             quantity++;
@@ -69,7 +69,7 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                     ],
                   ),
                   ElevatedButton(
-                    child: Text('Confirm'),
+                    child: const Text('Confirm'),
                     onPressed: () {
                       if (quantity == 0) {
                         cartProvider.removeItem(item.id);
@@ -96,34 +96,34 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purple,
-        title: Text('Shop Grocery'),
+        title: const Text('Shop Grocery'),
         actions: [
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: InkWell(
               onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => CartPage())),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Icon(Icons.shopping_bag_outlined, color: Colors.black),
+                  const Icon(Icons.shopping_bag_outlined, color: Colors.black),
                   Positioned(
                     right: 0,
                     top: 0,
                     child: Consumer<CartProvider>(
                       builder: (context, cart, child) {
                         return Container(
-                          padding: EdgeInsets.all(1),
+                          padding: const EdgeInsets.all(1),
                           decoration: BoxDecoration(
                             color: Colors.red,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          constraints: BoxConstraints(
+                          constraints: const BoxConstraints(
                             minWidth: 12,
                             minHeight: 12,
                           ),
                           child: Text(
                             '${cart.totalItemCount}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 8,
                             ),
@@ -146,7 +146,7 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
           int itemQuantity = cartProvider.getItemQuantity(item.id);
 
           return ListTile(
-            leading: Image.network(item.image, width: 50, height: 50, errorBuilder: (context, error, stackTrace) => Icon(Icons.error)),
+            leading: Image.network(item.image, width: 50, height: 50, errorBuilder: (context, error, stackTrace) => const Icon(Icons.error)),
             title: Text(item.name),
             subtitle: Text("\$${item.price.toStringAsFixed(2)}"),
             trailing: Row(
@@ -154,7 +154,7 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
               children: [
                 if (itemQuantity > 0) Text('$itemQuantity x '),
                 IconButton(
-                  icon: Icon(Icons.add_shopping_cart),
+                  icon: const Icon(Icons.add_shopping_cart),
                   onPressed: () => _showQuantityDialog(context, item, cartProvider),
                 ),
               ],

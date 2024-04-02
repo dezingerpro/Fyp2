@@ -21,11 +21,11 @@ class _Splash_ScreenState extends State<Splash_Screen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
 
     // After 3 seconds, trigger the image transition
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         isChefImageVisible = false;
         _controller.forward(); // Start the animation
@@ -37,7 +37,7 @@ class _Splash_ScreenState extends State<Splash_Screen>
           final prefs = await SharedPreferences.getInstance();
           if(prefs.getBool('isLoggedIn')==true){
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (BuildContext context) => MyHomePage()),
+              MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()),
             );
           }
           else{
@@ -58,7 +58,7 @@ class _Splash_ScreenState extends State<Splash_Screen>
       Center(
         child: Container(
 
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/home.png',),
                 fit: BoxFit.cover,
@@ -84,12 +84,12 @@ class _Splash_ScreenState extends State<Splash_Screen>
               Column(
                 children: [
                   AnimatedSwitcher(
-                    duration: Duration(seconds: 1),
+                    duration: const Duration(seconds: 1),
                     child: isChefImageVisible
                         ? SlideTransition(
                       position: Tween<Offset>(
-                        begin: Offset(0.0, 0.0),
-                        end: Offset(-0.08, 0.0),
+                        begin: const Offset(0.0, 0.0),
+                        end: const Offset(-0.08, 0.0),
                       ).animate(CurvedAnimation(
                         curve: Curves.easeOut,
                         parent: _controller,
@@ -98,13 +98,13 @@ class _Splash_ScreenState extends State<Splash_Screen>
                         'assets/chef.png',
                         height: 300,
                         width: 300,
-                        key: Key('1'),
+                        key: const Key('1'),
                       ),
                     )
                         : SlideTransition(
                       position: Tween<Offset>(
-                        begin: Offset(-1.0, -0.1),
-                        end: Offset(-0.08, -0.1),
+                        begin: const Offset(-1.0, -0.1),
+                        end: const Offset(-0.08, -0.1),
                       ).animate(CurvedAnimation(
                         curve: Curves.easeOut,
                         parent: _controller,
@@ -113,7 +113,7 @@ class _Splash_ScreenState extends State<Splash_Screen>
                         'assets/bike.png',
                         height: 300,
                         width: 300,
-                        key: Key('2'),
+                        key: const Key('2'),
                       ),
                     ),
                   ),

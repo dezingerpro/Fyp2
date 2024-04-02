@@ -3,7 +3,7 @@ import 'package:fyp2/Authentication/signin_screen.dart';
 import '../API/api.dart';
 
 class forgotPassword extends StatefulWidget {
-  const forgotPassword({Key? key}) : super(key: key);
+  const forgotPassword({super.key});
 
   @override
   State<forgotPassword> createState() => _forgotPasswordState();
@@ -42,7 +42,7 @@ class _forgotPasswordState extends State<forgotPassword> {
               visible: true,
               child: Column(
                 children: [
-                  Text("Enter Email"),
+                  const Text("Enter Email"),
                   TextFormField(
                     key: _forgotPassword,
                     controller: emailController,
@@ -57,7 +57,7 @@ class _forgotPasswordState extends State<forgotPassword> {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             //INPUT SECURITY QUESTION
             Visibility(
               visible: _visibleQuestion,
@@ -65,7 +65,7 @@ class _forgotPasswordState extends State<forgotPassword> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(securityQuestion),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextFormField(
                     key: _securityQuestion,
                     controller: questionController,
@@ -80,17 +80,17 @@ class _forgotPasswordState extends State<forgotPassword> {
               ),
             ),
             Container(),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Visibility(
               visible: _newPass,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextFormField(
                     controller: newPasswordController,
                     obscureText: true,
-                    decoration: InputDecoration(labelText: 'New Password'),
+                    decoration: const InputDecoration(labelText: 'New Password'),
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "New Password is required";
@@ -115,7 +115,7 @@ class _forgotPasswordState extends State<forgotPassword> {
                         forgotPasswordCheck(emailController.text);
                       }
                     },
-                    child: Text("Submit"),
+                    child: const Text("Submit"),
                   ),
                 ),
                 Visibility(
@@ -124,7 +124,7 @@ class _forgotPasswordState extends State<forgotPassword> {
                     onPressed: () {
                       checkAnswer();
                     },
-                    child: Text("Check Answer"),
+                    child: const Text("Check Answer"),
                   ),
                 ),
               ],
@@ -152,14 +152,14 @@ class _forgotPasswordState extends State<forgotPassword> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Incorrect Answer"),
-            content: Text("The answer is incorrect. Please try again."),
+            title: const Text("Incorrect Answer"),
+            content: const Text("The answer is incorrect. Please try again."),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
             ],
           );
@@ -185,14 +185,14 @@ class _forgotPasswordState extends State<forgotPassword> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Email not Found"),
-            content: Text("Invalid email. Please try again."),
+            title: const Text("Email not Found"),
+            content: const Text("Invalid email. Please try again."),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
             ],
           );
@@ -211,8 +211,8 @@ class _forgotPasswordState extends State<forgotPassword> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Password Changed"),
-          content: Text("Password successfully updated"),
+          title: const Text("Password Changed"),
+          content: const Text("Password successfully updated"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -223,7 +223,7 @@ class _forgotPasswordState extends State<forgotPassword> {
                   ),
                 );
               },
-              child: Text("OK"),
+              child: const Text("OK"),
             ),
           ],
         );

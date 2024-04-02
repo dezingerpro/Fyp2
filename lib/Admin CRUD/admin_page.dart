@@ -24,7 +24,7 @@ class _AdminPageState extends State<AdminPage> {
           width: 10,
         )
       ]),
-      drawer: navBar(),
+      drawer: const navBar(),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -41,14 +41,14 @@ class _AdminPageState extends State<AdminPage> {
                       "View",
                       "View all recipes",
                       Icons.visibility,
-                      FoodRecipesScreen(),
+                      const FoodRecipesScreen(),
                     ),
                     CrudCard(
                       context,
                       "Add",
                       "Add a new recipe",
                       Icons.add,
-                      AddRecipe(),
+                      const AddRecipe(),
                     ),
                   ],
                 ),
@@ -75,46 +75,46 @@ class _AdminPageState extends State<AdminPage> {
                   children: [
                     Card(
                       elevation: 5.0,
-                      margin: EdgeInsets.all(8.0),
+                      margin: const EdgeInsets.all(8.0),
                       child: InkWell(
                         onTap: (){
                         },
                         child: Container(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           width: MediaQuery.of(context).size.width*0.92,
                           child: ListTile(
                             leading: Icon(Icons.inventory_outlined,
                                 color: Theme.of(context).primaryColor,
                                 size: 40
                             ),
-                            title: Text("Inventory Management"),
-                            subtitle: Text('Manage the inventory of groceries'),
+                            title: const Text("Inventory Management"),
+                            subtitle: const Text('Manage the inventory of groceries'),
                           ),
                         ),
                       ),
                     ),
                     Card(
                       elevation: 5,
-                      margin: EdgeInsets.all(8.0),
+                      margin: const EdgeInsets.all(8.0),
                       child: InkWell(
                         onTap: (){
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => orderManage(),
+                              builder: (context) => const orderManage(),
                             ),
                           );
                         },
                         child: Container(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           width: MediaQuery.of(context).size.width*0.92,
                           child: ListTile(
                             leading: Icon(Icons.production_quantity_limits,
                                 color: Theme.of(context).primaryColor,
                                 size: 40
                             ),
-                            title: Text("Order Management"),
-                            subtitle: Text('Manange your orders'),
+                            title: const Text("Order Management"),
+                            subtitle: const Text('Manange your orders'),
                           ),
                         ),
                       ),
@@ -151,7 +151,7 @@ class _AdminPageState extends State<AdminPage> {
         child: Container(
           width: MediaQuery.of(context).size.width*0.45, // Set your desired width
           height: MediaQuery.of(context).size.height*0.21, // Set your desired height
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -161,19 +161,19 @@ class _AdminPageState extends State<AdminPage> {
                 size: 40,
                 color: Theme.of(context).primaryColor,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
                 ),

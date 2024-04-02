@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:fyp2/Admin%20CRUD/admin_page.dart';
 import 'package:fyp2/colors.dart';
 import 'package:fyp2/Authentication/signin_screen.dart';
 import 'package:fyp2/my_orders.dart';
-import 'package:fyp2/provider/cart_provider.dart';
 import 'package:fyp2/user_profile.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'API/api.dart';
 
 class navBar extends StatefulWidget {
-  const navBar({Key? key}) : super(key: key);
+  const navBar({super.key});
 
   @override
   State<navBar> createState() => _navBarState();
@@ -30,12 +27,8 @@ class _navBarState extends State<navBar> {
       final prefs = await SharedPreferences.getInstance();
       print("HELLO5555");
       await prefs.setBool('isAdmin', false);
-      print("HELLO5555");
       await prefs.setBool('isLoggedIn', false);
-      print("HELLO5555");
-      String userId = prefs.getString('userId') as String;
       await prefs.setString('userId', '');
-      print("HELLO5555");
       //await context.read<CartProvider>().saveCartToDatabase(userId);
       print("HELLO5555");// Navigate to the login screen (replace SignInScreen with your actual login screen)
       Navigator.of(context).push(
@@ -70,7 +63,7 @@ class _navBarState extends State<navBar> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MyOrdersPage(),
+                      builder: (context) => const MyOrdersPage(),
                     ));            },
             ),
             ListTile(

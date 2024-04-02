@@ -112,14 +112,14 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Alert'),
+        title: const Text('Alert'),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -139,13 +139,13 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         backgroundColor: Colors.purple,
-        title: Text('Update Recipe'),
+        title: const Text('Update Recipe'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -156,15 +156,15 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
               // Recipe Name
               TextFormField(
                 controller: recipeNameController,
-                decoration: InputDecoration(labelText: 'Recipe Name'),
+                decoration: const InputDecoration(labelText: 'Recipe Name'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Recipe Main Ingredient
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Main Ingredient"),
+                  const Text("Main Ingredient"),
                   SizedBox(
                     width: 250,
                     child: DropdownSearch(
@@ -174,7 +174,7 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
                       dropdownBuilder: (context, selectedItem) {
                         return Text(
                           selectedItem ?? recipeMainIngController.text,
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         );
                       },
                       compareFn: (item1, item2) {
@@ -200,33 +200,33 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Recipe Rating
               TextFormField(
                 controller: recipeRatingController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Recipe Rating'),
+                decoration: const InputDecoration(labelText: 'Recipe Rating'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Recipe Image Link
               TextFormField(
                 controller: recipeImageController,
-                decoration: InputDecoration(labelText: 'Recipe Image Link'),
+                decoration: const InputDecoration(labelText: 'Recipe Image Link'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
 
               // Recipe Link
               TextFormField(
                 controller: recipeLinkController,
-                decoration: InputDecoration(labelText: 'Recipe Link'),
+                decoration: const InputDecoration(labelText: 'Recipe Link'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Ingredients section
-              Text(
+              const Text(
                 'Ingredients:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -247,7 +247,7 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
                               dropdownBuilder: (context, selectedItem) {
                                 return Text(
                                   selectedItem ?? ingredientNameControllers[index].text,
-                                  style: TextStyle(fontSize: 16),
+                                  style: const TextStyle(fontSize: 16),
                                 );
                               },
                               compareFn: (item1, item2) {
@@ -275,11 +275,11 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
                       // ),
 
 
-                      SizedBox(width: 20),
+                      const SizedBox(width: 20),
                       Expanded(
                         child: TextFormField(
                           controller: ingredientQtyControllers[index],
-                          decoration: InputDecoration(labelText: 'Quantity'),
+                          decoration: const InputDecoration(labelText: 'Quantity'),
                         ),
                       ),
                     ],
@@ -288,19 +288,19 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
               ),
 
               // Update and Cancel buttons
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   ElevatedButton(
                     onPressed: updateRecipe,
-                    child: Text('Update'),
+                    child: const Text('Update'),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context); // Navigate back without updating
                     },
-                    child: Text('Cancel'),
+                    child: const Text('Cancel'),
                   ),
                 ],
               ),

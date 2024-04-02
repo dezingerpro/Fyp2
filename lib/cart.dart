@@ -10,10 +10,10 @@ class CartPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Cart'),
+        title: const Text('Your Cart'),
       ),
       body: cartProvider.itemCount == 0
-          ? Center(
+          ? const Center(
         child: Text('Your cart is empty'),
       )
           : ListView.builder(
@@ -22,24 +22,24 @@ class CartPage extends StatelessWidget {
           final cartItemKey = cartProvider.items.keys.elementAt(index);
           final cartItem = cartProvider.items[cartItemKey];
           return ListTile(
-            leading: Image.network(cartItem!.item.image, width: 50, height: 50, errorBuilder: (context, error, stackTrace) => Icon(Icons.error)),
+            leading: Image.network(cartItem!.item.image, width: 50, height: 50, errorBuilder: (context, error, stackTrace) => const Icon(Icons.error)),
             title: Text(cartItem.item.name),
             subtitle: Text("Quantity: ${cartItem.quantity}"),
             trailing: IconButton(
-              icon: Icon(Icons.remove_shopping_cart),
+              icon: const Icon(Icons.remove_shopping_cart),
               onPressed: () => cartProvider.removeItem(cartItemKey),
             ),
           );
         },
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'Total: \$${cartProvider.totalAmount.toStringAsFixed(2)}',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
               onPressed: cartProvider.itemCount > 0
@@ -51,7 +51,7 @@ class CartPage extends StatelessWidget {
                 );
               }
                   : null, // Disable the button if the cart is empty
-              child: Text('Checkout'),
+              child: const Text('Checkout'),
               style: ElevatedButton.styleFrom(
                 onPrimary: Colors.white,
                 primary: cartProvider.itemCount > 0 ? Theme.of(context).primaryColor : Colors.grey,

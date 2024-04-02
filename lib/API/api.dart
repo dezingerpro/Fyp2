@@ -307,7 +307,7 @@ class Api {
       return [];
     }
     // Your backend endpoint URL
-    final String apiUrl = '${baseUrl}recommended_recipes';
+    const String apiUrl = '${baseUrl}recommended_recipes';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),

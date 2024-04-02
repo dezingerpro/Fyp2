@@ -4,13 +4,15 @@ import 'package:email_validator/email_validator.dart';
 import 'API/api.dart';
 
 class UserProfilePage extends StatefulWidget {
+  const UserProfilePage({super.key});
+
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
   final _formKey = GlobalKey<FormState>();
-  Map<String, TextEditingController> _controllers = {
+  final Map<String, TextEditingController> _controllers = {
     'uname': TextEditingController(),
     'uemail': TextEditingController(),
     'upass': TextEditingController(),
@@ -59,7 +61,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           prefixIcon: Icon(icon),
         ),
         validator: validator,
@@ -72,10 +74,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Profile'),
+        title: const Text('User Profile'),
         actions: [
           IconButton(
-              icon: Icon(Icons.save),
+              icon: const Icon(Icons.save),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   // Collect form data

@@ -56,35 +56,35 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.purple,
-        title: Text('Shop Grocery'),
+        title: const Text('Shop Grocery'),
         actions: [
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: InkWell(
               onTap: () => Navigator.of(context)
                   .push(MaterialPageRoute(builder: (context) => CartPage())),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Icon(Icons.shopping_bag_outlined, color: Colors.black),
+                  const Icon(Icons.shopping_bag_outlined, color: Colors.black),
                   Positioned(
                     right: 0,
                     top: 0,
                     child: Consumer<CartProvider>(
                       builder: (context, cart, child) {
                         return Container(
-                          padding: EdgeInsets.all(1),
+                          padding: const EdgeInsets.all(1),
                           decoration: BoxDecoration(
                             color: Colors.red,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          constraints: BoxConstraints(
+                          constraints: const BoxConstraints(
                             minWidth: 12,
                             minHeight: 12,
                           ),
                           child: Text(
                             '${cart.totalItemCount}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 8,
                             ),
@@ -131,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                           filled: true,
-                          fillColor: Color(0xfff7f7f7),
+                          fillColor: const Color(0xfff7f7f7),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(50),
                             borderSide: BorderSide.none,
@@ -151,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       key: _scaffoldState,
-      drawer: navBar(),
+      drawer: const navBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -160,15 +160,15 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
+                  const Padding(
                     padding:
-                        const EdgeInsets.only(left: 20, right: 20, top: 15),
+                        EdgeInsets.only(left: 20, right: 20, top: 15),
                     //
                   ),
                   Center(
                     child: Column(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           height: 15,
                         ),
                         CarouselSlider(
@@ -191,7 +191,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             return Container(
                               width: double.infinity,
                               height: 200,
-                              margin: EdgeInsets.symmetric(
+                              margin: const EdgeInsets.symmetric(
                                   horizontal:
                                       5), // Add some margin between images
                               decoration: BoxDecoration(
@@ -202,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         0.5), // You can customize the shadow color and opacity
                                     spreadRadius: 5,
                                     blurRadius: 10,
-                                    offset: Offset(5,
+                                    offset: const Offset(5,
                                         3), // Adjust the offset for the desired shadow direction
                                   ),
                                 ],
@@ -217,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             );
                           }).toList(),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 5,
                         ),
                         AnimatedSmoothIndicator(
@@ -251,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => FoodRecipesScreen()),
+                            builder: (context) => const FoodRecipesScreen()),
                       ).then((_) {
                         fetchRecipes(); // Refresh your recipes list
                       });
@@ -264,7 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(15),
                             color: Colors.red),
-                        child: Center(
+                        child: const Center(
                           child: Text(
                             "Food Recipes",
                             style: TextStyle(color: Colors.black),
@@ -295,7 +295,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
                             "Shop Grocery",
                             style: TextStyle(color: Colors.white),
@@ -368,7 +368,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             const EdgeInsets.only(left: 8.0),
                                         child: Text(
                                           filteredRecipes[index].rname,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -386,7 +386,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           ignoreGestures: true,
                                           itemCount: 5,
                                           itemSize: 20,
-                                          itemBuilder: (context, _) => Icon(
+                                          itemBuilder: (context, _) => const Icon(
                                             Icons.star,
                                             color: Colors.amber,
                                           ),
@@ -430,7 +430,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           final groceryItem = groceries[index];
                           return Container(
                             width: 180, // Adjust as needed
-                            margin: EdgeInsets.only(
+                            margin: const EdgeInsets.only(
                                 right: 10), // Space between cards
                             child: Card(
                               elevation: 6, // Adds shadow
@@ -456,7 +456,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
                                         groceryItem.name,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.deepPurple),
@@ -468,9 +468,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 12.0),
                                       child: ElevatedButton.icon(
-                                        icon: Icon(Icons.add_shopping_cart,
+                                        icon: const Icon(Icons.add_shopping_cart,
                                             size: 18),
-                                        label: Text("Add to Cart",
+                                        label: const Text("Add to Cart",
                                             style: TextStyle(fontSize: 14)),
                                         onPressed: () async {
                                           _showAddToCartDialog(
@@ -499,7 +499,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 width: MediaQuery.of(context).size.width * 0.9,
                 height: 80,
                 alignment: Alignment.center,
-                child: Text(
+                child: const Text(
                   "REFER A FRIEND AND GET 10% OFF!",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
@@ -560,28 +560,28 @@ class _MyHomePageState extends State<MyHomePage> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Container(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               height: 200,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text("Select Quantity",
+                  const Text("Select Quantity",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.remove),
+                        icon: const Icon(Icons.remove),
                         onPressed: () => setState(() {
                           if (quantity > 0)
                             quantity--; // Allow reducing to 0 for removal
                         }),
                       ),
-                      Text(quantity.toString(), style: TextStyle(fontSize: 18)),
+                      Text(quantity.toString(), style: const TextStyle(fontSize: 18)),
                       IconButton(
-                        icon: Icon(Icons.add),
+                        icon: const Icon(Icons.add),
                         onPressed: () => setState(() {
                           quantity++;
                         }),
@@ -599,7 +599,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       }
                       Navigator.pop(context);
                     },
-                    child: Text('Update Cart'),
+                    child: const Text('Update Cart'),
                   ),
                 ],
               ),

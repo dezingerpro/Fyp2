@@ -48,28 +48,28 @@ class _DeleteRecipeState extends State<DeleteRecipe> {
           future: _deleteRecipeAndReload(index),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return AlertDialog(
+              return const AlertDialog(
                 title: Text('Deleting...'),
                 content: CircularProgressIndicator(),
               );
             } else if (snapshot.hasError) {
               return AlertDialog(
-                title: Text('Error'),
+                title: const Text('Error'),
                 content: Text('An error occurred: ${snapshot.error}'),
               );
             } else {
               return AlertDialog(
-                title: Text('Confirm Deletion'),
-                content: Text('Are you sure you want to delete this recipe?'),
+                title: const Text('Confirm Deletion'),
+                content: const Text('Are you sure you want to delete this recipe?'),
                 actions: <Widget>[
                   TextButton(
-                    child: Text('Cancel'),
+                    child: const Text('Cancel'),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                   ),
                   TextButton(
-                    child: Text('Delete'),
+                    child: const Text('Delete'),
                     onPressed: () async {
                       // Close the dialog
                       Navigator.of(context).pop();
@@ -100,18 +100,18 @@ class _DeleteRecipeState extends State<DeleteRecipe> {
         appBar: AppBar(
           backgroundColor: Colors.purple,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          title: Text('Delete Recipe'),
+          title: const Text('Delete Recipe'),
         ),
         body: ListView.builder(
           itemCount: recipes.length,
           itemBuilder: (context, index) {
             return Card(
-              margin: EdgeInsets.all(8.0),
+              margin: const EdgeInsets.all(8.0),
               child: ListTile(
                 leading: Image.network(
                   recipes[index].rimage,
@@ -123,7 +123,7 @@ class _DeleteRecipeState extends State<DeleteRecipe> {
                 subtitle: Text(
                     'Ratings: ${recipes[index].rratings.toString()}'),
                 trailing: IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: () {
                     _confirmDelete(context, index);
                   },

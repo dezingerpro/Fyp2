@@ -5,7 +5,7 @@ import 'package:fyp2/Models/recipe_model.dart';
 import 'package:fyp2/Models/ingredients_model.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  const SearchPage({super.key});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -74,7 +74,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search Recipes'),
+        title: const Text('Search Recipes'),
         elevation: 0, // Removes the shadow for a more modern look
         backgroundColor: Colors.deepPurple,
       ),
@@ -82,7 +82,7 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: searchController,
                 onChanged: (value) => filterRecipes(value, availableRecipeNames),
@@ -94,10 +94,10 @@ class _SearchPageState extends State<SearchPage> {
                     borderRadius: BorderRadius.circular(25.0),
                     borderSide: BorderSide.none,
                   ),
-                  prefixIcon: Icon(Icons.search),
+                  prefixIcon: const Icon(Icons.search),
                   suffixIcon: searchController.text.isNotEmpty
                       ? GestureDetector(
-                          child: Icon(Icons.close),
+                          child: const Icon(Icons.close),
                           onTap: () {
                             searchController.clear();
                             filterRecipes('',availableRecipeNames);
@@ -113,7 +113,7 @@ class _SearchPageState extends State<SearchPage> {
               dropdownBuilder: (context, selectedItem) {
                 return Text(
                   selectedItem ?? "Select Ingredient",
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 );
               },
               dropdownDecoratorProps: DropDownDecoratorProps(
@@ -151,14 +151,14 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: Colors.deepPurple, // Text color
                 ),
-                icon: Icon(Icons.add),
-                label: Text('Add Ingredient'),
+                icon: const Icon(Icons.add),
+                label: const Text('Add Ingredient'),
                   onPressed: () async {
                     if (currentIngredient.isNotEmpty &&
                         !selectedIngredients.contains(currentIngredient)) {
@@ -183,7 +183,7 @@ class _SearchPageState extends State<SearchPage> {
               children: selectedIngredients.map((ingredient) {
                 return Chip(
                   label: Text(ingredient),
-                  deleteIcon: Icon(Icons.close),
+                  deleteIcon: const Icon(Icons.close),
                     onDeleted: () {
                       setState(() {
                         selectedIngredients.remove(ingredient);
@@ -204,19 +204,19 @@ class _SearchPageState extends State<SearchPage> {
               shrinkWrap:
                   true, // Use it to make ListView scrollable inside Column
               physics:
-                  NeverScrollableScrollPhysics(), // Disables ListView's own scrolling
+                  const NeverScrollableScrollPhysics(), // Disables ListView's own scrolling
               itemCount: filteredRecipes.length,
               itemBuilder: (context, index) {
                 return Card(
-                  margin: EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(10),
                   child: ListTile(
                     leading: CircleAvatar(
                       backgroundImage:
                           NetworkImage(filteredRecipes[index].rimage),
                     ),
                     title: Text(filteredRecipes[index].rname,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('Click for more details'),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: const Text('Click for more details'),
                     onTap: () {
                       print(filteredRecipes[0].rname);
                       // Implement navigation to recipe details

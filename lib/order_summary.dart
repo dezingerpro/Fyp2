@@ -37,21 +37,21 @@ class OrderSummaryPage extends StatelessWidget {
 
           ),
           ListTile(
-            title: Text('Order Status'),
+            title: const Text('Order Status'),
             subtitle: Text(orderStatus),
           ),
           Text('Total Price: \$${totalPrice.toStringAsFixed(2)}', style: Theme.of(context).textTheme.titleLarge),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyHomePage(),
+                  builder: (context) => const MyHomePage(),
                 ),(Route<dynamic> route) => false,
               );
             },
-            child: Text('Continue Shopping'),
+            child: const Text('Continue Shopping'),
           )
         ],
       ),

@@ -7,13 +7,15 @@ import 'API/api.dart';
 import 'order_summary.dart';
 
 class CheckoutPage extends StatelessWidget {
+  const CheckoutPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Checkout'),
+        title: const Text('Checkout'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -21,7 +23,7 @@ class CheckoutPage extends StatelessWidget {
             // List of products
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: cartProvider.items.length,
               itemBuilder: (context, index) {
                 final cartItemKey = cartProvider.items.keys.elementAt(index);
@@ -31,7 +33,7 @@ class CheckoutPage extends StatelessWidget {
                     cartItem!.item.image,
                     width: 50,
                     height: 50,
-                    errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                   ),
                   title: Text(cartItem.item.name),
                   subtitle: Text('\$${cartItem.item.price} x ${cartItem.quantity}'),
@@ -39,34 +41,34 @@ class CheckoutPage extends StatelessWidget {
                 );
               },
             ),
-            Divider(),
+            const Divider(),
             // Summary
             ListTile(
-              title: Text('Total'),
+              title: const Text('Total'),
               trailing: Text('\$${cartProvider.totalAmount.toStringAsFixed(2)}'),
             ),
             ListTile(
-              title: Text('Discount'),
+              title: const Text('Discount'),
               // Assuming you have a method to calculate discount
               trailing: Text('-\$${cartProvider.discountAmount.toStringAsFixed(2)}'),
             ),
             ListTile(
-              title: Text('Delivery Charges'),
+              title: const Text('Delivery Charges'),
               // Assuming a flat rate or calculated based on items/location
               trailing: Text('\$${cartProvider.deliveryCharge.toStringAsFixed(2)}'),
             ),
             ListTile(
-              title: Text('Final Price'),
+              title: const Text('Final Price'),
               trailing: Text('\$${cartProvider.finalPrice.toStringAsFixed(2)}'),
             ),
-            Divider(),
+            const Divider(),
             // Payment Method
-            ListTile(
+            const ListTile(
               title: Text('Mode of Payment'),
               subtitle: Text('Cash On Delivery (COD)'),
             ),
             // Voucher/Coupon
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: TextField(
                 decoration: InputDecoration(
@@ -76,7 +78,7 @@ class CheckoutPage extends StatelessWidget {
               ),
             ),
             // Customer Details
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: TextField(
                 decoration: InputDecoration(
@@ -85,7 +87,7 @@ class CheckoutPage extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: TextField(
                 decoration: InputDecoration(
@@ -95,7 +97,7 @@ class CheckoutPage extends StatelessWidget {
                 keyboardType: TextInputType.phone,
               ),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: TextField(
                 decoration: InputDecoration(
@@ -105,13 +107,13 @@ class CheckoutPage extends StatelessWidget {
                 maxLines: 3,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _confirmOrder(context),
-              child: Text('Confirm Order'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50), // double.infinity is the width and 50 is the height
+                minimumSize: const Size(double.infinity, 50), // double.infinity is the width and 50 is the height
               ),
+              child: const Text('Confirm Order'),
             ),
           ],
         ),
@@ -152,7 +154,7 @@ class CheckoutPage extends StatelessWidget {
       ));
     } else {
       // Handle failure
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to place order')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to place order')));
     }
   }
 

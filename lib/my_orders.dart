@@ -4,6 +4,8 @@ import '../API/api.dart'; // Adjust import path to your Api class
 import '../Models/order_model.dart'; // Adjust import path to your Order model
 
 class MyOrdersPage extends StatefulWidget {
+  const MyOrdersPage({super.key});
+
   @override
   _MyOrdersPageState createState() => _MyOrdersPageState();
 }
@@ -32,33 +34,33 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
     if (isLoading) {
       // Show a loading spinner while waiting for initialization
       return Scaffold(
-        appBar: AppBar(title: Text('My Orders')),
-        body: Center(child: CircularProgressIndicator()),
+        appBar: AppBar(title: const Text('My Orders')),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
     // Once initialized, futureOrders is non-null and can safely be used
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Orders'),
+        title: const Text('My Orders'),
       ),
       body: FutureBuilder<List<Order>>(
         future: futureOrders,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
             return Center(child: Text("An error occurred: ${snapshot.error}"));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No orders found"));
+            return const Center(child: Text("No orders found"));
           }
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               Order order = snapshot.data![index];
               return Card(
-                margin: EdgeInsets.all(8.0),
+                margin: const EdgeInsets.all(8.0),
                 child: ExpansionTile(
                   title: Text('Order ID: ${order.id}'),
                   subtitle: Text('Status: ${order.orderStatus}'),
