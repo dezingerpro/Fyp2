@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 import '../API/api.dart';
 import '../Models/recipe_model.dart';
-import '../cart.dart';
+import '../Cart+Checkout/cart.dart';
 import '../provider/cart_provider.dart';
-import '../search_page.dart';
+import '../Main Page/search_page.dart';
 import 'single_recipe_screen.dart';
-import '../nav_bar.dart';
+import '../Navigation/nav_bar.dart';
 
 class FoodRecipesScreen extends StatefulWidget {
   const FoodRecipesScreen({Key? key}) : super(key: key);

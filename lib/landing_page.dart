@@ -1,11 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fyp2/grocery_screen.dart';
 import 'package:fyp2/Recipes/all_recipe_screen.dart';
-import 'package:fyp2/nav_bar.dart';
+import 'package:fyp2/Navigation/nav_bar.dart';
 import 'package:fyp2/provider/cart_provider.dart';
-import 'package:fyp2/search_page.dart';
+import 'package:fyp2/Main%20Page/search_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -13,7 +12,6 @@ import 'API/api.dart';
 import 'Models/ingredients_model.dart';
 import 'Models/recipe_model.dart';
 import 'Recipes/single_recipe_screen.dart';
-import 'cart.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -48,108 +46,75 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     fetchRecipes();
     fetchGroceries();
+  }
 
+  void _navigateToDetail(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => GroceryItemsPage()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple,
-        title: const Text('Shop Grocery'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => CartPage())),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Icon(Icons.shopping_bag_outlined, color: Colors.black),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Consumer<CartProvider>(
-                      builder: (context, cart, child) {
-                        return Container(
-                          padding: const EdgeInsets.all(1),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 12,
-                            minHeight: 12,
-                          ),
-                          child: Text(
-                            '${cart.totalItemCount}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 8,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        backgroundColor: Theme.of(context).primaryColor, // Consider using a gradient or a vibrant solid color
+        title: Text('Shop Grocery', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      // Navigate to the SearchPage when the search bar is tapped
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const SearchPage()),
-                      );
-                    },
-                    child: AbsorbPointer(
-                      // Prevents the TextField from being selected
-                      child: TextField(
-                        controller: searchController,
-                        focusNode: focusNode,
-                        decoration: InputDecoration(
-                          contentPadding:
-                              const EdgeInsets.only(top: 20.0, left: 20),
-                          hintText: "Search for dishes",
-                          prefixIcon: const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Icon(
-                              Icons.search,
-                              color: Color(0xff7b7b7b),
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: const Color(0xfff7f7f7),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        style: const TextStyle(
+          child: GestureDetector(
+            onTap: () {
+              // Trigger search or navigation
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchPage()));
+            },
+            child: Container(
+              width: double.infinity,
+              height: 60,
+              padding: const EdgeInsets.fromLTRB(15, 5, 15, 10), // Fine-tuned padding
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.white.withOpacity(0.8), Colors.white.withOpacity(0.6)], // Subtle gradient effect
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.white24), // Soft border to enhance the floating effect
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Icon(Icons.search, color: Color(0xff7b7b7b)),
+                    ),
+                    Expanded(
+                      child: Text(
+                        "Search for dishes",
+                        style: TextStyle(
                           color: Color(0xff707070),
-                          fontSize: 12,
+                          fontSize: 16,
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
+        elevation: 4, // Adjust elevation for depth
+        shape: RoundedRectangleBorder( // Rounded corners at the bottom of the AppBar
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+        ),
       ),
+
       key: _scaffoldState,
       drawer: const navBar(),
       body: SingleChildScrollView(
@@ -161,8 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding:
-                        EdgeInsets.only(left: 20, right: 20, top: 15),
+                    padding: EdgeInsets.only(left: 20, right: 20, top: 15),
                     //
                   ),
                   Center(
@@ -244,269 +208,118 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      // Handle Food Recipes tile click action
-                      // For example, navigate to FoodRecipesScreen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const FoodRecipesScreen()),
-                      ).then((_) {
-                        fetchRecipes(); // Refresh your recipes list
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.43,
-                        height: MediaQuery.of(context).size.width * 0.5,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.red),
-                        child: const Center(
-                          child: Text(
-                            "Food Recipes",
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: CategoryCard(
+                      title: "Food Recipes",
+                      imagePath: 'assets/food-recipe.png',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const FoodRecipesScreen()),
+                        ).then((_) {
+                          fetchRecipes(); // Refresh your recipes list
+                        });
+                      },
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      // Handle Shop Grocery tile click action
-                      // For example, navigate to ShopGroceryScreen
-                      // Replace ShopGroceryScreen with your intended screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => GroceryItemsPage()),
-                      ).then((_) {
-                        fetchRecipes(); // Refresh your recipes list
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 20.0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.43,
-                        height: MediaQuery.of(context).size.width * 0.5,
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            "Shop Grocery",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: CategoryCard(
+                      title: "Shop Grocery",
+                      // startColor: Colors.green,
+                      imagePath: 'assets/grocery-image.png',
+                      // endColor: Colors.teal,
+                      onTap: () {
+                        _navigateToDetail(context);
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => GroceryItemsPage()),
+                        // ).then((_) {
+                        //   fetchRecipes(); // Refresh your recipes list
+                        // });
+                      },
                     ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.only(left: 20.0,right: 20),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.only(left: 5.0),
+                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                     child: Text(
                       "Recommended Recipes",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple, // Adjust the color according to your theme
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 15,
                   ),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: List.generate(
                         filteredRecipes.length,
-                        (index) => Card(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          elevation: 4,
-                          child: GestureDetector(
-                            onTap: () {
-                              MaterialPageRoute(
-                                builder: (context) => RecipeIngredients(
-                                  recipe: filteredRecipes[index],
-                                ),
-                              );
-                            },
-                            child: SizedBox(
-                              height: 150,
-                              width: 210,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 100,
-                                    width: 210,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      child: Image.network(
-                                        recipes[index].rimage,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                        child: Text(
-                                          filteredRecipes[index].rname,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10.0),
-                                        child: RatingBar.builder(
-                                          initialRating: filteredRecipes[index]
-                                              .rratings
-                                              .toDouble(),
-                                          direction: Axis.horizontal,
-                                          allowHalfRating: true,
-                                          ignoreGestures: true,
-                                          itemCount: 5,
-                                          itemSize: 20,
-                                          itemBuilder: (context, _) => const Icon(
-                                            Icons.star,
-                                            color: Colors.amber,
-                                          ),
-                                          onRatingUpdate: (double value) {},
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                            (index) => RecipeCard(
+                          recipeName: filteredRecipes[index].rname,
+                          imageUrl: filteredRecipes[index].rimage,
+                          rating: filteredRecipes[index].rratings.toDouble(),
                         ),
                       ),
                     ),
-                  )
+                  ),
+                ],
+              )
+              ,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Shop Grocery",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  SizedBox(
+                    height: 240, // Adjust based on content
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: groceries.length,
+                      itemBuilder: (context, index) {
+                        final groceryItem = groceries[index];
+                        return GroceryItemCard(
+                          name: groceryItem.name,
+                          imageUrl: groceryItem.image,
+                          onAddToCart: () {
+                            _showAddToCartDialog(
+                                context, groceryItem);
+                          }, price: groceryItem.price.toString(),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(left: 20.0, bottom: 20, right: 20.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 5.0, top: 20.0),
-                      child: Text(
-                        "Shop Grocery",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Container(
-                      height: 200, // Adjust as needed
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: groceries.length,
-                        itemBuilder: (context, index) {
-                          final groceryItem = groceries[index];
-                          return Container(
-                            width: 180, // Adjust as needed
-                            margin: const EdgeInsets.only(
-                                right: 10), // Space between cards
-                            child: Card(
-                              elevation: 6, // Adds shadow
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                    20), // Clip image with card border radius
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize
-                                      .min, // Avoids taking unnecessary space
-                                  children: [
-                                    Image.network(
-                                      groceryItem.image,
-                                      width: double
-                                          .infinity, // Ensures image takes the full card width
-                                      height: 100,
-                                      fit: BoxFit
-                                          .cover, // Covers the card area with the image
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        groceryItem.name,
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.deepPurple),
-                                        overflow: TextOverflow
-                                            .ellipsis, // Prevents text from overflowing
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0),
-                                      child: ElevatedButton.icon(
-                                        icon: const Icon(Icons.add_shopping_cart,
-                                            size: 18),
-                                        label: const Text("Add to Cart",
-                                            style: TextStyle(fontSize: 14)),
-                                        onPressed: () async {
-                                          _showAddToCartDialog(
-                                              context, groceryItem);
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.white,
-                                          backgroundColor: Colors
-                                              .deepPurple, // Button text color
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ]),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.9,
-                height: 80,
-                alignment: Alignment.center,
-                child: const Text(
-                  "REFER A FRIEND AND GET 10% OFF!",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                decoration: BoxDecoration(
-                    border: Border.all(),
-                    borderRadius: BorderRadius.circular(20)),
-              ),
+            ReferAFriendCTA(
+              onReferPressed: () {
+                // Implement what happens when the button is pressed
+                // For example, showing a share dialog
+                print('Refer a friend pressed');
+              },
             ),
           ],
         ),
@@ -526,7 +339,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchRecipes() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isGuest = prefs.getBool('isGuest') ?? true; // Default to true if not set
+    bool isGuest =
+        prefs.getBool('isGuest') ?? true; // Default to true if not set
 
     var data = await Api.getRecipeAll();
 
@@ -534,15 +348,21 @@ class _MyHomePageState extends State<MyHomePage> {
       var recommendedNames = await Api.fetchRecommendedRecipeNames();
       setState(() {
         // Map JSON data to Recipe models
-        recipes = data.map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+        recipes = data
+            .map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson))
+            .toList();
         // Filter recipes to only include recommended ones
-        filteredRecipes = recipes.where((recipe) => recommendedNames.contains(recipe.rname)).toList();
+        filteredRecipes = recipes
+            .where((recipe) => recommendedNames.contains(recipe.rname))
+            .toList();
       });
     } else {
       // For guest users, display any 10 recipes
       setState(() {
         // Map JSON data to Recipe models
-        recipes = data.map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson)).toList();
+        recipes = data
+            .map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson))
+            .toList();
         // Randomly select 10 recipes to display
         filteredRecipes = (recipes..shuffle()).take(10).toList();
       });
@@ -575,11 +395,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       IconButton(
                         icon: const Icon(Icons.remove),
                         onPressed: () => setState(() {
-                          if (quantity > 0)
+                          if (quantity > 0) {
                             quantity--; // Allow reducing to 0 for removal
+                          }
                         }),
                       ),
-                      Text(quantity.toString(), style: const TextStyle(fontSize: 18)),
+                      Text(quantity.toString(),
+                          style: const TextStyle(fontSize: 18)),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () => setState(() {
@@ -610,3 +432,294 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+class CategoryCard extends StatelessWidget {
+  final String title;
+  final String imagePath;
+  final VoidCallback onTap;
+  final Color textColor;
+
+  const CategoryCard({
+    super.key,
+    required this.title,
+    required this.imagePath,
+    required this.onTap,
+    this.textColor = Colors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.43,
+        height: MediaQuery.of(context).size.width * 0.5,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 0,
+              blurRadius: 8,
+              offset: const Offset(0, 4), // Changes position of shadow
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: ColorFiltered(
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.3), // Darken the image
+                    BlendMode.darken,
+                  ),
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 10,
+              bottom: 10,
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ReferAFriendCTA extends StatelessWidget {
+  final VoidCallback onReferPressed;
+
+  const ReferAFriendCTA({
+    super.key,
+    required this.onReferPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        decoration: BoxDecoration(
+          color: Colors.deepPurple, // Adjust the color to fit your theme
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              spreadRadius: 0,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Invite Your Friends!",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "Share the joy and get 10% off for every friend who joins.",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: onReferPressed,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black, backgroundColor: Colors.amber, // Text color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+                ),
+                child: const Text("Refer Now"),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RecipeCard extends StatelessWidget {
+  final String recipeName;
+  final String imageUrl;
+  final double rating;
+
+  const RecipeCard({
+    super.key,
+    required this.recipeName,
+    required this.imageUrl,
+    required this.rating,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 230,
+      height: 170,
+      margin: const EdgeInsets.only(right: 10), // Add some space between the cards
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        image: DecorationImage(
+          image: NetworkImage(imageUrl),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '$rating',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 10,
+            left: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Text(
+                recipeName,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GroceryItemCard extends StatelessWidget {
+  final String name;
+  final String imageUrl;
+  final String price;
+  final VoidCallback onAddToCart;
+
+  const GroceryItemCard({
+    super.key,
+    required this.name,
+    required this.imageUrl,
+    required this.price,
+    required this.onAddToCart,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 180, // Increased width
+      // height: 180, // Decreased height
+      margin: const EdgeInsets.only(right: 20,bottom: 30), // Increased spacing between cards
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20), // Increased roundness
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Image.network(
+              imageUrl,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+            child: Text(
+              name,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18, // Slightly larger font for the name
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 4, 10, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Rs $price", // Added "Rs" before the price
+                  style: TextStyle(
+                    fontSize: 18, // Slightly larger font for the price
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: onAddToCart,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary, // Button background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  ),
+                  child: const Text("Add to cart", style: TextStyle(fontSize: 14, color: Colors.white,)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+

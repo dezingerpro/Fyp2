@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fyp2/Splash_Screen.dart';
-import 'package:fyp2/colors.dart';
+import 'package:fyp2/Others/Splash_Screen.dart';
+import 'package:fyp2/Others/colors.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:fyp2/provider/grocery_provider.dart'; // Import your GroceryProvider
 import 'package:provider/provider.dart';

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fyp2/Admin%20CRUD/add_recipe.dart';
-import 'package:fyp2/Admin%20CRUD/delete_recipe.dart';
-import 'package:fyp2/Admin%20CRUD/order_management.dart';
+import 'package:fyp2/Admin/add_recipe.dart';
+import 'package:fyp2/Admin/delete_recipe.dart';
+import 'package:fyp2/Admin/inventory_management.dart';
+import 'package:fyp2/Admin/order_management.dart';
 import 'package:fyp2/Recipes/all_recipe_screen.dart';
-import 'package:fyp2/Recipes/allrecipe_list_admin.dart';
-import 'package:fyp2/nav_bar.dart';
+import 'package:fyp2/Admin/allrecipe_list_admin.dart';
+import 'package:fyp2/Navigation/nav_bar.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({Key? key}) : super(key: key);
@@ -87,6 +88,14 @@ class _AdminPageState extends State<AdminPage> {
                                 color: Theme.of(context).primaryColor,
                                 size: 40
                             ),
+                            onTap: (){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => IngredientListPage(),
+                                ),
+                              );
+                            },
                             title: const Text("Inventory Management"),
                             subtitle: const Text('Manage the inventory of groceries'),
                           ),

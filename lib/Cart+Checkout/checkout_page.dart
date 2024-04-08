@@ -3,7 +3,7 @@ import 'package:fyp2/provider/cart_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'API/api.dart';
+import '../API/api.dart';
 import 'order_summary.dart';
 
 class CheckoutPage extends StatelessWidget {

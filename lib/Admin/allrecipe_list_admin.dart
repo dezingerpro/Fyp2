@@ -10,7 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/Models/recipe_model.dart';
 import '../API/api.dart';
-import '../Admin CRUD/update_recipe.dart';
+import 'update_recipe.dart';
 
 class MyRecipeApp extends StatefulWidget {
   @override

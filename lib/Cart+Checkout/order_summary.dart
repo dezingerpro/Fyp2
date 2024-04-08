@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'landing_page.dart';
+import '../landing_page.dart';
 
 class OrderSummaryPage extends StatelessWidget {
   final List<Map<String, dynamic>> orderItems;

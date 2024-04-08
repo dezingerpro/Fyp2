@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fyp2/colors.dart';
+import 'package:fyp2/Others/colors.dart';
 import 'package:fyp2/Authentication/signin_screen.dart';
-import 'package:fyp2/my_orders.dart';
-import 'package:fyp2/user_profile.dart';
+import 'package:fyp2/Navigation/my_orders.dart';
+import 'package:fyp2/Navigation/user_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'API/api.dart';
+import '../API/api.dart';
 
 class navBar extends StatefulWidget {
   const navBar({super.key});

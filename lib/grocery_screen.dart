@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:fyp2/provider/grocery_provider.dart';
-import 'package:provider/provider.dart';
 import '../Models/ingredients_model.dart';
-import 'cart.dart'; // Ensure correct import path
+import 'Cart+Checkout/cart.dart'; // Ensure correct import path
 
 class GroceryItemsPage extends StatefulWidget {
   @override
@@ -14,14 +14,105 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
   @override
   void initState() {
     super.initState();
-    // Ensures the page content is refreshed when navigated back to this page.
     WidgetsBinding.instance.addPostFrameCallback((_) => _refreshGroceries());
   }
 
   void _refreshGroceries() {
-    // Dummy method to simulate refreshing groceries. Implement your actual refresh logic here.
     final groceryProvider = Provider.of<GroceryProvider>(context, listen: false);
-    groceryProvider.fetchGroceries(); // This method should be implemented in your GroceryProvider.
+    groceryProvider.fetchGroceries();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final groceryProvider = Provider.of<GroceryProvider>(context);
+    final cartProvider = Provider.of<CartProvider>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
+        title: Text('Shop Grocery', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+        elevation: 0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        child: ListView.builder(
+          itemCount: groceryProvider.items.length,
+          itemBuilder: (context, index) {
+            final item = groceryProvider.items[index];
+            return Container(
+              height: 140, // Fixed height for each item
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 2,
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.horizontal(left: Radius.circular(20)),
+                        border: Border.all(color: Colors.grey.shade300, width: 1), // Thin outline
+                      ),
+                      clipBehavior: Clip.antiAlias, // Ensure the image respects the container's rounded corners
+                      child: Image.network(
+                        item.image,
+                        fit: BoxFit.cover,
+                        height: double.infinity,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            item.name,
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            "\$${item.price.toStringAsFixed(2)}",
+                            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight, // Center the button horizontally in the available space
+                            child: GestureDetector(
+                              onTap: () => _showQuantityDialog(context, item, cartProvider),
+                              child: Container(
+                                padding: EdgeInsets.all(8), // Increase padding for a larger touch area
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurple,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.add_shopping_cart, color: Colors.white, size: 24), // Larger icon size
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 
   void _showQuantityDialog(BuildContext context, Ingredient item, CartProvider cartProvider) {
@@ -37,7 +128,8 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
           builder: (BuildContext context, StateSetter setState) {
             return Container(
               padding: const EdgeInsets.all(16),
-              height: currentQuantity > 0 ? 250 : 200, // Adjust height if item is already in the cart
+              height: currentQuantity > 0 ? 250 : 200,
+              // Adjust height if item is already in the cart
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -57,7 +149,8 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                           }
                         },
                       ),
-                      Text(quantity.toString(), style: const TextStyle(fontSize: 18)),
+                      Text(quantity.toString(),
+                          style: const TextStyle(fontSize: 18)),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
@@ -88,80 +181,4 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final groceryProvider = Provider.of<GroceryProvider>(context);
-    final cartProvider = Provider.of<CartProvider>(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.purple,
-        title: const Text('Shop Grocery'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => CartPage())),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Icon(Icons.shopping_bag_outlined, color: Colors.black),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Consumer<CartProvider>(
-                      builder: (context, cart, child) {
-                        return Container(
-                          padding: const EdgeInsets.all(1),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 12,
-                            minHeight: 12,
-                          ),
-                          child: Text(
-                            '${cart.totalItemCount}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 8,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: groceryProvider.items.length,
-        itemBuilder: (context, index) {
-          final item = groceryProvider.items[index];
-          int itemQuantity = cartProvider.getItemQuantity(item.id);
-
-          return ListTile(
-            leading: Image.network(item.image, width: 50, height: 50, errorBuilder: (context, error, stackTrace) => const Icon(Icons.error)),
-            title: Text(item.name),
-            subtitle: Text("\$${item.price.toStringAsFixed(2)}"),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (itemQuantity > 0) Text('$itemQuantity x '),
-                IconButton(
-                  icon: const Icon(Icons.add_shopping_cart),
-                  onPressed: () => _showQuantityDialog(context, item, cartProvider),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
 }

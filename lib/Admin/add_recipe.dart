@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fyp2/Models/main_ingredient_model.dart';
 import '../API/api.dart';
 import '../Models/ingredients_model.dart';
+import '../Others/custom_text_fields.dart';
 
 class AddRecipe extends StatefulWidget {
   const AddRecipe({Key? key}) : super(key: key);
@@ -69,44 +70,24 @@ class _AddRecipeState extends State<AddRecipe> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextFormField(
+                CustomTextField(
+                  labelText: "Recipe Name",
                   controller: recipeNameController,
-                  decoration: const InputDecoration(
-                    labelText: "Recipe Name",
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Recipe Name is required';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? 'Recipe Name is required' : null,
                 ),
                 const SizedBox(height: 16.0),
-                TextFormField(
+                CustomTextField(
+                  labelText: "Recipe Rating",
                   controller: recipeRatingController,
-                  decoration: const InputDecoration(
-                    labelText: "Recipe Rating",
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Recipe Rating is required';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? 'Recipe Rating is required' : null,
                 ),
                 const SizedBox(height: 16.0),
-                TextFormField(
+                CustomTextField(
+                  labelText: "Recipe Type",
                   controller: recipeTypeController,
-                  decoration: const InputDecoration(
-                    labelText: "Recipe Type", // Label for recipe type
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Recipe Type is required'; // Validation message
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? 'Recipe Type is required' : null,
                 ),
+                const SizedBox(height: 16.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -161,30 +142,16 @@ class _AddRecipeState extends State<AddRecipe> {
                   ],
                 ),
                 const SizedBox(height: 16.0),
-                TextFormField(
+                CustomTextField(
+                  labelText: "Recipe Image Link",
                   controller: recipeImageController,
-                  decoration: const InputDecoration(
-                    labelText: "Recipe Image Link",
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Recipe Image Link is required';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? 'Recipe Image Link is required' : null,
                 ),
                 const SizedBox(height: 16.0),
-                TextFormField(
+                CustomTextField(
+                  labelText: "Recipe Link",
                   controller: recipeLinkController,
-                  decoration: const InputDecoration(
-                    labelText: "Recipe Link",
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Recipe Link is required';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty ? 'Recipe Link is required' : null,
                 ),
                 // Ingredient input fields
                 Column(
@@ -210,66 +177,71 @@ class _AddRecipeState extends State<AddRecipe> {
                   }).toList(),
                 ),
                 const SizedBox(height: 16.0),
+                const Text("Ingredient: "),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    const Text("Ingredient: "),
-                    SizedBox(
-                      width: 250,
-                      child: DropdownSearch(
-                        // recipe = Api.getRecipe();
+                    Expanded( // Use Expanded for the dropdown to take up available space
+                      flex: 3,
+                      child: DropdownSearch<String>(
                         items: ingredients,
                         dropdownBuilder: (context, selectedItem) {
                           return Text(
                             selectedItem ?? "Select Ingredient",
-                            style: const TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: 16),
                           );
                         },
                         dropdownDecoratorProps: DropDownDecoratorProps(
-                            dropdownSearchDecoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0), // Adjust the value as needed
-                              ),
+                          dropdownSearchDecoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
-                        compareFn: (item1, item2) {
-                          return true;
-                        },
-                        onChanged: (value){
-                          recipeIngredientNameController.text = value;
+                        ),
+                        onChanged: (value) {
+                          recipeIngredientNameController.text = value ?? '';
                         },
                         popupProps: PopupProps.bottomSheet(
-                            isFilterOnline: true,
-                            showSearchBox: true,
-                            showSelectedItems: true,
-                            searchFieldProps: TextFieldProps(
-                              decoration: InputDecoration(
-                                labelText: "Search",
-                                hintText: "Search Ingredients",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0), // Adjust the value as needed
-                                ),
+                          isFilterOnline: true,
+                          showSearchBox: true,
+                          showSelectedItems: true,
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              labelText: "Search",
+                              hintText: "Search Ingredients",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
                               ),
-                              cursorColor: Theme.of(context).primaryColor,
-                            )
                             ),
+                            cursorColor: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10), // Add some spacing between the dropdown and the text field
+                    Expanded( // Use Expanded for the text field to take up remaining space
+                      flex: 2,
+                      child: CustomTextField(
+                        labelText: "Ingredient Qty",
+                        controller: recipeIngredientQtyController,
                       ),
                     ),
                   ],
                 ),
-                TextFormField(
-                  controller: recipeIngredientQtyController,
-                  decoration: const InputDecoration(
-                    labelText: "Ingredient Qty",
-                  ),
-                ),
-
                 const SizedBox(height: 16.0),
-                ElevatedButton(
+                CustomElevatedButton(
+                  text: "Add Ingredient",
                   onPressed: () {
                     addIngredient();
                   },
-                  child: const Text("Add Ingredient"),
+                ),
+                const SizedBox(height: 16.0),
+                CustomElevatedButton(
+                  text: "Submit",
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      addOneRecipe();
+                    }
+                  },
                 ),
 
                 const SizedBox(height: 16.0),

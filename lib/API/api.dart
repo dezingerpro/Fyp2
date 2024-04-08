@@ -4,9 +4,11 @@ import 'package:fyp2/Models/recipe_model.dart';
 import 'package:fyp2/Models/security_question.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../Models/allergy_model.dart';
 import '../Models/ingredients_model.dart';
 import '../Models/main_ingredient_model.dart';
 import '../Models/order_model.dart';
+import '../Models/ratings_model.dart';
 import '../Models/user_model.dart';
 
 class Api {
@@ -29,10 +31,10 @@ class Api {
         var data = jsonDecode(res.body.toString());
         print(data);
         return 200;
-      } else  if (res.statusCode == 205){
+      } else if (res.statusCode == 205) {
         print("Email Already Taken");
         return 205;
-      }else{
+      } else {
         print("Failed to get response");
         return 400;
       }
@@ -95,35 +97,35 @@ class Api {
 
   //USER LOGIN
   static Future<bool> getUser(Map userData) async {
-  var url = Uri.parse("${baseUrl}get_user");
-  //print(email+password);
-  final res = await http.post(url,body: userData);
+    var url = Uri.parse("${baseUrl}get_user");
+    //print(email+password);
+    final res = await http.post(url, body: userData);
 
-    try{
-      if(res.statusCode == 401){
-         var data = jsonDecode(res.body);
-         final prefs = await SharedPreferences.getInstance();
-         if(data['isAdmin']==true){
-           prefs.setBool('isAdmin', true);
-           adminStatus = true;
-         }
-         else{
-           prefs.setBool('isAdmin', false);
-           adminStatus = false;
-         }
-         String userId = data['_id']; // Make sure to replace 'userId' with the actual key used in your API response
-         prefs.setString('userId', userId);
-         return true;
-      }else if(res.statusCode == 402){
+    try {
+      if (res.statusCode == 401) {
+        var data = jsonDecode(res.body);
+        final prefs = await SharedPreferences.getInstance();
+        if (data['isAdmin'] == true) {
+          prefs.setBool('isAdmin', true);
+          adminStatus = true;
+        }
+        else {
+          prefs.setBool('isAdmin', false);
+          adminStatus = false;
+        }
+        String userId = data['_id']; // Make sure to replace 'userId' with the actual key used in your API response
+        prefs.setString('userId', userId);
+        return true;
+      } else if (res.statusCode == 402) {
         print("PLEASE CHECK YOUR PASSWORD");
-      }else if(res.statusCode == 403){
+      } else if (res.statusCode == 403) {
         print("PLEASE CHECK YOUR Email");
       }
-    }catch(e){
+    } catch (e) {
       print(e.toString());
     }
     return false;
-}
+  }
 
 //GET SECURITY QUESTION
   static Future<List<securityQuestion>> fetchQuestions() async {
@@ -141,7 +143,8 @@ class Api {
 
         return questions;
       } else {
-        throw Exception('Failed to load ingredients. Status Code: ${response.statusCode}');
+        throw Exception(
+            'Failed to load ingredients. Status Code: ${response.statusCode}');
       }
     } catch (error) {
       throw Exception('Failed to connect to the server');
@@ -152,18 +155,18 @@ class Api {
 
   static Future<String> forgotPassword(Map userData) async {
     var url = Uri.parse("${baseUrl}forgot_password");
-    final res = await http.post(url,body: userData);
+    final res = await http.post(url, body: userData);
     //print(res.statusCode);
-    try{
-      if(res.statusCode == 200){
+    try {
+      if (res.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(res.body);
         //print(data['usecurityQuestion']);
         return data['usecurityQuestion'] as String;
         //return true;
-      }else if(res.statusCode == 205){
+      } else if (res.statusCode == 205) {
         return "invalid";
       }
-    }catch(e){
+    } catch (e) {
       print(e.toString());
     }
     return "error";
@@ -210,12 +213,12 @@ class Api {
   static Future<List> getRecipeAll() async {
     var url = Uri.parse("${baseUrl}get_allrecipe");
     final res = await http.post(url);
-    try{
-      if(res.statusCode == 200){
+    try {
+      if (res.statusCode == 200) {
         var data = jsonDecode(res.body) as List<dynamic>;
         return data;
       }
-    }catch(e){
+    } catch (e) {
       print(e.toString());
       return [];
     }
@@ -265,18 +268,21 @@ class Api {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> lastViewedRecipes = jsonDecode(response.body)['lastViewedRecipes'];
+      List<dynamic> lastViewedRecipes = jsonDecode(
+          response.body)['lastViewedRecipes'];
       print(lastViewedRecipes);
       return lastViewedRecipes.cast<String>();
     } else {
       // Handle error or return an empty list
-      print('Failed to fetch last viewed recipes. Status code: ${response.statusCode}.');
+      print('Failed to fetch last viewed recipes. Status code: ${response
+          .statusCode}.');
       return [];
     }
   }
 
   //SEND INGREDIENTS
-  static Future<List<String>> sendIngredients(List<String> selectedIngredients) async {
+  static Future<List<String>> sendIngredients(
+      List<String> selectedIngredients) async {
     var url = Uri.parse('${baseUrl}search_recipes');
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"},
@@ -320,13 +326,15 @@ class Api {
       if (response.statusCode == 200) {
         // Parse the JSON response to extract recipe names
         final List<dynamic> recipeNamesJson = jsonDecode(response.body);
-        final List<String> recipeNames = recipeNamesJson.map((name) => name.toString()).toList();
+        final List<String> recipeNames = recipeNamesJson.map((name) =>
+            name.toString()).toList();
         print(recipeNamesJson);
         print(recipeNames);
         return recipeNames;
       } else {
         // Handle server errors or invalid status codes
-        print('Failed to fetch recommended recipe names. Status code: ${response.statusCode}');
+        print('Failed to fetch recommended recipe names. Status code: ${response
+            .statusCode}');
         return [];
       }
     } catch (e) {
@@ -335,6 +343,50 @@ class Api {
       return [];
     }
   }
+
+  //ADD RATINGS
+  static Future<bool> submitRecipeRating({
+    required String recipeId,
+    required String userId,
+    required double rating,
+    String? review,
+  }) async {
+    final url = Uri.parse('${baseUrl}add_ratings');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'recipeId': recipeId,
+        'userId': userId,
+        'rating': rating,
+        'review': review,
+      }),
+    );
+    if (response.statusCode == 201) {
+      // Assuming a 201 status code means the rating was successfully created
+      return true;
+    } else {
+      // Handle different statuses/errors appropriately in production code
+      print('Failed to submit rating: ${response.body}');
+      return false;
+    }
+  }
+
+  //FETCH RATINGS
+  static Future<List<Rating>> fetchRatingsForRecipe(String recipeId) async {
+    final url = Uri.parse('${baseUrl}get_ratings?recipeId=$recipeId');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      List<dynamic> ratingsJson = json.decode(response.body);
+      print(ratingsJson);
+      return ratingsJson.map((json) => Rating.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load ratings');
+    }
+  }
+
 
 
   //GET MAIN INGREDIENT LIST
@@ -420,7 +472,6 @@ class Api {
 
       if (res.statusCode == 200) {
         var data = jsonDecode(res.body) as List<dynamic>;
-
         List<Recipe> recipes = data.map((recipeJson) {
           return Recipe.fromJson(recipeJson);
         }).toList();
@@ -538,4 +589,46 @@ class Api {
       print('Fail to delete');
     }
   }
+
+  //ADD INGREDIENT
+  static Future<bool> addIngredient(Ingredient ingredient) async {
+    final response = await http.post(
+      Uri.parse('${baseUrl}add_ingredient'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(ingredient.toJson()),
+    );
+    return response.statusCode == 201;
+  }
+
+  //Update INGREDIENT
+  static Future<bool> updateIngredient(String id, Ingredient ingredient) async {
+    final response = await http.patch(
+      Uri.parse('${baseUrl}update_ingredient/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(ingredient.toJson()),
+    );
+    return response.statusCode == 200;
+  }
+
+  //Delete INGREDIENT
+  static Future<bool> deleteIngredient(String id) async {
+    final response = await http.delete(Uri.parse('${baseUrl}delete_ingredient/$id'));
+    return response.statusCode == 200;
+  }
+
+  //GET ALLERGY
+  static Future<List<Allergen>> fetchAllergens() async {
+    final response = await http.get(Uri.parse('${baseUrl}get_allergens'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Allergen.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load allergens');
+    }
+  }
+
 }

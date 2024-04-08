@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../API/api.dart'; // Adjust import path to your Api class
-import '../Models/order_model.dart'; // Adjust import path to your Order model
+import '../../API/api.dart'; // Adjust import path to your Api class
+import '../../Models/order_model.dart'; // Adjust import path to your Order model
 
 class MyOrdersPage extends StatefulWidget {
   const MyOrdersPage({super.key});
