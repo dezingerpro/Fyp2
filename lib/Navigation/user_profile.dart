@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../API/api.dart';
+import '../Authentication/signin_screen.dart';
 import '../Models/allergy_model.dart';
 import '../Others/custom_text_fields.dart';
+import '../main.dart';
+import '../provider/cart_provider.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -230,26 +235,37 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         }).toList(),
                       ),
                     const SizedBox(height: 20),
-                    CustomElevatedButton(
-                      text: 'Save Profile',
-                      onPressed: () async {
-                        print(selectedAllergies);
-                        if (_formKey.currentState!.validate()) {
-                          if (_formKey.currentState!.validate()) {
-                            Map<String, dynamic> updatedUserData = _collectFormData();
-                            updatedUserData = {
-                              'allergies': selectedAllergies,
-                            };
-                            bool success = await Api.updateUserDetails(updatedUserData);
-                            String message = success ? 'Profile updated successfully!' : 'Failed to update profile.';
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please correct the errors in the form.')));
-                          }
-                          // Collect form data and update
-                        }
-                      },
+                    Row(
+                      children: [
+                        CustomElevatedButton(
+                          text: 'Save Profile',
+                          onPressed: () async {
+                            print(selectedAllergies);
+                            if (_formKey.currentState!.validate()) {
+                              if (_formKey.currentState!.validate()) {
+                                Map<String, dynamic> updatedUserData = _collectFormData();
+                                updatedUserData = {
+                                  'allergies': selectedAllergies,
+                                };
+                                bool success = await Api.updateUserDetails(updatedUserData);
+                                String message = success ? 'Profile updated successfully!' : 'Failed to update profile.';
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please correct the errors in the form.')));
+                              }
+                              // Collect form data and update
+                            }
+                          },
+                        ),
+                        CustomElevatedButton(
+                          text: 'Logout',
+                          onPressed: () async {
+                            _logoutUser();
+                          },
+                        ),
+                      ],
                     ),
+
 
                   ],
                 ),
@@ -261,6 +277,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
+  void _logoutUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isAdmin', false);
+      await prefs.setBool('isLoggedIn', false);
+      await prefs.setString('userId', '');
+      final cartProvider = Provider.of<CartProvider>(context,listen: false);
+      cartProvider.clear();
+      MyApp.navigatorKey.currentState!.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const signInScreen()),
+            (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print("Error logging out: $e");
+    }
+  }
 
   Map<String, dynamic> _collectFormData() {
     // This function collects form data into a map

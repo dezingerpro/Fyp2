@@ -15,7 +15,8 @@ class AddRecipe extends StatefulWidget {
 
 class _AddRecipeState extends State<AddRecipe> {
   List<Map<String, String>> ingredientsList = [];
-
+  List<Ingredient> ingredientsList2 = [];
+  Map<String, String> ingredientNameToTypeMap = {};
   final recipeNameController = TextEditingController();
   final recipeRatingController = TextEditingController();
   final recipeImageController = TextEditingController();
@@ -26,6 +27,8 @@ class _AddRecipeState extends State<AddRecipe> {
   final recipeTypeController = TextEditingController(); // Controller for recipe type
   List<String> mainIngredients = [];
   List<String> ingredients = [];
+  String currentQuantityType = "Qty"; // Default label text for quantity type
+
 
   final _formKey = GlobalKey<FormState>();
 
@@ -180,52 +183,60 @@ class _AddRecipeState extends State<AddRecipe> {
                 const Text("Ingredient: "),
                 Row(
                   children: [
-                    Expanded( // Use Expanded for the dropdown to take up available space
-                      flex: 3,
-                      child: DropdownSearch<String>(
-                        items: ingredients,
-                        dropdownBuilder: (context, selectedItem) {
-                          return Text(
-                            selectedItem ?? "Select Ingredient",
-                            style: TextStyle(fontSize: 16),
-                          );
-                        },
-                        dropdownDecoratorProps: DropDownDecoratorProps(
-                          dropdownSearchDecoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                        ),
-                        onChanged: (value) {
-                          recipeIngredientNameController.text = value ?? '';
-                        },
-                        popupProps: PopupProps.bottomSheet(
-                          isFilterOnline: true,
-                          showSearchBox: true,
-                          showSelectedItems: true,
-                          searchFieldProps: TextFieldProps(
-                            decoration: InputDecoration(
-                              labelText: "Search",
-                              hintText: "Search Ingredients",
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: DropdownSearch<String>(
+                          items: ingredients,
+                          dropdownBuilder: (context, selectedItem) {
+                            return Text(
+                              selectedItem ?? "Select Ingredient",
+                              style: TextStyle(fontSize: 16),
+                            );
+                          },
+                          dropdownDecoratorProps: DropDownDecoratorProps(
+                            dropdownSearchDecoration: InputDecoration(
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
-                            cursorColor: Theme.of(context).primaryColor,
+                          ),
+                          onChanged: (value) {
+                            if (value != null) {
+                              String quantityType = ingredientNameToTypeMap[value] ?? "Qty"; // Default to "Qty" if not found
+                              setState(() {
+                                recipeIngredientNameController.text = value;
+                                currentQuantityType = quantityType; // Update the state for quantity type
+                              });
+                            }
+                          },
+                          popupProps: PopupProps.bottomSheet(
+                            isFilterOnline: true,
+                            showSearchBox: true,
+                            showSelectedItems: true,
+                            searchFieldProps: TextFieldProps(
+                              decoration: InputDecoration(
+                                labelText: "Search",
+                                hintText: "Search Ingredients",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                              ),
+                              cursorColor: Theme.of(context).primaryColor,
+                            ),
                           ),
                         ),
                       ),
                     ),
                     SizedBox(width: 10), // Add some spacing between the dropdown and the text field
-                    Expanded( // Use Expanded for the text field to take up remaining space
-                      flex: 2,
-                      child: CustomTextField(
-                        labelText: "Ingredient Qty",
-                        controller: recipeIngredientQtyController,
-                      ),
-                    ),
                   ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomTextField(
+                    labelText: "Type in $currentQuantityType",  // Use the updated state here
+                    controller: recipeIngredientQtyController,
+                  ),
                 ),
                 const SizedBox(height: 16.0),
                 CustomElevatedButton(
@@ -242,16 +253,6 @@ class _AddRecipeState extends State<AddRecipe> {
                       addOneRecipe();
                     }
                   },
-                ),
-
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      addOneRecipe();
-                    }
-                  },
-                  child: const Text("Submit"),
                 ),
               ],
             ),
@@ -270,12 +271,25 @@ class _AddRecipeState extends State<AddRecipe> {
   }
 
   Future<void> fetchIngredients() async {
-    List<Ingredient> Ing = await Api.fetchIngredients();
+    List<Ingredient> fetchedIngredients = await Api.fetchIngredients();
     setState(() {
-      ingredients = Ing.map((ing) => ing.name).toList();
-      print(ingredients);
+      ingredientsList2 = fetchedIngredients;
+      // Build a map from ingredient names to their quantity types
+      ingredientNameToTypeMap = {
+        for (Ingredient ing in fetchedIngredients) ing.name: ing.quantityType
+      };
+      // Only extract names for the DropdownSearch
+      ingredients = fetchedIngredients.map((ing) => ing.name).toList();
     });
   }
+
+  // Future<void> fetchIngredients() async {
+  //   List<Ingredient> Ing = await Api.fetchIngredients();
+  //   setState(() {
+  //     ingredients = Ing.map((ing) => ing.name).toList();
+  //     print(ingredients);
+  //   });
+  // }
 
   void addOneRecipe() async {
     if (ingredientsList.length < 3) {

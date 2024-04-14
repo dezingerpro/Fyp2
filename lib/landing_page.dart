@@ -1,6 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:fyp2/grocery_screen.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:fyp2/Main%20Page/search_page.dart';
 import 'package:provider/provider.dart';
