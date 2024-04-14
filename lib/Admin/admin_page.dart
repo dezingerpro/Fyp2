@@ -3,9 +3,12 @@ import 'package:fyp2/Admin/add_recipe.dart';
 import 'package:fyp2/Admin/delete_recipe.dart';
 import 'package:fyp2/Admin/inventory_management.dart';
 import 'package:fyp2/Admin/order_management.dart';
+import 'package:fyp2/Main%20Page/search_page.dart';
 import 'package:fyp2/Recipes/all_recipe_screen.dart';
 import 'package:fyp2/Admin/allrecipe_list_admin.dart';
 import 'package:fyp2/Navigation/nav_bar.dart';
+
+import '../API/api.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({Key? key}) : super(key: key);
@@ -34,6 +37,7 @@ class _AdminPageState extends State<AdminPage> {
               // mainAxisAlignment: MainAxisAlignment.center,
               //crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                AllergyButton(context),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -42,7 +46,7 @@ class _AdminPageState extends State<AdminPage> {
                       "View",
                       "View all recipes",
                       Icons.visibility,
-                      const FoodRecipesScreen(),
+                      const SearchPage(),
                     ),
                     CrudCard(
                       context,
@@ -110,7 +114,7 @@ class _AdminPageState extends State<AdminPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const orderManage(),
+                              builder: (context) => const OrderManage(),
                             ),
                           );
                         },
@@ -133,6 +137,25 @@ class _AdminPageState extends State<AdminPage> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget AllergyButton(BuildContext context) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          Api.reanalyzeRecipes(); // Call the function when the button is pressed
+        },
+        child: Text('Analyze Recipes'),
+        style: ElevatedButton.styleFrom(
+          primary: Colors.blue, // Set the background color to blue
+          onPrimary: Colors.white, // Set the text color to white
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8), // Rounded corners
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Padding inside the button
         ),
       ),
     );

@@ -1,8 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp2/grocery_screen.dart';
-import 'package:fyp2/Recipes/all_recipe_screen.dart';
-import 'package:fyp2/Navigation/nav_bar.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:fyp2/Main%20Page/search_page.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +9,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'API/api.dart';
 import 'Models/ingredients_model.dart';
 import 'Models/recipe_model.dart';
-import 'Recipes/single_recipe_screen.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -48,16 +45,15 @@ class _MyHomePageState extends State<MyHomePage> {
     fetchGroceries();
   }
 
-  void _navigateToDetail(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => GroceryItemsPage()));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor, // Consider using a gradient or a vibrant solid color
-        title: Text('Shop Grocery', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+        title: const Padding(
+          padding: EdgeInsets.only(left: 5.0,top: 8),
+          child: Text('Food Savvy', style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: GestureDetector(
@@ -86,8 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Padding(
                       padding: EdgeInsets.only(left: 20),
                       child: Icon(Icons.search, color: Color(0xff7b7b7b)),
@@ -108,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         elevation: 4, // Adjust elevation for depth
-        shape: RoundedRectangleBorder( // Rounded corners at the bottom of the AppBar
+        shape: const RoundedRectangleBorder( // Rounded corners at the bottom of the AppBar
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(30),
           ),
@@ -116,7 +112,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
       key: _scaffoldState,
-      drawer: const navBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -214,13 +209,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: "Food Recipes",
                       imagePath: 'assets/food-recipe.png',
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const FoodRecipesScreen()),
-                        ).then((_) {
-                          fetchRecipes(); // Refresh your recipes list
-                        });
                       },
                     ),
                   ),
@@ -232,7 +220,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       imagePath: 'assets/grocery-image.png',
                       // endColor: Colors.teal,
                       onTap: () {
-                        _navigateToDetail(context);
                         // Navigator.push(
                         //   context,
                         //   MaterialPageRoute(
@@ -419,6 +406,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         cartProvider.removeItem(item
                             .id); // Remove the item if quantity is reduced to 0
                       }
+                      cartProvider.updateCart();
                       Navigator.pop(context);
                     },
                     child: const Text('Update Cart'),

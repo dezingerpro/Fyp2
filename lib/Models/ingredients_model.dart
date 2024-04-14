@@ -7,7 +7,7 @@ class Ingredient {
   final String quantityType; // New field for quantity type
 
   Ingredient({
-    required this.id,
+    required this.id ,
     required this.name,
     required this.image,
     required this.stock,
@@ -17,7 +17,7 @@ class Ingredient {
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
     return Ingredient(
-      id: json['_id'] ?? '',
+      id: json['_id'] ?? '' ,
       name: json['iname'] ?? '',
       image: json['iimage'] ?? '',
       stock: json['istock'] ?? 0,

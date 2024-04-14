@@ -140,7 +140,6 @@ class CheckoutPage extends StatelessWidget {
     if (success) {
       // Clear the cart
       cartProvider.clear();
-
       // Navigate to the OrderSummaryPage
       Navigator.of(context).push(PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
@@ -148,7 +147,7 @@ class CheckoutPage extends StatelessWidget {
           child: OrderSummaryPage(
             orderItems: items,
             totalPrice: cartProvider.totalAmount,
-            orderStatus: 'Pending',
+            orderStatus: 'Processing',
           ),
         ),
       ));

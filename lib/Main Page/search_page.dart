@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:fyp2/API/api.dart';
 import 'package:fyp2/Models/recipe_model.dart';
 import 'package:fyp2/Models/ingredients_model.dart';
+import 'package:provider/provider.dart';
+import '../Recipes/all_recipe_screen.dart';
+import '../provider/recipe_provider.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -20,6 +24,10 @@ class _SearchPageState extends State<SearchPage> {
   List<String> ingredients = [];
   List<String> availableRecipeNames = [];
   final recipeIngredientNameController = TextEditingController();
+  bool isLoading = false;
+  final debouncer =
+      Debouncer(milliseconds: 500); // Adjust the milliseconds as needed
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -28,11 +36,20 @@ class _SearchPageState extends State<SearchPage> {
     fetchIngredients();
   }
 
+  void _onSearchChanged(String query) {
+    setState(() {
+      _isSearching = query.isNotEmpty;
+    });
+    debouncer.run(() {
+      filterRecipes(query, availableRecipeNames);
+    });
+  }
+
   void sortFilteredRecipes() {
     setState(() {
-      filteredRecipes.sort((a, b) =>
-          availableRecipeNames.indexOf(a.rname).compareTo(availableRecipeNames.indexOf(b.rname))
-      );
+      filteredRecipes.sort((a, b) => availableRecipeNames
+          .indexOf(a.rname)
+          .compareTo(availableRecipeNames.indexOf(b.rname)));
     });
   }
 
@@ -44,6 +61,8 @@ class _SearchPageState extends State<SearchPage> {
           .toList();
       filteredRecipes = List.from(recipes);
     });
+    Provider.of<RecipeProvider>(context, listen: false)
+        .updateRecipes(filteredRecipes);
   }
 
   Future<void> fetchIngredients() async {
@@ -54,81 +73,120 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void filterRecipes(String query, List<String> availableRecipes) {
-    setState(() {
-      // First, filter the recipes to include only those in the availableRecipes list
-      var recipesToShow = recipes
-          .where((recipe) => availableRecipes.contains(recipe.rname))
-          .toList();
+    // First, filter the recipes to include only those in the availableRecipes list
+    var recipesToShow = recipes
+        .where((recipe) => availableRecipes.contains(recipe.rname))
+        .toList();
+    // Next, filter based on the query if it's not empty
+    filteredRecipes = query.isEmpty
+        ? recipesToShow
+        : recipesToShow
+            .where((recipe) =>
+                recipe.rname.toLowerCase().contains(query.toLowerCase()))
+            .toList();
 
-      // Next, filter based on the query if it's not empty
-      filteredRecipes = query.isEmpty
-          ? recipesToShow
-          : recipesToShow
-          .where((recipe) =>
-          recipe.rname.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
+    Provider.of<RecipeProvider>(context, listen: false)
+        .updateRecipes(filteredRecipes);
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Search Recipes'),
-        elevation: 0, // Removes the shadow for a more modern look
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: SingleChildScrollView(
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.03),
         child: Column(
           children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Search Recipes",
+                  style: TextStyle(
+                    fontSize: 32,  // Large font size for emphasis
+                    fontWeight: FontWeight.bold,  // Bold for visual impact
+                    color: Colors.black,  // Thematic color consistency
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: searchController,
-                onChanged: (value) => filterRecipes(value, availableRecipeNames),
+                onChanged: _onSearchChanged,
+                style: TextStyle(fontSize: 16, color: Colors.black),
                 decoration: InputDecoration(
-                  labelText: 'Search for dishes...',
-                  fillColor: Colors.white,
+                  labelText: 'Search for recipe...',
+                  hintText: "Enter a recipe name",
+                  fillColor: _isSearching ? Colors.lightBlue[50] : Colors.white,
                   filled: true,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(15.0), // Subtle rounding of corners
+                    borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0), // Light grey outline
                   ),
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: searchController.text.isNotEmpty
-                      ? GestureDetector(
-                          child: const Icon(Icons.close),
-                          onTap: () {
-                            searchController.clear();
-                            filterRecipes('',availableRecipeNames);
-                            Api.sendIngredients(selectedIngredients);
-                          },
-                        )
-                      : null,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0), // Consistent with the overall border
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(color: Colors.deepPurple, width: 1.5), // Highlighted when focused
+                  ),
+                  prefixIcon: Icon(Icons.search, color: Colors.deepPurple),
+                  suffixIcon: AnimatedOpacity(
+                    opacity: searchController.text.isNotEmpty ? 1.0 : 0.0,
+                    duration: Duration(milliseconds: 300),
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.grey),
+                      onPressed: () {
+                        searchController.clear();
+                        _onSearchChanged('');
+                      },
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  floatingLabelBehavior: FloatingLabelBehavior.never, // Keeps the label as a placeholder
+                  labelStyle: TextStyle(color: Colors.grey),
                 ),
-              ),
+              )
+
             ),
             DropdownSearch<String>(
               items: ingredients,
               dropdownBuilder: (context, selectedItem) {
-                return Text(
-                  selectedItem ?? "Select Ingredient",
-                  style: const TextStyle(fontSize: 16),
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: Text(
+                    selectedItem ?? "Select Ingredient",
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                  ),
                 );
               },
               dropdownDecoratorProps: DropDownDecoratorProps(
                 dropdownSearchDecoration: InputDecoration(
+                  labelText: "Select Ingredient",
+                  contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                        10.0), // Adjust the value as needed
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: BorderSide.none,
                   ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
                 ),
               ),
               onChanged: (value) {
                 if (value != null) {
                   setState(() {
-                    currentIngredient =
-                        value; // Update currentIngredient with the selected value
+                    currentIngredient = value; // Update currentIngredient with the selected value
                     recipeIngredientNameController.text = value;
                   });
                 }
@@ -138,18 +196,22 @@ class _SearchPageState extends State<SearchPage> {
                 showSearchBox: true,
                 showSelectedItems: true,
                 searchFieldProps: TextFieldProps(
+                  autofocus: true,
                   decoration: InputDecoration(
-                    labelText: "Search",
-                    hintText: "Search Ingredients",
+                    labelText: "Search Ingredients",
+                    hintText: "Type to search...",
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                          20.0), // Adjust the value as needed
+                      borderRadius: BorderRadius.circular(20.0),
                     ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   cursorColor: Theme.of(context).primaryColor,
                 ),
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton.icon(
@@ -159,23 +221,38 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 icon: const Icon(Icons.add),
                 label: const Text('Add Ingredient'),
-                  onPressed: () async {
-                    if (currentIngredient.isNotEmpty &&
-                        !selectedIngredients.contains(currentIngredient)) {
-                      setState(() {
-                        selectedIngredients.add(currentIngredient);
-                        currentIngredient = '';
-                      });
+                onPressed: () async {
+                  if (currentIngredient.isNotEmpty &&
+                      !selectedIngredients.contains(currentIngredient)) {
+                    setState(() {
+                      selectedIngredients.add(currentIngredient);
+                      currentIngredient = '';
+                      // Set loading state to true when the button is pressed
+                      isLoading = true;
+                    });
+
+                    try {
                       // Fetch available recipe names based on the updated selected ingredients
-                      var newAvailableRecipeNames = await Api.sendIngredients(selectedIngredients);
+                      var newAvailableRecipeNames =
+                          await Api.sendIngredients(selectedIngredients);
                       setState(() {
                         availableRecipeNames = newAvailableRecipeNames;
                         // Filter recipes to display based on the new list of available recipe names
-                        filterRecipes(searchController.text, availableRecipeNames);
+                        filterRecipes(
+                            searchController.text, availableRecipeNames);
+                        // Set loading state back to false when operation completes
+                        isLoading = false;
                       });
                       sortFilteredRecipes();
+                    } catch (error) {
+                      print('Error fetching recipe names: $error');
+                      // Ensure loading state is set to false even if there's an error
+                      setState(() {
+                        isLoading = false;
+                      });
                     }
-                  },
+                  }
+                },
               ),
             ),
             Wrap(
@@ -184,52 +261,61 @@ class _SearchPageState extends State<SearchPage> {
                 return Chip(
                   label: Text(ingredient),
                   deleteIcon: const Icon(Icons.close),
-                    onDeleted: () {
+                  onDeleted: () {
+                    setState(() {
+                      selectedIngredients.remove(ingredient);
+                      isLoading =
+                          true; // Start loading indicator when deleting begins
+                    });
+
+                    Api.sendIngredients(selectedIngredients)
+                        .then((newAvailableRecipeNames) {
                       setState(() {
-                        selectedIngredients.remove(ingredient);
+                        availableRecipeNames = newAvailableRecipeNames;
+                        // Filter recipes to display based on the new list of available recipe names
+                        filterRecipes(
+                            searchController.text, availableRecipeNames);
+                        isLoading =
+                            false; // Stop loading indicator once data is fetched and processed
                       });
-                      // Re-fetch available recipe names based on the updated selected ingredients
-                      Api.sendIngredients(selectedIngredients).then((newAvailableRecipeNames) {
-                        setState(() {
-                          availableRecipeNames = newAvailableRecipeNames;
-                          // Filter recipes to display based on the new list of available recipe names
-                          filterRecipes(searchController.text, availableRecipeNames);
-                        });
+                    }).catchError((error) {
+                      // Always handle potential errors and stop loading
+                      print('Error updating after deletion: $error');
+                      setState(() {
+                        isLoading = false;
                       });
-                    },
+                    });
+                  },
                 );
               }).toList(),
             ),
-            ListView.builder(
-              shrinkWrap:
-                  true, // Use it to make ListView scrollable inside Column
-              physics:
-                  const NeverScrollableScrollPhysics(), // Disables ListView's own scrolling
-              itemCount: filteredRecipes.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.all(10),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage:
-                          NetworkImage(filteredRecipes[index].rimage),
+            isLoading
+                ? const Center(
+                    child: CircularProgressIndicator()) // Show loading indicator
+                : Expanded(
+                    child: RecipeListView(
+                      recipes: filteredRecipes,
+                      screenWidth: screenWidth,
                     ),
-                    title: Text(filteredRecipes[index].rname,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: const Text('Click for more details'),
-                    onTap: () {
-                      print(filteredRecipes[0].rname);
-                      // Implement navigation to recipe details
-                    },
                   ),
-                );
-              },
-            ),
           ],
         ),
       ),
     );
   }
+}
 
+class Debouncer {
+  final int milliseconds;
+  VoidCallback? action;
+  Timer? _timer;
 
+  Debouncer({required this.milliseconds});
+
+  run(VoidCallback action) {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
 }

@@ -3,8 +3,11 @@ import 'package:fyp2/Others/colors.dart';
 import 'package:fyp2/Authentication/signin_screen.dart';
 import 'package:fyp2/Navigation/my_orders.dart';
 import 'package:fyp2/Navigation/user_profile.dart';
+import 'package:fyp2/provider/cart_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../API/api.dart';
+import '../main.dart';
 
 class navBar extends StatefulWidget {
   const navBar({super.key});
@@ -25,16 +28,14 @@ class _navBarState extends State<navBar> {
   void _logoutUser() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      print("HELLO5555");
       await prefs.setBool('isAdmin', false);
       await prefs.setBool('isLoggedIn', false);
       await prefs.setString('userId', '');
-      //await context.read<CartProvider>().saveCartToDatabase(userId);
-      print("HELLO5555");// Navigate to the login screen (replace SignInScreen with your actual login screen)
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => signInScreen(),
-        ),
+      final cartProvider = Provider.of<CartProvider>(context,listen: false);
+      cartProvider.clear();
+      MyApp.navigatorKey.currentState!.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const signInScreen()),
+            (Route<dynamic> route) => false,
       );
     } catch (e) {
       print("Error logging out: $e");
@@ -53,7 +54,7 @@ class _navBarState extends State<navBar> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UserProfilePage(),
+                      builder: (context) => const UserProfilePage(),
                     ));            },
             ),
             ListTile(

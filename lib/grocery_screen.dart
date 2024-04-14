@@ -28,88 +28,106 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
     final cartProvider = Provider.of<CartProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: Text('Shop Grocery', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-        elevation: 0,
-      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: ListView.builder(
-          itemCount: groceryProvider.items.length,
-          itemBuilder: (context, index) {
-            final item = groceryProvider.items[index];
-            return Container(
-              height: 140, // Fixed height for each item
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 6,
-                    offset: Offset(0, 3),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.03),
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Shop Groceries",
+                  style: TextStyle(
+                    fontSize: 32,  // Large font size for emphasis
+                    fontWeight: FontWeight.bold,  // Bold for visual impact
+                    color: Colors.black,  // Thematic color consistency
                   ),
-                ],
+                ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Container(
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView.builder(
+                  itemCount: groceryProvider.items.length,
+                  itemBuilder: (context, index) {
+                    final item = groceryProvider.items[index];
+                    return Container(
+                      height: 140, // Fixed height for each item
+                      margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.horizontal(left: Radius.circular(20)),
-                        border: Border.all(color: Colors.grey.shade300, width: 1), // Thin outline
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 2,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
                       ),
-                      clipBehavior: Clip.antiAlias, // Ensure the image respects the container's rounded corners
-                      child: Image.network(
-                        item.image,
-                        fit: BoxFit.cover,
-                        height: double.infinity,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Row(
                         children: [
-                          Text(
-                            item.name,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            overflow: TextOverflow.ellipsis,
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.horizontal(left: Radius.circular(20)),
+                                border: Border.all(color: Colors.grey.shade300, width: 1), // Thin outline
+                              ),
+                              clipBehavior: Clip.antiAlias, // Ensure the image respects the container's rounded corners
+                              child: Image.network(
+                                item.image,
+                                fit: BoxFit.cover,
+                                height: double.infinity,
+                              ),
+                            ),
                           ),
-                          Text(
-                            "\$${item.price.toStringAsFixed(2)}",
-                            style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight, // Center the button horizontally in the available space
-                            child: GestureDetector(
-                              onTap: () => _showQuantityDialog(context, item, cartProvider),
-                              child: Container(
-                                padding: EdgeInsets.all(8), // Increase padding for a larger touch area
-                                decoration: BoxDecoration(
-                                  color: Colors.deepPurple,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(Icons.add_shopping_cart, color: Colors.white, size: 24), // Larger icon size
+                          Expanded(
+                            flex: 3,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    item.name,
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    "\$${item.price.toStringAsFixed(2)}",
+                                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerRight, // Center the button horizontally in the available space
+                                    child: GestureDetector(
+                                      onTap: () => _showQuantityDialog(context, item, cartProvider),
+                                      child: Container(
+                                        padding: EdgeInsets.all(8), // Increase padding for a larger touch area
+                                        decoration: BoxDecoration(
+                                          color: Colors.deepPurple,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(Icons.add_shopping_cart, color: Colors.white, size: 24), // Larger icon size
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
@@ -169,6 +187,7 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                       } else {
                         cartProvider.addItem(item, quantity - currentQuantity);
                       }
+                      cartProvider.updateCart();
                       Navigator.pop(context); // Close the bottom sheet
                     },
                   ),

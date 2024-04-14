@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../API/api.dart';
+import '../Models/ingredients_model.dart';
 import '../Others/custom_text_fields.dart';
 
 class AddIngredientPage extends StatefulWidget {
@@ -107,13 +109,31 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                   ),
                 ),
                 child: Text('Add Ingredient', style: TextStyle(color: Colors.white)),
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    // Handle your ingredient addition logic here
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Ingredient Added')),
+                    // Create an Ingredient instance from the form data
+                    Ingredient newIngredient = Ingredient(
+                      id: _id,
+                      name: _name,
+                      image: _image,
+                      stock: _stock,
+                      price: _price,
+                      quantityType: _quantityType,
                     );
+
+                    // Call the addIngredient function and await its result
+                    bool success = await Api.addIngredient(newIngredient);
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Ingredient added successfully!')),
+                      );
+                      // Optionally clear the form or navigate away after a successful addition
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to add ingredient')),
+                      );
+                    }
                   }
                 },
               ),

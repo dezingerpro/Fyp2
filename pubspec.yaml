@@ -28,7 +28,7 @@ dependencies:
   provider: ^6.1.2
   email_validator: ^2.1.17
   flutter_spinkit: ^5.1.0
-
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +52,7 @@ flutter:
     - assets/delivery.png
     - assets/food-recipe.png
     - assets/grocery-image.png
+    - assets/logo.png
   uses-material-design: true
 
   fonts:

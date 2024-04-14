@@ -11,59 +11,61 @@ class Splash_Screen extends StatefulWidget {
   State<Splash_Screen> createState() => _Splash_ScreenState();
 }
 
-class _Splash_ScreenState extends State<Splash_Screen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  bool isChefImageVisible = true;
-
+class _Splash_ScreenState extends State<Splash_Screen> {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    );
+    Timer(const Duration(seconds: 3), navigateToNextScreen);
+  }
 
-    // Trigger the image transition after 2 seconds
-    Timer(const Duration(seconds: 2), () {
-      setState(() {
-        isChefImageVisible = false;
-      });
-      _controller.forward(); // Start the animation
-    });
+  void navigateToNextScreen() async {
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-    // Check the login status and navigate accordingly after the animation is completed
-    _controller.addStatusListener((status) async {
-      if (status == AnimationStatus.completed) {
-        final prefs = await SharedPreferences.getInstance();
-        final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-        if (isLoggedIn) {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen())); // Navigate to MainScreen if logged in
-        } else {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => signInScreen())); // Navigate to signInScreen if not logged in
-        }
+      if (isLoggedIn) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen())); // Navigate to MainScreen if logged in
+      } else {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => signInScreen())); // Navigate to signInScreen if not logged in
       }
-    });
+
   }
 
   @override
   Widget build(BuildContext context) {
+    // Assuming your logo's primary color is similar to #9C89B8; adjust as necessary.
+    Color backgroundColor = Color(0xFF9C89B8);
+
     return Scaffold(
-      body: Center(
-        child: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/home.png'),
-              fit: BoxFit.cover,
+      body: Container(
+        color: backgroundColor,
+        width: double.infinity,
+        height: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: Image.asset('assets/logo.png', height: 300, width: 300),
+              ),
             ),
-          ),
-          child: AnimatedSwitcher(
-            duration: const Duration(seconds: 1),
-            child: isChefImageVisible
-                ? Image.asset('assets/chef.png', key: ValueKey('chef'), height: 300, width: 300)
-                : Image.asset('assets/bike.png', key: ValueKey('bike'), height: 300, width: 300),
-          ),
+            Text(
+              "Food Savvy",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // Adjust the color to match your logo or design
+              ),
+            ),
+            Text(
+              "Make cooking easier",
+              style: TextStyle(
+                fontSize: 18,
+                fontStyle: FontStyle.italic,
+                color: Colors.white70, // Adjust the color to complement the background
+              ),
+            ),
+            SizedBox(height: 30), // Adjust spacing as needed
+          ],
         ),
       ),
     );

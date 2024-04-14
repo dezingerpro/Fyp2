@@ -1,12 +1,13 @@
 class Recipe {
-  final String id; // Added _id field
+  final String id;
   final String rname;
   final List<Map<String, dynamic>> ringredients;
   final num rratings;
   final String rimage;
   final String rlink;
-  final String rmainingredient; // Added mainIngredient field
-  final String rtype; // Added rtype field for recipe type
+  final String rmainingredient;
+  final String rtype;
+  final List<String> allergens;  // Added allergens field
 
   Recipe({
     required this.id,
@@ -16,26 +17,28 @@ class Recipe {
     required this.rimage,
     required this.rlink,
     required this.rmainingredient,
-    required this.rtype, // Initialize rtype in the constructor
+    required this.rtype,
+    required this.allergens, // Initialize allergens in the constructor
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
-      id: json['_id'], // Initialize _id field from JSON
+      id: json['_id'],
       rname: json['rname'],
       ringredients: parseIngredients(json['ringredients']),
       rratings: json['rratings'],
       rimage: json['rimage'],
       rlink: json['rlink'],
-      rmainingredient: json['rmainingredient'], // Initialize mainIngredient field from JSON
-      rtype: json['rtype'], // Initialize rtype field from JSON
+      rmainingredient: json['rmainingredient'],
+      rtype: json['rtype'],
+      allergens: List<String>.from(json['allergens'] ?? []), // Initialize allergens field from JSON, defaulting to an empty list if null
     );
   }
 
   static List<Map<String, dynamic>> parseIngredients(dynamic jsonIngredients) {
     List<Map<String, dynamic>> ingredientsList = [];
     if (jsonIngredients is List) {
-      jsonIngredients.forEach((ingredient) {
+      for (var ingredient in jsonIngredients) {
         if (ingredient is Map<String, dynamic>) {
           final Map<String, dynamic> parsedIngredient = {
             'ingredientName': ingredient['ingredientName'] ?? 'Unknown',
@@ -43,7 +46,7 @@ class Recipe {
           };
           ingredientsList.add(parsedIngredient);
         }
-      });
+      }
     }
     return ingredientsList;
   }

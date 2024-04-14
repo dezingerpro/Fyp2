@@ -5,6 +5,7 @@ import 'package:fyp2/landing_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../API/api.dart';
 import '../Admin/admin_page.dart';
+import '../Others/bottom_tabs.dart';
 
 class signInScreen extends StatefulWidget {
   const signInScreen({super.key});
@@ -270,7 +271,7 @@ class _signInScreenState extends State<signInScreen> {
       String upass = _passcontroller.text;
 
       var data = {"uemail": uemail, "upass": upass};
-      bool checkStatus = await Api.getUser(data);
+      bool checkStatus = await Api.getUser(data,context);
 
       setState(() {
         isLoading = false;
@@ -293,12 +294,7 @@ class _signInScreenState extends State<signInScreen> {
           saveLoginState();
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setBool('isGuest',false);
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MyHomePage(),
-            ),(Route<dynamic> route) => false,
-          );
+          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen())); // Navigate to MainScreen if logged in
         }
       } else {
         // Handle login failure

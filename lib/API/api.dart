@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:fyp2/Models/recipe_model.dart';
 import 'package:fyp2/Models/security_question.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+//import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Models/allergy_model.dart';
 import '../Models/ingredients_model.dart';
@@ -10,6 +12,7 @@ import '../Models/main_ingredient_model.dart';
 import '../Models/order_model.dart';
 import '../Models/ratings_model.dart';
 import '../Models/user_model.dart';
+import '../provider/cart_provider.dart';
 
 class Api {
   static const baseUrl = "http://192.168.18.108:2000/api/";
@@ -78,7 +81,7 @@ class Api {
       return false;
     }
 
-    final response = await http.put(
+    final response = await http.patch(
       Uri.parse('${Api.baseUrl}user/$userId'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -96,14 +99,17 @@ class Api {
   }
 
   //USER LOGIN
-  static Future<bool> getUser(Map userData) async {
+  static Future<bool> getUser(Map userData,BuildContext context) async {
     var url = Uri.parse("${baseUrl}get_user");
     //print(email+password);
     final res = await http.post(url, body: userData);
-
     try {
       if (res.statusCode == 401) {
-        var data = jsonDecode(res.body);
+        var received_data = jsonDecode(res.body);
+        var data = received_data['user'];
+        var ingredientsData = received_data['ingredients'];
+        print("data $data");
+        print("ingredientsData $ingredientsData");
         final prefs = await SharedPreferences.getInstance();
         if (data['isAdmin'] == true) {
           prefs.setBool('isAdmin', true);
@@ -115,6 +121,7 @@ class Api {
         }
         String userId = data['_id']; // Make sure to replace 'userId' with the actual key used in your API response
         prefs.setString('userId', userId);
+        updateCartFromData(data['ucart'],ingredientsData,context);
         return true;
       } else if (res.statusCode == 402) {
         print("PLEASE CHECK YOUR PASSWORD");
@@ -126,6 +133,34 @@ class Api {
     }
     return false;
   }
+
+  static void updateCartFromData(List<dynamic> ucart, List<dynamic> ingredientsData,BuildContext context) {
+    final ingredientMap = {for (var ingredient in ingredientsData) ingredient['_id']: Ingredient.fromJson(ingredient)};
+
+    // Use .map() and .where() to filter out any potential nulls
+    final List<CartItem> updatedCartItems = ucart.map((cartItem) {
+      final ingredientId = cartItem['id'];
+      final ingredient = ingredientMap[ingredientId];
+      if (ingredient != null) {
+        return CartItem(
+          item: ingredient,
+          quantity: cartItem['quantity'],
+        );
+      }
+      // Returning null here; make sure to filter these out
+      return null;
+    }).where((cartItem) => cartItem != null) // Remove nulls
+        .cast<CartItem>() // This cast is now safe; all nulls are filtered out
+        .toList();
+
+    // Now updatedCartItems is correctly typed as List<CartItem>
+    // Update cart items in your cart provider
+    final cartProvider = Provider.of<CartProvider>(context,listen: false);
+    cartProvider.setCartItems(updatedCartItems); // Implement setCartItems in CartProvider
+  }
+
+
+
 
 //GET SECURITY QUESTION
   static Future<List<securityQuestion>> fetchQuestions() async {
@@ -630,5 +665,69 @@ class Api {
       throw Exception('Failed to load allergens');
     }
   }
+
+  static Future<void> saveCartToDatabase(Map<String, CartItem> items,String userId) async {
+    final url = Uri.parse('${baseUrl}updateCart');
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          'userId': userId,
+          'ucart': items.entries.map((item) => {
+            'ingredientName': item.value.item.name,
+            'quantity': item.value.quantity,
+            'id': item.value.item.id,
+          }).toList(),
+        }),
+      );
+      var hello = items.entries.map((item) => {
+    'ingredientName': item.value.item.name,
+    'quantity': item.value.quantity,
+    'id': item.value.item.id,
+    }).toList();
+
+      print(hello);
+
+      if (response.statusCode == 200) {
+        print("Cart saved successfully");
+      } else {
+        print("Failed to save cart, Status Code: ${response.statusCode}");
+      }
+    } catch (error) {
+      print("Error saving cart: $error");
+    }
+  }
+
+  static Future<void> reanalyzeRecipes() async {
+    try {
+      final response = await http.post(
+        Uri.parse('${baseUrl}analyze-recipes'),
+      );
+      if (response.statusCode == 200) {
+        print('Recipes re-analyzed successfully.');
+      } else {
+        print('Failed to re-analyze recipes. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error occurred while trying to re-analyze recipes: $e');
+    }
+  }
+
+  // Future<void> fetchCart(String userId) async {
+  //   final response = await http.get(Uri.parse('YOUR_BACKEND_URL/api/getCart/$userId'));
+  //
+  //   if (response.statusCode == 200) {
+  //     final data = jsonDecode(response.body);
+  //     if (data['success']) {
+  //       // Update your cart provider with fetched cart contents
+  //       // Assuming you have a method in your CartProvider for this
+  //       CartProvider.updateCartFromDatabase(data['cartContents']);
+  //     }
+  //   } else {
+  //     print("Failed to fetch cart");
+  //   }
+  // }
+
 
 }
