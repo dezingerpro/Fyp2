@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fyp2/Authentication/signin_screen.dart';
 import 'package:fyp2/Others/bottom_tabs.dart'; // Adjust the path as per your project structure
+import 'package:fyp2/enter_ip.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Splash_Screen extends StatefulWidget {
@@ -19,16 +20,23 @@ class _Splash_ScreenState extends State<Splash_Screen> {
   }
 
   void navigateToNextScreen() async {
-      final prefs = await SharedPreferences.getInstance();
-      final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-      if (isLoggedIn) {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen())); // Navigate to MainScreen if logged in
-      } else {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => signInScreen())); // Navigate to signInScreen if not logged in
-      }
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => StartupScreen())); // Navigate to signInScreen if not logged in
+
 
   }
+
+  // void navigateToNextScreen() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  //
+  //   if (isLoggedIn) {
+  //     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen())); // Navigate to MainScreen if logged in
+  //   } else {
+  //     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => signInScreen())); // Navigate to signInScreen if not logged in
+  //   }
+  //
+  // }
 
   @override
   Widget build(BuildContext context) {

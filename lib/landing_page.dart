@@ -220,6 +220,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       imagePath: 'assets/grocery-image.png',
                       // endColor: Colors.teal,
                       onTap: () {
+
+                        print(Api.baseUrl);
                         // Navigator.push(
                         //   context,
                         //   MaterialPageRoute(

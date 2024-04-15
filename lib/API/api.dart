@@ -4,7 +4,6 @@ import 'package:fyp2/Models/recipe_model.dart';
 import 'package:fyp2/Models/security_question.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-//import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Models/allergy_model.dart';
 import '../Models/ingredients_model.dart';
@@ -15,34 +14,48 @@ import '../Models/user_model.dart';
 import '../provider/cart_provider.dart';
 
 class Api {
-  static const baseUrl = "http://192.168.18.108:2000/api/";
-  static bool ?adminStatus;
+
+
+  static bool? adminStatus;
+  static late String baseUrl;
+
+  static Future<void> initIp(String ip) async {
+    baseUrl = "http://$ip:2000/api/";
+    _submitIPpython(ip);
+  }
+
+  static void _submitIPpython(String ip) async {
+    String url = '${baseUrl}submit-ip';  // Change 'your-server-ip' to your actual server IP
+    try {
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'ip': ip}),
+      );
+      print('Server responded: ${response.body}');
+    } catch (e) {
+      print('Error sending IP: $e');
+    }
+  }
 
   //USER REGISTRATION
   static Future<int> addUser(User user) async {
     Map<String, dynamic> userData = user.toJson();
-    print(userData);
     userData['isAdmin'] = userData['isAdmin'].toString();
     //print(userData);
     var url = Uri.parse("${baseUrl}add_user");
     try {
       final res = await http.post(url, body: userData);
-      print("Posted successfully");
-      print(res.statusCode);
       //print(res);
       if (res.statusCode == 200) {
         var data = jsonDecode(res.body.toString());
-        print(data);
         return 200;
       } else if (res.statusCode == 205) {
-        print("Email Already Taken");
         return 205;
       } else {
-        print("Failed to get response");
         return 400;
       }
     } catch (e) {
-      print("HI");
       debugPrint(e.toString());
       return 400;
     }
@@ -62,11 +75,9 @@ class Api {
       if (response.statusCode == 200) {
         return json.decode(response.body); // Return user data
       } else {
-        print('Failed to load user with status code: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error occurred while fetching user: $e');
       return null;
     }
   }
@@ -77,7 +88,6 @@ class Api {
     final userId = prefs.getString('userId');
 
     if (userId == null) {
-      print("User ID not found");
       return false;
     }
 
@@ -90,10 +100,8 @@ class Api {
     );
 
     if (response.statusCode == 200) {
-      print("User updated successfully");
       return true;
     } else {
-      print("Failed to update user. Status code: ${response.statusCode}");
       return false;
     }
   }
@@ -105,11 +113,9 @@ class Api {
     final res = await http.post(url, body: userData);
     try {
       if (res.statusCode == 401) {
-        var received_data = jsonDecode(res.body);
-        var data = received_data['user'];
-        var ingredientsData = received_data['ingredients'];
-        print("data $data");
-        print("ingredientsData $ingredientsData");
+        var receivedData = jsonDecode(res.body);
+        var data = receivedData['user'];
+        var ingredientsData = receivedData['ingredients'];
         final prefs = await SharedPreferences.getInstance();
         if (data['isAdmin'] == true) {
           prefs.setBool('isAdmin', true);
@@ -124,12 +130,9 @@ class Api {
         updateCartFromData(data['ucart'],ingredientsData,context);
         return true;
       } else if (res.statusCode == 402) {
-        print("PLEASE CHECK YOUR PASSWORD");
       } else if (res.statusCode == 403) {
-        print("PLEASE CHECK YOUR Email");
       }
     } catch (e) {
-      print(e.toString());
     }
     return false;
   }
@@ -202,7 +205,6 @@ class Api {
         return "invalid";
       }
     } catch (e) {
-      print(e.toString());
     }
     return "error";
   }
@@ -210,18 +212,15 @@ class Api {
   //check security question answer
   static Future<bool> checkAnswer(String email, String answer) async {
     var url = Uri.parse("${baseUrl}check_answer");
-    print(answer);
     var data = {"uemail": email, "uanswer": answer};
     try {
       final response = await http.post(url, body: data);
       if (response.statusCode == 200) {
-        print("200");
         return true;
       } else {
         return false;
       }
     } catch (e) {
-      print("Error during API call: $e");
     }
     return false;
   }
@@ -231,13 +230,10 @@ class Api {
     var url = Uri.parse("${baseUrl}update_password");
     try {
       final res = await http.patch(url, body: data);
-      print("Posted successfully");
 
       if (res.statusCode == 200) {
         var data = jsonDecode(res.body.toString());
-        print(data);
       } else {
-        print("Failed to get response");
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -254,7 +250,6 @@ class Api {
         return data;
       }
     } catch (e) {
-      print(e.toString());
       return [];
     }
     return [];
@@ -305,12 +300,9 @@ class Api {
     if (response.statusCode == 200) {
       List<dynamic> lastViewedRecipes = jsonDecode(
           response.body)['lastViewedRecipes'];
-      print(lastViewedRecipes);
       return lastViewedRecipes.cast<String>();
     } else {
       // Handle error or return an empty list
-      print('Failed to fetch last viewed recipes. Status code: ${response
-          .statusCode}.');
       return [];
     }
   }
@@ -334,7 +326,6 @@ class Api {
       return recipeNames;
     } else {
       // Handle errors
-      print('Request failed with status: ${response.statusCode}.');
     }
     return recipeNames; // Return the list of recipe names
   }
@@ -348,7 +339,7 @@ class Api {
       return [];
     }
     // Your backend endpoint URL
-    const String apiUrl = '${baseUrl}recommended_recipes';
+    String apiUrl = '${baseUrl}recommended_recipes';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -363,18 +354,13 @@ class Api {
         final List<dynamic> recipeNamesJson = jsonDecode(response.body);
         final List<String> recipeNames = recipeNamesJson.map((name) =>
             name.toString()).toList();
-        print(recipeNamesJson);
-        print(recipeNames);
         return recipeNames;
       } else {
         // Handle server errors or invalid status codes
-        print('Failed to fetch recommended recipe names. Status code: ${response
-            .statusCode}');
         return [];
       }
     } catch (e) {
       // Handle network errors or JSON parsing errors
-      print('An error occurred while fetching recommended recipe names: $e');
       return [];
     }
   }
@@ -404,7 +390,6 @@ class Api {
       return true;
     } else {
       // Handle different statuses/errors appropriately in production code
-      print('Failed to submit rating: ${response.body}');
       return false;
     }
   }
@@ -415,7 +400,6 @@ class Api {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       List<dynamic> ratingsJson = json.decode(response.body);
-      print(ratingsJson);
       return ratingsJson.map((json) => Rating.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load ratings');
@@ -459,16 +443,13 @@ class Api {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        print(data);
 
         // Assuming the API returns the details for a single ingredient
         return Ingredient.fromJson(data);
       } else {
-        print('Failed to load ingredient details. Status Code: ${response.statusCode}');
         return null;
       }
     } catch (error) {
-      print('Exception when fetching ingredient details: $error');
       return null;
     }
   }
@@ -483,10 +464,8 @@ class Api {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body) as List<dynamic>;
-        print(data);
 
         List<Ingredient> ingredients = data.map((item) {
-          print(item);
           return Ingredient.fromJson(item);
         }).toList();
 
@@ -514,12 +493,10 @@ class Api {
 
       } else {
         // Handle non-200 status codes
-        print('Request failed with status: ${res.statusCode}');
         return [];
       }
     } catch (e) {
       // Handle exceptions
-      print('Exception occurred: $e');
       return [];
     }
   }
@@ -580,15 +557,11 @@ class Api {
     //print(productData);
     var url = Uri.parse("${baseUrl}add_recipe");
     try {
-      print(productData);
       final res = await http.post(url, body: productData);
-      print("Posted successfully");
 
       if (res.statusCode == 200) {
         var data = jsonDecode(res.body.toString());
-        print(data);
       } else {
-        print("Failed to get response");
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -600,13 +573,10 @@ class Api {
     var url = Uri.parse("${baseUrl}update_recipe");
     try {
       final res = await http.put(url, body: data);
-      print("Posted successfully");
 
       if (res.statusCode == 200) {
         var data = jsonDecode(res.body.toString());
-        print(data);
       } else {
-        print("Failed to get response");
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -619,9 +589,7 @@ class Api {
 
     final res = await http.post(url);
     if(res.statusCode == 200){
-      print(jsonDecode(res.body));
     }else{
-      print('Fail to delete');
     }
   }
 
@@ -687,15 +655,11 @@ class Api {
     'id': item.value.item.id,
     }).toList();
 
-      print(hello);
 
       if (response.statusCode == 200) {
-        print("Cart saved successfully");
       } else {
-        print("Failed to save cart, Status Code: ${response.statusCode}");
       }
     } catch (error) {
-      print("Error saving cart: $error");
     }
   }
 
@@ -705,12 +669,9 @@ class Api {
         Uri.parse('${baseUrl}analyze-recipes'),
       );
       if (response.statusCode == 200) {
-        print('Recipes re-analyzed successfully.');
       } else {
-        print('Failed to re-analyze recipes. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error occurred while trying to re-analyze recipes: $e');
     }
   }
 
