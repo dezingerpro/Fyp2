@@ -21,21 +21,6 @@ class Api {
 
   static Future<void> initIp(String ip) async {
     baseUrl = "http://$ip:2000/api/";
-    _submitIPpython(ip);
-  }
-
-  static void _submitIPpython(String ip) async {
-    String url = '${baseUrl}submit-ip';  // Change 'your-server-ip' to your actual server IP
-    try {
-      var response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'ip': ip}),
-      );
-      print('Server responded: ${response.body}');
-    } catch (e) {
-      print('Error sending IP: $e');
-    }
   }
 
   //USER REGISTRATION
