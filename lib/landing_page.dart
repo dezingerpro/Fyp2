@@ -58,7 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
           child: GestureDetector(
             onTap: () {
               // Trigger search or navigation
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchPage()));
+              Navigator.of(context).push(slideFromBottomTransition(const SearchPage()));
+              //Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchPage()));
             },
             child: Container(
               width: double.infinity,
@@ -708,5 +709,26 @@ class GroceryItemCard extends StatelessWidget {
     );
   }
 }
+
+PageRouteBuilder<dynamic> slideFromBottomTransition(Widget page) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => page,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0); // Start position off the screen (bottom)
+      const end = Offset.zero; // End position (fills the screen)
+      const curve = Curves.easeInOut; // An easing curve for smooth animation
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 300), // Duration of the animation
+  );
+}
+
 
 

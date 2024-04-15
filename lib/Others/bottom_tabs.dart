@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/Main%20Page/search_page.dart';
 import '../Cart+Checkout/cart.dart';
+import '../Navigation/settings.dart';
 import '../Navigation/user_profile.dart';
 import '../grocery_screen.dart';
 import '../landing_page.dart';
@@ -67,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
             BottomNavigationBarItem(icon: Icon(Icons.food_bank), label: 'Recipes'),
             BottomNavigationBarItem(icon: Icon(Icons.production_quantity_limits), label: 'Grocery'),
             BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.deepPurple,
@@ -105,7 +106,7 @@ class TabNavigator extends StatelessWidget {
         child = const CartPage(); // Replace with your RecipePage widget
         break;
       case 4:
-        child = const UserProfilePage();  // Replace with your GroceryPage widget
+        child = SettingsPage();  // Replace with your GroceryPage widget
         break;
     }
 

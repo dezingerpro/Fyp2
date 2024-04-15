@@ -7,7 +7,7 @@ import '../Models/ingredients_model.dart';
 import '../Others/custom_text_fields.dart';
 
 class AddRecipe extends StatefulWidget {
-  const AddRecipe({Key? key}) : super(key: key);
+  const AddRecipe({super.key});
 
   @override
   State<AddRecipe> createState() => _AddRecipeState();
@@ -191,7 +191,7 @@ class _AddRecipeState extends State<AddRecipe> {
                           dropdownBuilder: (context, selectedItem) {
                             return Text(
                               selectedItem ?? "Select Ingredient",
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             );
                           },
                           dropdownDecoratorProps: DropDownDecoratorProps(
@@ -228,7 +228,7 @@ class _AddRecipeState extends State<AddRecipe> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 10), // Add some spacing between the dropdown and the text field
+                    const SizedBox(width: 10), // Add some spacing between the dropdown and the text field
                   ],
                 ),
                 Padding(
@@ -265,7 +265,7 @@ class _AddRecipeState extends State<AddRecipe> {
   Future<void> fetchMainIngredients() async {
     List<MainIngredient> mainIng = await Api.fetchMainIngredients();
     setState(() {
-      mainIngredients = mainIng.map((main_ing) => main_ing.mname).toList();
+      mainIngredients = mainIng.map((mainIng) => mainIng.mname).toList();
       print(mainIngredients);
     });
   }
