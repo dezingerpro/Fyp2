@@ -1,13 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp2/provider/cart_provider.dart';
-import 'package:fyp2/Main%20Page/search_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'API/api.dart';
-import 'Models/ingredients_model.dart';
-import 'Models/recipe_model.dart';
+import '../API/api.dart';
+import '../Models/ingredients_model.dart';
+import '../Models/recipe_model.dart';
+import '../Others/bottom_tabs.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -58,7 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
           child: GestureDetector(
             onTap: () {
               // Trigger search or navigation
-              Navigator.of(context).push(slideFromBottomTransition(const SearchPage()));
+              mainScreenKey.currentState?.selectTab(2);  // 1 should be the index of the Search tab
+              //Navigator.of(context).push(slideFromBottomTransition(const SearchPage()));
               //Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchPage()));
             },
             child: Container(

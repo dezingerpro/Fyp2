@@ -4,14 +4,13 @@ import 'package:fyp2/Admin/delete_recipe.dart';
 import 'package:fyp2/Admin/inventory_management.dart';
 import 'package:fyp2/Admin/order_management.dart';
 import 'package:fyp2/Main%20Page/search_page.dart';
-import 'package:fyp2/Recipes/all_recipe_screen.dart';
 import 'package:fyp2/Admin/allrecipe_list_admin.dart';
 import 'package:fyp2/Navigation/nav_bar.dart';
 
 import '../API/api.dart';
 
 class AdminPage extends StatefulWidget {
-  const AdminPage({Key? key}) : super(key: key);
+  const AdminPage({super.key});
 
   @override
   State<AdminPage> createState() => _AdminPageState();
@@ -96,7 +95,7 @@ class _AdminPageState extends State<AdminPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => IngredientListPage(),
+                                  builder: (context) => const IngredientListPage(),
                                 ),
                               );
                             },
@@ -148,15 +147,14 @@ class _AdminPageState extends State<AdminPage> {
         onPressed: () {
           Api.reanalyzeRecipes(); // Call the function when the button is pressed
         },
-        child: Text('Analyze Recipes'),
         style: ElevatedButton.styleFrom(
-          primary: Colors.blue, // Set the background color to blue
-          onPrimary: Colors.white, // Set the text color to white
+          foregroundColor: Colors.white, backgroundColor: Colors.blue, // Set the text color to white
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8), // Rounded corners
           ),
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Padding inside the button
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Padding inside the button
         ),
+        child: const Text('Analyze Recipes'),
       ),
     );
   }

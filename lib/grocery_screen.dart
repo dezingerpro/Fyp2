@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:fyp2/provider/grocery_provider.dart';
 import '../Models/ingredients_model.dart';
-import 'Cart+Checkout/cart.dart'; // Ensure correct import path
 
 class GroceryItemsPage extends StatefulWidget {
   @override

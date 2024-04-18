@@ -2,36 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fyp2/Recipes/single_recipe_screen.dart';
 import 'package:provider/provider.dart';
 import '../Models/recipe_model.dart';
-import '../Main Page/search_page.dart';
 import '../provider/recipe_provider.dart';
-
-class SearchBar extends StatelessWidget {
-  final TextEditingController controller;
-  const SearchBar({super.key, required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: GestureDetector(
-        onTap: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => const SearchPage())),
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: "Search for dishes...",
-            prefixIcon: const Icon(Icons.search),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none),
-            filled: true,
-            fillColor: Colors.grey[200],
-          ),
-        ),
-      ),
-    );
-  }
-}
+import 'package:shimmer/shimmer.dart';
 
 class RecipeListView extends StatelessWidget {
   final List<Recipe> recipes;
@@ -43,8 +15,15 @@ class RecipeListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Recipe> recipes = Provider.of<RecipeProvider>(context).recipes;
+    if (recipes.isEmpty) {
+      // Display a placeholder widget or error message if recipes list is empty
+      return const Center(
+        child: Text('No recipes available. :(',textAlign: TextAlign.center,),
+      );
+    }
+
     return ListView.builder(
-      physics: AlwaysScrollableScrollPhysics(), // Ensure the list is always scrollable
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       itemCount: recipes.length,
       itemBuilder: (context, index) {
@@ -57,8 +36,8 @@ class RecipeListView extends StatelessWidget {
         );
       },
     );
-
   }
+
 }
 
 class RecipeCard extends StatelessWidget {
@@ -84,7 +63,7 @@ class RecipeCard extends StatelessWidget {
                   image: DecorationImage(
                     image: NetworkImage(recipe.rimage),
                     fit: BoxFit.cover,
-                    onError: (error, stackTrace) => Icon(Icons.broken_image, color: Colors.grey),
+                    onError: (error, stackTrace) => const Icon(Icons.broken_image, color: Colors.grey),
                   ),
                 ),
               ),
@@ -137,4 +116,66 @@ class RecipeCard extends StatelessWidget {
     );
   }
 }
+
+class RecipeCardShimmer extends StatelessWidget {
+  final double screenWidth;
+
+  const RecipeCardShimmer({Key? key, required this.screenWidth}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 4),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                height: 18,
+                width: screenWidth * 0.5,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 40,
+                  height: 18,
+                  color: Colors.white,
+                ),
+                Container(
+                  width: 40,
+                  height: 18,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 

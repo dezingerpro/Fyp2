@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/Navigation/user_profile.dart';
+import 'package:fyp2/Recipes/saved_recipe_screen.dart';
 
 import 'my_orders.dart';
 
@@ -51,7 +52,10 @@ class SettingsPage extends StatelessWidget {
                       context,
                       icon: Icons.bookmark,
                       text: 'Saved Recipes',
-                      onTap: () => print('Saved Recipes'),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RecipeScreen()),
+                      ),
                     ),
                     _settingsItem(
                       context,

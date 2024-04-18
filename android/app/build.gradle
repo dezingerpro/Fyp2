@@ -66,4 +66,7 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    // Add other dependencies if needed
+}

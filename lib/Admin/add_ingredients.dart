@@ -6,7 +6,7 @@ import '../Models/ingredients_model.dart';
 import '../Others/custom_text_fields.dart';
 
 class AddIngredientPage extends StatefulWidget {
-  const AddIngredientPage({Key? key}) : super(key: key);
+  const AddIngredientPage({super.key});
 
   @override
   _AddIngredientPageState createState() => _AddIngredientPageState();
@@ -14,23 +14,23 @@ class AddIngredientPage extends StatefulWidget {
 
 class _AddIngredientPageState extends State<AddIngredientPage> {
   final _formKey = GlobalKey<FormState>();
-  String _id = Uuid().v4();
+  final String _id = const Uuid().v4();
   String _name = '';
   String _image = '';
   num _stock = 0;
   num _price = 0.0;
   String _quantityType = 'Pieces';
-  List<String> _quantityTypes = ['Pieces', 'Kilograms', 'Liters', 'Packets'];
+  final List<String> _quantityTypes = ['Pieces', 'Kilograms', 'Liters', 'Packets'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Ingredient', style: TextStyle(color: Colors.white)),
+        title: const Text('Add Ingredient', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.deepPurple, // Feel free to adjust the color
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
@@ -68,7 +68,7 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
               ),
               CustomTextField(
                 labelText: 'Price',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 validator: (value) {
                   if (value == null || value.isEmpty || double.tryParse(value) == null) {
                     return 'Please enter a valid price';
@@ -99,16 +99,16 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                   });
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple, // Adjust the button color
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                child: Text('Add Ingredient', style: TextStyle(color: Colors.white)),
+                child: const Text('Add Ingredient', style: TextStyle(color: Colors.white)),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
@@ -126,12 +126,12 @@ class _AddIngredientPageState extends State<AddIngredientPage> {
                     bool success = await Api.addIngredient(newIngredient);
                     if (success) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Ingredient added successfully!')),
+                        const SnackBar(content: Text('Ingredient added successfully!')),
                       );
                       // Optionally clear the form or navigate away after a successful addition
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to add ingredient')),
+                        const SnackBar(content: Text('Failed to add ingredient')),
                       );
                     }
                   }

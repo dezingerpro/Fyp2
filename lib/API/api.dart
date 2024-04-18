@@ -17,11 +17,7 @@ class Api {
 
 
   static bool? adminStatus;
-  static late String baseUrl;
-
-  static Future<void> initIp(String ip) async {
-    baseUrl = "http://$ip:2000/api/";
-  }
+  static String baseUrl = "http://192.168.18.108:2000/api/";
 
   //USER REGISTRATION
   static Future<int> addUser(User user) async {
@@ -462,6 +458,18 @@ class Api {
     } catch (error) {
       throw Exception(error);
     }
+  }
+
+  Future<Map<String, dynamic>> fetchRecipeById(String recipeId) async {
+    try {
+      final response = await http.get(Uri.parse('${baseUrl}single_recipes/$recipeId'));
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+    } catch (e) {
+      print("Failed to load recipe: $e");
+    }
+    return {};
   }
 
   static Future<List<Recipe>> getRecipe() async {

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/Main%20Page/search_page.dart';
-import '../Cart+Checkout/cart.dart';
+import '../Cart/cart.dart';
 import '../Navigation/settings.dart';
-import '../Navigation/user_profile.dart';
 import '../grocery_screen.dart';
-import '../landing_page.dart';
+import '../Main Page/landing_page.dart';
+
+final GlobalKey<_MainScreenState> mainScreenKey = GlobalKey<_MainScreenState>();
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+   const MainScreen({Key? key}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -23,6 +24,12 @@ class _MainScreenState extends State<MainScreen> {
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
+
+  void selectTab(int index) {
+    if (index != _selectedIndex) {
+      _onItemTapped(index);
+    }
+  }
 
   void _onItemTapped(int index) {
     _previousIndex = _selectedIndex;

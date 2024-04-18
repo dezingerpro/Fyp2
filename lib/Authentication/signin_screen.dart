@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/Authentication/forgot_password.dart';
 import 'package:fyp2/Authentication/signup_screen.dart';
-import 'package:fyp2/landing_page.dart';
+import 'package:fyp2/Main%20Page/landing_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../API/api.dart';
 import '../Admin/admin_page.dart';
