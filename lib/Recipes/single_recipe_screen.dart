@@ -245,74 +245,101 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
 
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.only(
-            top: 8.0, right: 8.0, bottom: 8.0), // Reduced left padding
+        padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
-          // Changed from ListView.separated to ListView.builder
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: widget.recipe.ringredients.length,
           itemBuilder: (context, index) {
             final ingredient = widget.recipe.ringredients[index];
-            bool hasImage =
-                ingredient['image'] != null && ingredient['image'].isNotEmpty;
+            bool hasImage = ingredient['image'] != null && ingredient['image'].isNotEmpty;
 
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.add_shopping_cart, color: Colors.deepPurple),
-                  onPressed: () async {
-                    Ingredient? detailedIngredient =
-                        await Api.fetchIngredientDetails(
-                            ingredient['ingredientName']);
-                    if (detailedIngredient != null) {
-                      _showQuantityDialog(
-                          context, detailedIngredient, cartProvider);
-                    } else {
-                      print(
-                          'Error fetching ingredient details'); // Optionally, handle this visibly
-                    }
-                  },
-                ),
-                hasImage
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            8), // Rounded corners for the image
+            return Card(
+              color: Colors.transparent, // Sets the background color of the card
+              elevation: 0,
+              margin: const EdgeInsets.symmetric(vertical: 6),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    if (hasImage)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
                         child: Image.network(
                           ingredient['image'],
-                          width: 40,
-                          height: 40,
+                          width: 50,
+                          height: 50,
                           fit: BoxFit.cover,
                         ),
                       )
-                    : CircleAvatar(
-                        backgroundColor: Colors.grey[
-                            300],
-                        radius: 20, // Light grey background for the info icon
+                    else
+                      CircleAvatar(
+                        backgroundColor: Colors.grey[300],
+                        radius: 25,
                         child: const Icon(Icons.info_outline, color: Colors.black),
                       ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      ingredient['ingredientName'],
-                      style: const TextStyle(fontSize: 16),
-                      overflow: TextOverflow.ellipsis,
+                    SizedBox(width: 10), // Space between image and text
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ingredient['ingredientName'],
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (ingredient['secondaryName'].isNotEmpty)
+                            Text(
+                              ingredient['secondaryName'],
+                              style: TextStyle(fontSize: 14, color: Colors.grey),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          Text(
+                            ingredient['extra'],
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          ingredient['quantity'],
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          ingredient['qtytype'],
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add_shopping_cart, color: Colors.deepPurple),
+                      onPressed: () async {
+                        Ingredient? detailedIngredient =
+                        await Api.fetchIngredientDetails(ingredient['ingredientName']);
+                        if (detailedIngredient != null) {
+                          _showQuantityDialog(context, detailedIngredient, cartProvider);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error fetching ingredient details'))
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                Text(
-                  ingredient['quantity'],
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
+              ),
             );
           },
         ),
       ),
     );
   }
+
+
 
   Widget _buildDetailsTab() {
     return SingleChildScrollView(

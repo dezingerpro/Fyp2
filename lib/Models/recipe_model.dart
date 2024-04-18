@@ -42,7 +42,10 @@ class Recipe {
         if (ingredient is Map<String, dynamic>) {
           final Map<String, dynamic> parsedIngredient = {
             'ingredientName': ingredient['ingredientName'] ?? 'Unknown',
-            'quantity': ingredient['quantity'] ?? '',
+            'quantity': ingredient['quantity'] ?? '0',
+            'qtytype': ingredient['qtytype'] ?? 'units',
+            'extra': ingredient['extra'] ?? '',
+            'secondaryName': ingredient['secondaryName'] ?? '',
           };
           ingredientsList.add(parsedIngredient);
         }

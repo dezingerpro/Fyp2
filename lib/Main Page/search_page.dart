@@ -18,8 +18,7 @@ class SearchPage extends StatefulWidget {
   _SearchPageState createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage>
-    with SingleTickerProviderStateMixin {
+class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateMixin {
   List<Recipe> recipes = [];
   List<Recipe> filteredRecipes = [];
   TextEditingController searchController = TextEditingController();
@@ -50,7 +49,10 @@ class _SearchPageState extends State<SearchPage>
   @override
   void initState() {
     super.initState();
-    fetchRecipes();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchRecipes();
+        // Assuming fetchRecipes calls notifyListeners
+    });
     fetchAllergies();
     fetchIngredients();
     _fetchUserDataAndInitialize();
@@ -58,6 +60,7 @@ class _SearchPageState extends State<SearchPage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+
   }
 
   Future<void> _handleRefresh() async {
@@ -240,7 +243,7 @@ class _SearchPageState extends State<SearchPage>
 
                         CheckboxListTile(
                           title:
-                              Text("Exclude recipes with selected allergens"),
+                              const Text("Exclude recipes with selected allergens"),
                           value: filterAllergens,
                           onChanged: (bool? newValue) {
                             setState(() {
@@ -251,8 +254,8 @@ class _SearchPageState extends State<SearchPage>
                           },
                           controlAffinity: ListTileControlAffinity.leading,
                         ),
-                        Divider(),
-                        SizedBox(height: 15),
+                        const Divider(),
+                        const SizedBox(height: 15),
                         Row(
                           children: [
                             Expanded(
@@ -297,8 +300,8 @@ class _SearchPageState extends State<SearchPage>
                               );
                             }).toList(),
                           ),
-                        Divider(),
-                        SizedBox(height: 15),
+                        const Divider(),
+                        const SizedBox(height: 15),
                         Row(
                           children: [
                             Expanded(
@@ -552,10 +555,7 @@ class _SearchPageState extends State<SearchPage>
 
       // Print information about recipes with allergens
       if (allergenContainingRecipes.isNotEmpty) {
-        print(
-            'Found ${allergenContainingRecipes.length} recipes containing selected allergens.');
       } else {
-        print('No recipes found containing selected allergens.');
       }
     }
 
@@ -601,7 +601,7 @@ class CategoryTab extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const CategoryTab({
+  const CategoryTab({super.key,
     required this.category,
     required this.isSelected,
     required this.onTap,
