@@ -42,13 +42,17 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    fetchRecipes();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
+      recipeProvider.recommendedRecipes(); // Fetch recommended recipes
+    });
+    //fetchRecipes();
     fetchGroceries();
   }
 
   @override
   Widget build(BuildContext context) {
-    final recipeProvider = Provider.of<RecipeProvider>(context);
+    final recipeProvider = Provider.of<RecipeProvider>(context,listen:false);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor, // Consider using a gradient or a vibrant solid color
@@ -239,40 +243,48 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0,right: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                    child: Text(
-                      "Recommended Recipes",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple, // Adjust the color according to your theme
-                      ),
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: List.generate(
-                        filteredRecipes.length,
-                            (index) => RecipeCard(
-                              recipe: filteredRecipes[index],
-                          recipeName: filteredRecipes[index].rname,
-                          imageUrl: filteredRecipes[index].rimage,
-                          rating: filteredRecipes[index].rratings.toDouble(),
+        Consumer<RecipeProvider>(
+            builder: (context, recipeProvider, child) {
+              return Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 10.0),
+                      child: Text(
+                        "Recommended Recipes",
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors
+                              .deepPurple, // Adjust the color according to your theme
                         ),
                       ),
                     ),
-                  ),
-                ],
-              )
-              ,
-            ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(
+                          recipeProvider.filteredRecipes.length,
+                              (index) =>
+                              RecipeCard(
+                                recipe: recipeProvider.filteredRecipes[index],
+                                recipeName: recipeProvider.filteredRecipes[index].rname,
+                                imageUrl: recipeProvider.filteredRecipes[index].rimage,
+                                rating: recipeProvider.filteredRecipes[index].rratings
+                                    .toDouble(),
+                              ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+                ,
+              );
+            }
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
               child: Column(
@@ -331,34 +343,34 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> fetchRecipes() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isGuest = prefs.getBool('isGuest') ?? true; // Default to true if not set
-    final recipeProvider = Provider.of<RecipeProvider>(context);
-    var data = await Api.getRecipeAll();
-    if (!isGuest) {
-      var recommendedNames = await Api.fetchRecommendedRecipeNames();
-      setState(() {
-        // Map JSON data to Recipe models
-        recipes = data
-            .map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson))
-            .toList();
-        // Filter recipes to only include recommended ones
-        filteredRecipes = recipes.where((recipe) => recommendedNames.contains(recipe.rname)).toList();
-        recipeProvider.updateFilteredRecipes(filteredRecipes);
-      });
-    } else {
-      // For guest users, display any 10 recipes
-      setState(() {
-        // Map JSON data to Recipe models
-        recipes = data
-            .map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson))
-            .toList();
-        // Randomly select 10 recipes to display
-        filteredRecipes = (recipes..shuffle()).take(10).toList();
-      });
-    }
-  }
+  // Future<void> fetchRecipes() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   bool isGuest = prefs.getBool('isGuest') ?? true; // Default to true if not set
+  //   final recipeProvider = Provider.of<RecipeProvider>(context,listen: false);
+  //   var data = await Api.getRecipeAll();
+  //   if (!isGuest) {
+  //     var recommendedNames = await Api.fetchRecommendedRecipeNames();
+  //     setState(() {
+  //       // Map JSON data to Recipe models
+  //       recipes = data
+  //           .map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson))
+  //           .toList();
+  //       // Filter recipes to only include recommended ones
+  //       filteredRecipes = recipes.where((recipe) => recommendedNames.contains(recipe.rname)).toList();
+  //       recipeProvider.updateFilteredRecipes(filteredRecipes);
+  //     });
+  //   } else {
+  //     // For guest users, display any 10 recipes
+  //     setState(() {
+  //       // Map JSON data to Recipe models
+  //       recipes = data
+  //           .map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson))
+  //           .toList();
+  //       // Randomly select 10 recipes to display
+  //       filteredRecipes = (recipes..shuffle()).take(10).toList();
+  //     });
+  //   }
+  // }
 
   void _showAddToCartDialog(BuildContext context, Ingredient item) {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);

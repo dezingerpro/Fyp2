@@ -75,6 +75,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
         rmainingredient: recipeMap['rmainingredient'],
         rtype: recipeMap['rtype'],
         allergens: allergensMaps.map((m) => m['allergen'].toString()).toList(),
+        rinstructions: allergensMaps.map((m) => m['rinstructions'].toString()).toList(),
       ));
     }
 

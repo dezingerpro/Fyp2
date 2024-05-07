@@ -17,7 +17,7 @@ class Api {
 
 
   static bool? adminStatus;
-  static String baseUrl = "http://192.168.18.108:2000/api/";
+  static String baseUrl = "http://13.214.60.179:2000/api/";
 
   //USER REGISTRATION
   static Future<int> addUser(User user) async {
@@ -252,7 +252,7 @@ class Api {
     currentLastViewed.insert(0, newRecipeName);
 
     // Ensure only the last five recipes are kept
-    List<String> updatedLastViewed = currentLastViewed.length > 5
+    List<String> updatedLastViewed = currentLastViewed.length > 10
         ? currentLastViewed.sublist(0, 5)
         : currentLastViewed;
 

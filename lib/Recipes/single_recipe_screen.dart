@@ -32,10 +32,13 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
 
   @override
   void initState() {
-    final recipeProvider = Provider.of<RecipeProvider>(context);
-    recipeProvider.recommendedRecipes();
     super.initState();
     _fetchRatings();
+    Api.updateLastViewedRecipes(widget.recipe.rtype);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final recipeProvider = Provider.of<RecipeProvider>(context, listen: false);
+      recipeProvider.recommendedRecipes(); // Fetch recommended recipes
+    });
     _tabController = TabController(length: 3, vsync: this);
     _youtubePlayerController = YoutubePlayerController(
       initialVideoId: YoutubePlayer.convertUrlToId('bFpfqGT5u-k')!,
@@ -361,14 +364,19 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Description:",
+            const Text("Description:" ,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            //Text(widget.recipe.description ?? "No description available.", style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 20),
-            // Text("Cooking Time: ${widget.recipe.cookingTime} minutes", style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 20),
-            //Text("Servings: ${widget.recipe.servings}", style: TextStyle(fontSize: 16)),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: widget.recipe.rinstructions.length,
+              itemBuilder: (context, index) {
+                return InstructionCard(
+                  stepNumber: index + 1,
+                  instruction: widget.recipe.rinstructions[index],
+                );
+              },
+            ),
             const SizedBox(height: 20),
             const Text('Rate and Review:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -380,7 +388,7 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
               allowHalfRating: true,
               itemCount: 5,
               itemPadding: const EdgeInsets.symmetric(
-                  horizontal: 8.0), // Increased spacing for a cleaner look
+                  horizontal: 8.0),
               itemBuilder: (context, _) =>
                   const Icon(Icons.star, color: Colors.amber),
               onRatingUpdate: (rating) {
@@ -648,3 +656,64 @@ class RatingCard extends StatelessWidget {
     );
   }
 }
+class InstructionCard extends StatelessWidget {
+  final int stepNumber;
+  final String instruction;
+
+  const InstructionCard({
+    Key? key,
+    required this.stepNumber,
+    required this.instruction,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0), // Adjust margin as needed
+      padding: const EdgeInsets.all(12.0), // Add internal padding for a neat look
+      decoration: BoxDecoration(
+        color: Colors.white, // Card background color
+        borderRadius: BorderRadius.circular(10.0), // Rounded corners
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12, // Shadow color
+            blurRadius: 6.0, // Blur intensity
+            offset: const Offset(0, 2), // Shadow offset
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Step number indicator
+          CircleAvatar(
+            radius: 15.0,
+            backgroundColor: Theme.of(context).primaryColor, // Step circle background
+            child: Text(
+              stepNumber.toString(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12), // Spacing between the circle and text
+          // Instruction text
+          Expanded(
+            child: Text(
+              instruction,
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.5, // Line height for better readability
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+
