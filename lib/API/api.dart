@@ -289,26 +289,33 @@ class Api {
   }
 
   //SEND INGREDIENTS
-  static Future<List<String>> sendIngredients(
+  static Future<List<Map<String, dynamic>>> sendIngredients(
       List<String> selectedIngredients) async {
     var url = Uri.parse('${baseUrl}search_recipes');
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"ingredients": selectedIngredients}));
-    List<String> recipeNames = [];
+
+    List<Map<String, dynamic>> recipeList = [];
+
     if (response.statusCode == 200) {
       var recommendations = jsonDecode(response.body) as Map<String, dynamic>;
-      // Extracting recipe names into a list
+      print(recommendations);
+
+      // Extract the recommended recipes and similarity scores
       var recommendedRecipes = recommendations['recommended_recipes'] as List;
-      recipeNames = recommendedRecipes
-          .map((recipe) => recipe['name'] as String)
-          .toList();
-      // Printing the list of recipe names
-      return recipeNames;
+      recipeList = recommendedRecipes.map((recipe) {
+        var name = recipe['name'] as String;
+        var similarity = recipe['similarity'].toDouble();
+        return {'name': name, 'similarity': similarity};
+      }).toList();
+
     } else {
-      // Handle errors
+      // Handle errors by logging or returning a specific message
+      print('Error fetching recommendations: ${response.statusCode}');
     }
-    return recipeNames; // Return the list of recipe names
+    // Return the list of recipe maps containing names and similarity scores
+    return recipeList;
   }
 
   //FETCH RECOMMENDED RECIPE NAMES

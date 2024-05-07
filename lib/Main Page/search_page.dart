@@ -219,6 +219,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                         child: RecipeListView(
                           recipes: filteredRecipes,
                           screenWidth: screenWidth,
+                          selectedIngredients: selectedIngredients
                         ),
                       ),
               ],
@@ -384,9 +385,20 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
                                   try {
                                     // Fetch available recipe names based on the updated selected ingredients
-                                    var newAvailableRecipeNames =
-                                        await Api.sendIngredients(
-                                            selectedIngredients);
+                                    var recipeNames = await Api.sendIngredients(selectedIngredients);
+                                    for (var data in recipeNames) {
+                                      var recipeName = data['name'] as String;
+                                      var similarityScore = data['similarity'] as double;
+
+                                      // Find the corresponding recipe and update its similarity score
+                                      for (var recipe in recipes) {
+                                        if (recipe.rname == recipeName) {
+                                          recipe.similarity = similarityScore; // Assuming the Recipe model has a similarity property
+                                          break;
+                                        }
+                                      }
+                                    }
+                                    var newAvailableRecipeNames = recipeNames.map((recipe) => recipe['name'] as String).toList();
                                     setState(() {
                                       availableRecipeNames =
                                           newAvailableRecipeNames;
@@ -421,11 +433,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                                   isLoading =
                                       true; // Start loading indicator when deleting begins
                                 });
-                                Api.sendIngredients(selectedIngredients)
-                                    .then((newAvailableRecipeNames) {
+                                Api.sendIngredients(selectedIngredients).then((newAvailableRecipeNames) {
                                   setState(() {
-                                    availableRecipeNames =
-                                        newAvailableRecipeNames;
+                                    availableRecipeNames = newAvailableRecipeNames.map((recipe) => recipe['name'] as String).toList();
                                     // Filter recipes to display based on the new list of available recipe names
                                     filterRecipes(searchController.text,
                                         availableRecipeNames);
@@ -532,9 +542,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   void filterRecipes(String query, List<String> availableRecipes) {
     // First, filter the recipes to include only those in the availableRecipes list
-    var recipesToShow = recipes
-        .where((recipe) => availableRecipes.contains(recipe.rname))
-        .toList();
+    var recipesToShow = recipes.where((recipe) => availableRecipes.contains(recipe.rname)).toList();
 
     // Conditionally filter out recipes containing selected allergens
     // if (filterAllergens) {
@@ -579,6 +587,21 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         // Initialize selectedAllergies from userData, ensuring it handles the case where allergies may not exist
         selectedAllergies = List<String>.from(userData['allergies'] ?? []);
       });
+    }
+  }
+
+  void updateRecipesWithSimilarityScores(List<Map<String, dynamic>> similarityData) {
+    for (var data in similarityData) {
+      var recipeName = data['name'] as String;
+      var similarityScore = data['similarity'] as double;
+
+      // Find the corresponding recipe and update its similarity score
+      for (var recipe in recipes) {
+        if (recipe.rname == recipeName) {
+          recipe.similarity = similarityScore; // Assuming the Recipe model has a similarity property
+          break;
+        }
+      }
     }
   }
 

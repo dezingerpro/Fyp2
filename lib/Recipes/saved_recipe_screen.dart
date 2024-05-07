@@ -89,7 +89,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : RecipeListView(recipes: _recipes, screenWidth: MediaQuery.of(context).size.width),
+          : RecipeListView(recipes: _recipes, screenWidth: MediaQuery.of(context).size.width,selectedIngredients: const [],),
     );
   }
 }

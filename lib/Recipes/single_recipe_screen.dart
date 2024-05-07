@@ -12,8 +12,9 @@ import '../provider/cart_provider.dart'; // Adjust the import path as necessary
 
 class RecipeIngredients extends StatefulWidget {
   final Recipe recipe;
+  final List<String> selectedIngredients;
 
-  const RecipeIngredients({super.key, required this.recipe});
+  const RecipeIngredients({super.key, required this.recipe,required this.selectedIngredients});
 
   @override
   _RecipeIngredientsState createState() => _RecipeIngredientsState();
@@ -30,6 +31,8 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
 
   @override
   void initState() {
+    print(widget.recipe.ringredients.first['quantity']);
+    print(widget.recipe.ringredients.first['ingredientName']);
     super.initState();
     _fetchRatings();
     _tabController = TabController(length: 3, vsync: this);
@@ -88,14 +91,6 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Colors.purple,
-      //   title: Text(widget.recipe.rname),
-      //   leading: IconButton(
-      //     icon: Icon(Icons.arrow_back),
-      //     onPressed: () => Navigator.pop(context),
-      //   ),
-      // ),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
@@ -110,7 +105,7 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
                 builder: (BuildContext context, BoxConstraints constraints) {
                   var top = constraints.biggest.height;
                   return Padding(
-                    padding: const EdgeInsets.only(top: 15.0),
+                    padding: const EdgeInsets.only(top: 20.0),
                     child: Stack(
                       children: <Widget>[
                         Positioned.fill(
@@ -254,83 +249,99 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
             final ingredient = widget.recipe.ringredients[index];
             bool hasImage = ingredient['image'] != null && ingredient['image'].isNotEmpty;
 
-            return Card(
-              color: Colors.transparent, // Sets the background color of the card
-              elevation: 0,
+            // Check if the ingredient is in the selectedIngredients list
+            bool isSelected = widget.selectedIngredients.contains(ingredient['ingredientName']);
+
+            // Apply different background colors based on whether the ingredient is selected or not
+            Color backgroundColor = isSelected ? Colors.grey.shade200 : Colors.white;
+
+            // Text style for ingredient names
+            TextStyle nameStyle = const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            );
+
+            return Container(
+              decoration: BoxDecoration(
+                color: backgroundColor, // Set background color conditionally
+                borderRadius: BorderRadius.circular(10), // Rounded corners
+                border: Border.all(
+                  color: Colors.grey.shade300, // Subtle border color
+                  width: 1,
+                ),
+              ),
               margin: const EdgeInsets.symmetric(vertical: 6),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    if (hasImage)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          ingredient['image'],
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    else
-                      CircleAvatar(
-                        backgroundColor: Colors.grey[300],
-                        radius: 25,
-                        child: const Icon(Icons.info_outline, color: Colors.black),
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  if (hasImage)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        ingredient['image'],
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
                       ),
-                    SizedBox(width: 10), // Space between image and text
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            ingredient['ingredientName'],
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          if (ingredient['secondaryName'].isNotEmpty)
-                            Text(
-                              ingredient['secondaryName'],
-                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          Text(
-                            ingredient['extra'],
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
+                    )
+                  else
+                    CircleAvatar(
+                      backgroundColor: Colors.grey[300],
+                      radius: 25,
+                      child: const Icon(Icons.info_outline, color: Colors.black),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          ingredient['quantity'],
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          ingredient['ingredientName'],
+                          style: nameStyle,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        if (ingredient['secondaryName'].isNotEmpty)
+                          Text(
+                            ingredient['secondaryName'],
+                            style: const TextStyle(fontSize: 14, color: Colors.grey),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         Text(
-                          ingredient['qtytype'],
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ingredient['extra'],
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                    IconButton(
-                      icon: Icon(Icons.add_shopping_cart, color: Colors.deepPurple),
-                      onPressed: () async {
-                        Ingredient? detailedIngredient =
-                        await Api.fetchIngredientDetails(ingredient['ingredientName']);
-                        if (detailedIngredient != null) {
-                          _showQuantityDialog(context, detailedIngredient, cartProvider);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error fetching ingredient details'))
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        ingredient['quantity'],
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        ingredient['qtytype'],
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_shopping_cart, color: Colors.deepPurple),
+                    onPressed: () async {
+                      Ingredient? detailedIngredient = await Api.fetchIngredientDetails(ingredient['ingredientName']);
+                      if (detailedIngredient != null) {
+                        _showQuantityDialog(context, detailedIngredient, cartProvider);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Error fetching ingredient details'))
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
             );
           },
@@ -338,6 +349,7 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
       ),
     );
   }
+
 
 
 
@@ -501,8 +513,6 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
 
   Future<List<Rating>> getRatings() async {
     var listoflol = await Api.fetchRatingsForRecipe(widget.recipe.id);
-    print("GETSETGO");
-    print("HIH$listoflol");
     return listoflol;
   }
 }

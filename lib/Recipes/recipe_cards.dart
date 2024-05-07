@@ -8,9 +8,11 @@ import 'package:shimmer/shimmer.dart';
 class RecipeListView extends StatelessWidget {
   final List<Recipe> recipes;
   final double screenWidth;
+  final List<String> selectedIngredients;
+
 
   const RecipeListView(
-      {super.key, required this.recipes, required this.screenWidth});
+      {super.key, required this.recipes, required this.screenWidth, required this.selectedIngredients});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class RecipeListView extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => RecipeIngredients(recipe: recipes[index])));
+                builder: (_) => RecipeIngredients(recipe: recipes[index],selectedIngredients: selectedIngredients)));
           },
           child: RecipeCard(recipe: recipes[index], screenWidth: screenWidth),
         );
@@ -81,6 +83,33 @@ class RecipeCard extends StatelessWidget {
                   ),
                 ),
               ),
+              Positioned(
+                bottom: 12,
+                left: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8), // Adjust padding as necessary
+                  decoration: BoxDecoration(
+                    color: Colors.white, // White background color
+                    borderRadius: BorderRadius.circular(16), // Rounded corners with a border radius
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3), // shadow position
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    'Match: ${recipe.similarity.toStringAsFixed(2)}', // Displaying similarity score
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
           Padding(

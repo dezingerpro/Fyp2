@@ -8,6 +8,8 @@ class Recipe {
   final String rmainingredient;
   final String rtype;
   final List<String> allergens;  // Added allergens field
+  double similarity;
+
 
   Recipe({
     required this.id,
@@ -19,7 +21,13 @@ class Recipe {
     required this.rmainingredient,
     required this.rtype,
     required this.allergens, // Initialize allergens in the constructor
+    this.similarity = 0.0, // Add a default value for similarity
   });
+
+  // Add a method to update the similarity score if needed
+  void updateSimilarity(double score) {
+    similarity = score;
+  }
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
@@ -31,6 +39,7 @@ class Recipe {
       rlink: json['rlink'],
       rmainingredient: json['rmainingredient'],
       rtype: json['rtype'],
+      similarity: json['similarity']?.toDouble() ?? 0.0, // Safe conversion to double
       allergens: List<String>.from(json['allergens'] ?? []), // Initialize allergens field from JSON, defaulting to an empty list if null
     );
   }
