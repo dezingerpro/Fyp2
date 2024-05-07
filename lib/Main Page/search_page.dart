@@ -29,8 +29,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   final recipeIngredientNameController = TextEditingController();
   bool isLoading = true;
   late AnimationController _animationController;
-  final debouncer =
-      Debouncer(milliseconds: 500); // Adjust the milliseconds as needed
+  final debouncer = Debouncer(milliseconds: 500); // Adjust the milliseconds as needed
   bool _isSearching = false;
   double _dragStart = 0.0; // To track start position of the drag
   String? selectedAllergy; // Declare selectedAllergy variable

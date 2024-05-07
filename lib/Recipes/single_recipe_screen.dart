@@ -8,7 +8,8 @@ import '../API/api.dart';
 import '../Models/ingredients_model.dart';
 import '../Models/ratings_model.dart';
 import '../Models/recipe_model.dart';
-import '../provider/cart_provider.dart'; // Adjust the import path as necessary
+import '../provider/cart_provider.dart';
+import '../provider/recipe_provider.dart'; // Adjust the import path as necessary
 
 class RecipeIngredients extends StatefulWidget {
   final Recipe recipe;
@@ -31,8 +32,8 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
 
   @override
   void initState() {
-    print(widget.recipe.ringredients.first['quantity']);
-    print(widget.recipe.ringredients.first['ingredientName']);
+    final recipeProvider = Provider.of<RecipeProvider>(context);
+    recipeProvider.recommendedRecipes();
     super.initState();
     _fetchRatings();
     _tabController = TabController(length: 3, vsync: this);

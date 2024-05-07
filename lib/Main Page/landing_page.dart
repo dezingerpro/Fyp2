@@ -8,6 +8,7 @@ import '../API/api.dart';
 import '../Models/ingredients_model.dart';
 import '../Models/recipe_model.dart';
 import '../Others/bottom_tabs.dart';
+import '../provider/recipe_provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -46,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final recipeProvider = Provider.of<RecipeProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor, // Consider using a gradient or a vibrant solid color
@@ -329,8 +331,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> fetchRecipes() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isGuest =
-        prefs.getBool('isGuest') ?? true; // Default to true if not set
+    bool isGuest = prefs.getBool('isGuest') ?? true; // Default to true if not set
+    final recipeProvider = Provider.of<RecipeProvider>(context);
 
     var data = await Api.getRecipeAll();
 
@@ -342,9 +344,8 @@ class _MyHomePageState extends State<MyHomePage> {
             .map<Recipe>((recipeJson) => Recipe.fromJson(recipeJson))
             .toList();
         // Filter recipes to only include recommended ones
-        filteredRecipes = recipes
-            .where((recipe) => recommendedNames.contains(recipe.rname))
-            .toList();
+        filteredRecipes = recipes.where((recipe) => recommendedNames.contains(recipe.rname)).toList();
+        recipeProvider.updateFilteredRecipes(filteredRecipes);
       });
     } else {
       // For guest users, display any 10 recipes
