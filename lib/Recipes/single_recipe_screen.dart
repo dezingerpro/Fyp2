@@ -186,8 +186,8 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
                     const InfoCard(
                         icon: Icons.star_rate, label: '4.5', tooltip: 'Rating'),
                     InfoCard(
-                        icon: Icons.thumb_up_alt_outlined,
-                        label: 'Like',
+                        icon: Icons.download_for_offline_outlined,
+                        label: 'Save',
                         isButton: true,
                         onTap: () {
                           final service = FlutterBackgroundService();
