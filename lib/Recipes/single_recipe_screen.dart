@@ -377,61 +377,6 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
                 );
               },
             ),
-            const SizedBox(height: 20),
-            const Text('Rate and Review:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            RatingBar.builder(
-              initialRating: 0,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: true,
-              itemCount: 5,
-              itemPadding: const EdgeInsets.symmetric(
-                  horizontal: 8.0),
-              itemBuilder: (context, _) =>
-                  const Icon(Icons.star, color: Colors.amber),
-              onRatingUpdate: (rating) {
-                setState(() {
-                  _userRating = rating;
-                });
-              },
-            ),
-
-            const SizedBox(height: 16),
-            TextField(
-              controller: _reviewController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Leave a review (Optional)',
-                hintStyle:
-                    TextStyle(color: Colors.grey[500]), // Lighter hint text
-                border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(8), // Rounded corners for the field
-                  borderSide: BorderSide.none, // No border
-                ),
-                filled: true,
-                fillColor: Colors.grey[200], // Light grey fill for subtlety
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: ElevatedButton(
-                onPressed: _submitRating,
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, backgroundColor: Colors.deepPurple, // Text color
-                  elevation: 2, // Subtle shadow
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Rounded edges
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 10), // Padding for a better shape
-                ),
-                child: const Text('Submit Rating'),
-              ),
-            ),
           ],
         ),
       ),
@@ -442,23 +387,84 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
     return SingleChildScrollView(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
-      child: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _ratings.isEmpty
-              ? const Text("No reviews yet.")
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _ratings.length,
-                  itemBuilder: (context, index) {
-                    final rating = _ratings[index];
-                    return RatingCard(
-                      rating: rating.rating,
-                      review: rating.review,
-                      userName: rating.user.uname,
-                    );
-                  },
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          const Text('Rate and Review:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          RatingBar.builder(
+            initialRating: 0,
+            minRating: 1,
+            direction: Axis.horizontal,
+            allowHalfRating: true,
+            itemCount: 5,
+            itemPadding: const EdgeInsets.symmetric(
+                horizontal: 8.0),
+            itemBuilder: (context, _) =>
+            const Icon(Icons.star, color: Colors.amber),
+            onRatingUpdate: (rating) {
+              setState(() {
+                _userRating = rating;
+              });
+            },
+          ),
+          const SizedBox(height: 15),
+          TextField(
+            controller: _reviewController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Leave a review (Optional)',
+              hintStyle:
+              TextStyle(color: Colors.grey[500]), // Lighter hint text
+              border: OutlineInputBorder(
+                borderRadius:
+                BorderRadius.circular(8), // Rounded corners for the field
+                borderSide: BorderSide.none, // No border
+              ),
+              filled: true,
+              fillColor: Colors.grey[200], // Light grey fill for subtlety
+            ),
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: ElevatedButton(
+              onPressed: _submitRating,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.deepPurple, // Text color
+                elevation: 2, // Subtle shadow
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20), // Rounded edges
                 ),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 10), // Padding for a better shape
+              ),
+              child: const Text('Submit Rating'),
+            ),
+          ),
+          const SizedBox(height: 18),
+          const Text('Customer Reviews:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,)),
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _ratings.isEmpty
+                  ? const Text("No reviews yet.")
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _ratings.length,
+                      itemBuilder: (context, index) {
+                        final rating = _ratings[index];
+                        return RatingCard(
+                          rating: rating.rating,
+                          review: rating.review,
+                          userName: rating.user.uname,
+                        );
+                      },
+                    ),
+        ],
+      ),
     ));
   }
 
