@@ -8,6 +8,7 @@ import '../API/api.dart';
 import '../Models/ingredients_model.dart';
 import '../Models/recipe_model.dart';
 import '../Others/bottom_tabs.dart';
+import '../Recipes/single_recipe_screen.dart';
 import '../provider/recipe_provider.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -260,6 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: List.generate(
                         filteredRecipes.length,
                             (index) => RecipeCard(
+                              recipe: filteredRecipes[index],
                           recipeName: filteredRecipes[index].rname,
                           imageUrl: filteredRecipes[index].rimage,
                           rating: filteredRecipes[index].rratings.toDouble(),
@@ -333,9 +335,7 @@ class _MyHomePageState extends State<MyHomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isGuest = prefs.getBool('isGuest') ?? true; // Default to true if not set
     final recipeProvider = Provider.of<RecipeProvider>(context);
-
     var data = await Api.getRecipeAll();
-
     if (!isGuest) {
       var recommendedNames = await Api.fetchRecommendedRecipeNames();
       setState(() {
@@ -564,64 +564,72 @@ class RecipeCard extends StatelessWidget {
   final String recipeName;
   final String imageUrl;
   final double rating;
+  final Recipe recipe;
 
   const RecipeCard({
     super.key,
     required this.recipeName,
     required this.imageUrl,
     required this.rating,
+    required this.recipe,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 230,
-      height: 170,
-      margin: const EdgeInsets.only(right: 10), // Add some space between the cards
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        image: DecorationImage(
-          image: NetworkImage(imageUrl),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 10,
-            left: 10,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                '$rating',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
+    return GestureDetector(
+      onTap: (){
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => RecipeIngredients(recipe: recipe,selectedIngredients: const [])));
+      },
+      child: Container(
+        width: 230,
+        height: 170,
+        margin: const EdgeInsets.only(right: 10), // Add some space between the cards
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          image: DecorationImage(
+            image: NetworkImage(imageUrl),
+            fit: BoxFit.cover,
           ),
-          Positioned(
-            bottom: 10,
-            left: 10,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Text(
-                recipeName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 10,
+              left: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '$rating',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: 10,
+              left: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Text(
+                  recipeName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
