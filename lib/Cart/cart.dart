@@ -11,76 +11,82 @@ class CartPage extends StatelessWidget {
     final cartProvider = Provider.of<CartProvider>(context);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Cart"),
+        backgroundColor: Colors.transparent,
+      ),
       body: Padding(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.03),
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: MediaQuery.of(context).size.height * 0.03),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Cart",
-                  style: TextStyle(
-                    fontSize: 32,  // Large font size for emphasis
-                    fontWeight: FontWeight.bold,  // Bold for visual impact
-                    color: Colors.black,  // Thematic color consistency
-                  ),
+            LinearProgressIndicator(
+              value: 0.5, // As step 2 of 3, Menu (1) -> Cart (2) -> Checkout (3)
+              backgroundColor: Colors.grey[300],
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Menu',
+                  style: Theme.of(context).textTheme.subtitle1,
                 ),
-              ),
+                Text(
+                  'Cart',
+                  style: Theme.of(context).textTheme.subtitle1,
+                ),
+                Text(
+                  'Checkout',
+                  style: Theme.of(context).textTheme.subtitle1,
+                ),
+              ],
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  LinearProgressIndicator(
-                    value: 0.5, // As step 2 of 3, Menu (1) -> Cart (2) -> Checkout (3)
-                    backgroundColor: Colors.grey,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Menu'),
-                      Text('Cart'),
-                      Text('Checkout'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            const SizedBox(height: 20),
             Expanded(
               child: cartProvider.itemCount == 0
                   ? const Center(
-                child: Text('Your cart is empty'),
+                child: Text(
+                  'Your cart is empty',
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
               )
                   : ListView.builder(
                 itemCount: cartProvider.items.length,
                 itemBuilder: (context, index) {
                   final cartItemKey = cartProvider.items.keys.elementAt(index);
                   final cartItem = cartProvider.items[cartItemKey];
-                  return ListTile(
-                    leading: Image.network(
-                      cartItem!.item.image,
-                      width: 50,
-                      height: 50,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-                    ),
-                    title: Text(cartItem.item.name),
-                    subtitle: Text("\$${cartItem.item.price} x ${cartItem.quantity}"),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent),
-                          onPressed: () => cartProvider.decreaseItemQuantity(cartItemKey),
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    elevation: 2.0,
+                    child: ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Image.network(
+                          cartItem!.item.image,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline, color: Colors.green),
-                          onPressed: () => cartProvider.increaseItemQuantity(cartItemKey),
-                        ),
-                      ],
+                      ),
+                      title: Text(cartItem.item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text("\$${cartItem.item.price} x ${cartItem.quantity}"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent),
+                            onPressed: () => cartProvider.decreaseItemQuantity(cartItemKey),
+                          ),
+                          Text('${cartItem.quantity}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          IconButton(
+                            icon: const Icon(Icons.add_circle_outline, color: Colors.green),
+                            onPressed: () => cartProvider.increaseItemQuantity(cartItemKey),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -88,17 +94,20 @@ class CartPage extends StatelessWidget {
             ),
             Container(
               padding: const EdgeInsets.all(16.0),
-              color: Colors.blueGrey[50],
-              child: const Row(
+              decoration: BoxDecoration(
+                color: Colors.deepPurple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Estimated Delivery Time:',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     '30 - 45 min', // Example time, adjust based on your app's logic
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ],
               ),
@@ -108,14 +117,18 @@ class CartPage extends StatelessWidget {
       ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
-          height: 60,
+          height: 80,
           padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.deepPurple,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20.0)),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Total: \$${cartProvider.totalAmount.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               ElevatedButton.icon(
                 onPressed: cartProvider.itemCount > 0
@@ -125,7 +138,14 @@ class CartPage extends StatelessWidget {
                     : null, // Disable if cart is empty
                 icon: const Icon(Icons.payment),
                 label: const Text('Checkout'),
-                style: ElevatedButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Theme.of(context).primaryColor),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                ),
               ),
             ],
           ),
@@ -134,4 +154,3 @@ class CartPage extends StatelessWidget {
     );
   }
 }
-

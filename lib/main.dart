@@ -8,6 +8,7 @@ import 'package:fyp2/provider/recipe_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'API/api.dart';
+import 'Others/bottom_tabs.dart';
 import 'SQFLite DB/database_sqflite.dart';
 
 void main() async {
@@ -99,19 +100,19 @@ Future<bool> downloadAndSaveRecipe(String recipeId) async {
 
 
 class MyApp extends StatelessWidget {
-   const MyApp({super.key});
+  const MyApp({super.key});
 
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<MainScreenState> mainScreenKey = GlobalKey<MainScreenState>();
 
   @override
   Widget build(BuildContext context) {
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => GroceryProvider()),
-    ChangeNotifierProvider(create: (context) => RecipeProvider()),// Add your GroceryProvider
-],
+        ChangeNotifierProvider(create: (context) => RecipeProvider()), // Add your GroceryProvider
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -121,10 +122,10 @@ class MyApp extends StatelessWidget {
               TargetPlatform.android: _CustomPageTransitionBuilder(),
               TargetPlatform.iOS: _CustomPageTransitionBuilder(),
             },
-          ),// Ensure 'primary' is defined or use Colors.blue
+          ), // Ensure 'primary' is defined or use Colors.blue
         ),
         navigatorKey: navigatorKey,
-        home: const Splash_Screen(), // Make sure Splash_Screen is correctly implemented
+        home: const Splash_Screen(), // Set Splash_Screen as the home screen
         debugShowCheckedModeBanner: false,
       ),
     );

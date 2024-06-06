@@ -4,6 +4,8 @@ import 'package:fyp2/Authentication/signin_screen.dart';
 import 'package:fyp2/Others/bottom_tabs.dart'; // Adjust the path as per your project structure
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../main.dart';
+
 class Splash_Screen extends StatefulWidget {
   const Splash_Screen({super.key,});
 
@@ -23,7 +25,7 @@ class _Splash_ScreenState extends State<Splash_Screen> {
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
     if (isLoggedIn) {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainScreen())); // Navigate to MainScreen if logged in
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) =>  MainScreen(key:MyApp.mainScreenKey))); // Navigate to MainScreen if logged in
     } else {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const signInScreen())); // Navigate to signInScreen if not logged in
     }

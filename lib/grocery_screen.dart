@@ -5,11 +5,15 @@ import 'package:fyp2/provider/grocery_provider.dart';
 import '../Models/ingredients_model.dart';
 
 class GroceryItemsPage extends StatefulWidget {
+  const GroceryItemsPage({super.key});
+
   @override
   _GroceryItemsPageState createState() => _GroceryItemsPageState();
 }
 
 class _GroceryItemsPageState extends State<GroceryItemsPage> {
+  String searchQuery = '';
+
   @override
   void initState() {
     super.initState();
@@ -27,8 +31,31 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
     final cartProvider = Provider.of<CartProvider>(context);
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: TextField(
+            onChanged: (query) {
+              setState(() {
+                searchQuery = query;
+              });
+            },
+            decoration: InputDecoration(
+              icon: Icon(Icons.search, color: Colors.grey[600]),
+              hintText: 'Search groceries...',
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+      ),
       body: Padding(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.03),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
         child: Column(
           children: [
             const Padding(
@@ -38,9 +65,9 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                 child: Text(
                   "Shop Groceries",
                   style: TextStyle(
-                    fontSize: 32,  // Large font size for emphasis
-                    fontWeight: FontWeight.bold,  // Bold for visual impact
-                    color: Colors.black,  // Thematic color consistency
+                    fontSize: 32, // Large font size for emphasis
+                    fontWeight: FontWeight.bold, // Bold for visual impact
+                    color: Colors.black, // Thematic color consistency
                   ),
                 ),
               ),
@@ -52,8 +79,12 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                   itemCount: groceryProvider.items.length,
                   itemBuilder: (context, index) {
                     final item = groceryProvider.items[index];
+                    if (searchQuery.isNotEmpty &&
+                        !item.name.toLowerCase().contains(searchQuery.toLowerCase())) {
+                      return Container();
+                    }
                     return Container(
-                      height: 140, // Fixed height for each item
+                      height: 160, // Increased height for more content
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -63,7 +94,7 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                             color: Colors.grey.withOpacity(0.2),
                             spreadRadius: 2,
                             blurRadius: 6,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -73,7 +104,7 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                             flex: 2,
                             child: Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.horizontal(left: Radius.circular(20)),
+                                borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
                                 border: Border.all(color: Colors.grey.shade300, width: 1), // Thin outline
                               ),
                               clipBehavior: Clip.antiAlias, // Ensure the image respects the container's rounded corners
@@ -94,24 +125,32 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                                 children: [
                                   Text(
                                     item.name,
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   Text(
                                     "\$${item.price.toStringAsFixed(2)}",
-                                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
                                   ),
                                   Align(
                                     alignment: Alignment.centerRight, // Center the button horizontally in the available space
                                     child: GestureDetector(
                                       onTap: () => _showQuantityDialog(context, item, cartProvider),
                                       child: Container(
-                                        padding: EdgeInsets.all(8), // Increase padding for a larger touch area
+                                        padding: const EdgeInsets.all(12), // Increase padding for a larger touch area
                                         decoration: BoxDecoration(
                                           color: Colors.deepPurple,
                                           shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.deepPurple.withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
                                         ),
-                                        child: Icon(Icons.add_shopping_cart, color: Colors.white, size: 24), // Larger icon size
+                                        child: const Icon(Icons.add_shopping_cart, color: Colors.white, size: 28), // Larger icon size
                                       ),
                                     ),
                                   ),
@@ -198,5 +237,4 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
       },
     );
   }
-
 }

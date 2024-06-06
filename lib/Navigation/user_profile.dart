@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:provider/provider.dart';
@@ -130,17 +131,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const Padding(
+               Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Profile",
-                    style: TextStyle(
-                      fontSize: 32,  // Large font size for emphasis
-                      fontWeight: FontWeight.bold,  // Bold for visual impact
-                      color: Colors.black,  // Thematic color consistency
-                    ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: (){
+                            Navigator.pop;
+                        },
+                        child: Icon(
+                          Icons.arrow_back_ios_new
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Text(
+                        "Profile",
+                        style: TextStyle(
+                          fontSize: 32,  // Large font size for emphasis
+                          fontWeight: FontWeight.bold,  // Bold for visual impact
+                          color: Colors.black,  // Thematic color consistency
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -17,7 +17,7 @@ class Api {
 
 
   static bool? adminStatus;
-  static String baseUrl = "http://13.214.60.179:2000/api/";
+  static String baseUrl = "http://192.168.18.178:2000/api/";
 
   //USER REGISTRATION
   static Future<int> addUser(User user) async {
@@ -300,7 +300,6 @@ class Api {
 
     if (response.statusCode == 200) {
       var recommendations = jsonDecode(response.body) as Map<String, dynamic>;
-      print(recommendations);
 
       // Extract the recommended recipes and similarity scores
       var recommendedRecipes = recommendations['recommended_recipes'] as List;
@@ -312,7 +311,6 @@ class Api {
 
     } else {
       // Handle errors by logging or returning a specific message
-      print('Error fetching recommendations: ${response.statusCode}');
     }
     // Return the list of recipe maps containing names and similarity scores
     return recipeList;
@@ -474,7 +472,6 @@ class Api {
         return json.decode(response.body);
       }
     } catch (e) {
-      print("Failed to load recipe: $e");
     }
     return {};
   }

@@ -1,25 +1,86 @@
 import 'package:flutter/material.dart';
-import 'package:fyp2/provider/cart_provider.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../API/api.dart';
+import '../Authentication/signin_screen.dart';
+import '../Others/bottom_tabs.dart';
+import '../provider/cart_provider.dart';
 import 'order_summary.dart';
 
-class CheckoutPage extends StatelessWidget {
+class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final cartProvider = Provider.of<CartProvider>(context);
+  _CheckoutPageState createState() => _CheckoutPageState();
+}
 
+class _CheckoutPageState extends State<CheckoutPage> {
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = true;
+  bool _isLoggedIn = false;
+  Map<String, TextEditingController> _controllers = {
+    'name': TextEditingController(),
+    'phoneNumber': TextEditingController(),
+    'address': TextEditingController(),
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatusAndFetchUserDetails();
+  }
+
+  void _checkLoginStatusAndFetchUserDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (_isLoggedIn) {
+      var userData = await Api.fetchUser(); // Assume this returns a Map<String, dynamic> of user data
+      if (userData != null) {
+        setState(() {
+          _controllers['name']?.text = userData['uname'] ?? '';
+          _controllers['phoneNumber']?.text = userData['umobile'] ?? '';
+          _controllers['address']?.text = "${userData['ustreet'] ?? ''}, ${userData['ucity'] ?? ''}, ${userData['uhouse'] ?? ''}";
+        });
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controllers.forEach((_, controller) => controller.dispose());
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checkout'),
+        backgroundColor: Colors.deepPurple,
       ),
-      body: SingleChildScrollView(
+      body: _isLoading ? Center(child: CircularProgressIndicator()) : _isLoggedIn ? buildCheckoutForm() : _buildSignInPrompt(),
+    );
+  }
+
+  Widget buildCheckoutForm() {
+    final cartProvider = Provider.of<CartProvider>(context);
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Order Summary',
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
             // List of products
             ListView.builder(
               shrinkWrap: true,
@@ -28,44 +89,37 @@ class CheckoutPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final cartItemKey = cartProvider.items.keys.elementAt(index);
                 final cartItem = cartProvider.items[cartItemKey];
-                return ListTile(
-                  leading: Image.network(
-                    cartItem!.item.image,
-                    width: 50,
-                    height: 50,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ListTile(
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(
+                        cartItem!.item.image,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                      ),
+                    ),
+                    title: Text(cartItem.item.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    subtitle: Text('\$${cartItem.item.price} x ${cartItem.quantity}', style: const TextStyle(fontSize: 14)),
+                    trailing: Text('\$${(cartItem.item.price * cartItem.quantity).toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
-                  title: Text(cartItem.item.name),
-                  subtitle: Text('\$${cartItem.item.price} x ${cartItem.quantity}'),
-                  trailing: Text('\$${(cartItem.item.price * cartItem.quantity).toStringAsFixed(2)}'),
                 );
               },
             ),
             const Divider(),
             // Summary
-            ListTile(
-              title: const Text('Total'),
-              trailing: Text('\$${cartProvider.totalAmount.toStringAsFixed(2)}'),
-            ),
-            ListTile(
-              title: const Text('Discount'),
-              // Assuming you have a method to calculate discount
-              trailing: Text('-\$${cartProvider.discountAmount.toStringAsFixed(2)}'),
-            ),
-            ListTile(
-              title: const Text('Delivery Charges'),
-              // Assuming a flat rate or calculated based on items/location
-              trailing: Text('\$${cartProvider.deliveryCharge.toStringAsFixed(2)}'),
-            ),
-            ListTile(
-              title: const Text('Final Price'),
-              trailing: Text('\$${cartProvider.finalPrice.toStringAsFixed(2)}'),
-            ),
+            _buildSummaryTile(context, 'Total', '\$${cartProvider.totalAmount.toStringAsFixed(2)}'),
+            _buildSummaryTile(context, 'Discount', '-\$${cartProvider.discountAmount.toStringAsFixed(2)}'),
+            _buildSummaryTile(context, 'Delivery Charges', '\$${cartProvider.deliveryCharge.toStringAsFixed(2)}'),
+            _buildSummaryTile(context, 'Final Price', '\$${cartProvider.finalPrice.toStringAsFixed(2)}'),
             const Divider(),
             // Payment Method
             const ListTile(
-              title: Text('Mode of Payment'),
-              subtitle: Text('Cash On Delivery (COD)'),
+              title: Text('Mode of Payment', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              subtitle: Text('Cash On Delivery (COD)', style: TextStyle(fontSize: 14)),
             ),
             // Voucher/Coupon
             const Padding(
@@ -74,46 +128,92 @@ class CheckoutPage extends StatelessWidget {
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Add Voucher/Coupon',
+                  prefixIcon: Icon(Icons.card_giftcard),
                 ),
               ),
             ),
             // Customer Details
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Name',
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Phone Number',
-                ),
-                keyboardType: TextInputType.phone,
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Address',
-                ),
-                maxLines: 3,
-              ),
-            ),
+            _buildTextField('Name', _controllers['name']!, TextInputType.text, editable: !_isLoggedIn),
+            _buildTextField('Phone Number', _controllers['phoneNumber']!, TextInputType.phone, editable: !_isLoggedIn),
+            _buildTextField('Address', _controllers['address']!, TextInputType.text, maxLines: 3, editable: !_isLoggedIn),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _confirmOrder(context),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50), // double.infinity is the width and 50 is the height
+                backgroundColor: Colors.deepPurple,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
               ),
-              child: const Text('Confirm Order'),
+              child: const Text('Confirm Order', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryTile(BuildContext context, String title, String value) {
+    return ListTile(
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+      trailing: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller, TextInputType keyboardType, {int maxLines = 1, bool editable = true}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        enabled: editable,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          labelText: label,
+        ),
+        style: TextStyle(fontSize: 16),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter your $label';
+          }
+          if (label == 'Phone Number' && value.length != 10) {
+            return 'Phone Number must be 10 digits';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildSignInPrompt() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'You need to sign in to proceed with the checkout.',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const signInScreen()));
+              },
+              child: const Text('Sign In'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              ),
             ),
           ],
         ),
@@ -125,22 +225,18 @@ class CheckoutPage extends StatelessWidget {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId') as String;
-    //String userId = ; // Assume you have a way to obtain the user's ID, e.g., from SharedPreferences
 
     List<Map<String, dynamic>> items = cartProvider.items.entries.map((entry) {
       return {
         'itemName': entry.value.item.name,
         'quantity': entry.value.quantity,
-        'price': entry.value.item.price, // If you want to include price
+        'price': entry.value.item.price,
       };
     }).toList();
 
     bool success = await Api.placeOrder(userId, items);
-    print(success);
     if (success) {
-      // Clear the cart
       cartProvider.clear();
-      // Navigate to the OrderSummaryPage
       Navigator.of(context).push(PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
           opacity: animation,
@@ -148,11 +244,13 @@ class CheckoutPage extends StatelessWidget {
             orderItems: items,
             totalPrice: cartProvider.totalAmount,
             orderStatus: 'Processing',
+            onContinueShopping: () {
+              mainScreenKey.currentState?.selectTab(2); // Navigate to the Grocery tab
+            },
           ),
         ),
       ));
     } else {
-      // Handle failure
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to place order')));
     }
   }
