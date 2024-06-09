@@ -19,15 +19,21 @@ class Api {
   static bool? adminStatus;
   static String baseUrl = "http://192.168.18.178:2000/api/";
 
-  //USER REGISTRATION
+  // USER REGISTRATION
   static Future<int> addUser(User user) async {
     Map<String, dynamic> userData = user.toJson();
-    userData['isAdmin'] = userData['isAdmin'].toString();
-    //print(userData);
+    userData['isAdmin'] = userData['isAdmin'].toString(); // Convert boolean to string
+
     var url = Uri.parse("${baseUrl}add_user");
     try {
-      final res = await http.post(url, body: userData);
-      //print(res);
+      final res = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(userData),
+      );
+
       if (res.statusCode == 200) {
         var data = jsonDecode(res.body.toString());
         return 200;
@@ -37,7 +43,7 @@ class Api {
         return 400;
       }
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint("Error during user registration: $e");
       return 400;
     }
   }
@@ -60,6 +66,17 @@ class Api {
       }
     } catch (e) {
       return null;
+    }
+  }
+
+  static Future<User> fetchUserById(String userId) async {
+    final response = await http.get(Uri.parse('${baseUrl}users/$userId'));
+    print("hello");
+    if (response.statusCode == 200) {
+      print("hello");
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load user');
     }
   }
 
@@ -192,16 +209,25 @@ class Api {
 
   //check security question answer
   static Future<bool> checkAnswer(String email, String answer) async {
+    print("CALLED");
     var url = Uri.parse("${baseUrl}check_answer");
     var data = {"uemail": email, "uanswer": answer};
+    print(data);
     try {
+      print("hi?");
       final response = await http.post(url, body: data);
+      print("DADA");
+      print(response);
       if (response.statusCode == 200) {
+        print("here?");
         return true;
       } else {
+        print("false");
         return false;
       }
     } catch (e) {
+      print("EEROR");
+      print(e);
     }
     return false;
   }
@@ -499,7 +525,7 @@ class Api {
   }
 
   //place orders
-  static Future<bool> placeOrder(String userId, List<Map<String, dynamic>> items, {String? voucher, String? name, String? phoneNumber, String? address}) async {
+  static Future<bool> placeOrder(String userId, List<Map<String, dynamic>> items, String orderTotal, {String? voucher}) async {
     final url = Uri.parse('${baseUrl}orders');
     final response = await http.post(
       url,
@@ -509,6 +535,7 @@ class Api {
       body: jsonEncode({
         'userId': userId,
         'items': items,
+        'orderTotal' : orderTotal,
       }),
     );
 

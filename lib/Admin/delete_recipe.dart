@@ -98,14 +98,16 @@ class _DeleteRecipeState extends State<DeleteRecipe> {
     Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.purple,
+          backgroundColor: Colors.transparent,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          title: const Text('Delete Recipe'),
+          title: const Text("Delete Recipe",style: TextStyle(
+            fontWeight: FontWeight.bold,fontSize: 28
+        ),),
         ),
         body: ListView.builder(
           itemCount: recipes.length,

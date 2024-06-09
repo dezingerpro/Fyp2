@@ -173,7 +173,7 @@ class _signInScreenState extends State<signInScreen> {
       alignment: Alignment.centerRight,
       child: TextButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const forgotPassword()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPassword()));
         },
         child: const Text('Forgot Password?', style: TextStyle(color: Colors.purple)),
       ),
@@ -222,8 +222,10 @@ class _signInScreenState extends State<signInScreen> {
   Widget _buildLoginAsGuestButton(BuildContext context) {
     return Center(
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const MyHomePage()));
+        onPressed: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool('isGuest',true);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const MainScreen()));
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.black, backgroundColor: Colors.grey,

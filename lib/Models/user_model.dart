@@ -11,8 +11,8 @@ class User {
   String uanswer;
   bool isAdmin;
   List<Map<String, dynamic>> ucart;
-  List<String> allergies; // New field for allergies
-  List<String> savedRecipes; // New field for saved recipes
+  List<String> allergies;
+  List<String> savedRecipes;
 
   User({
     this.id,
@@ -27,8 +27,8 @@ class User {
     required this.uanswer,
     required this.isAdmin,
     this.ucart = const [],
-    this.allergies = const [], // Initialize the new field
-    this.savedRecipes = const [], // Initialize the new field
+    this.allergies = const [],
+    this.savedRecipes = const [],
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -44,15 +44,14 @@ class User {
       usecurityQuestion: json['usecurityQuestion'] ?? '',
       uanswer: json['uanswer'] ?? '',
       isAdmin: json['isAdmin'] ?? false,
-      ucart: List<Map<String, dynamic>>.from(json['ucart'] ?? []),
-      allergies: List<String>.from(json['allergies'] ?? []), // Parse allergies from JSON
-      savedRecipes: List<String>.from(json['savedRecipes'] ?? []), // Parse saved recipes from JSON
+      ucart: (json['ucart'] as List<dynamic>).map((e) => Map<String, dynamic>.from(e)).toList(),
+      allergies: List<String>.from(json['allergies'] ?? []),
+      savedRecipes: List<String>.from(json['savedRecipes'] ?? []),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      //'id': id, // Uncomment if you decide to serialize the ID
       'uname': username,
       'uemail': email,
       'upass': password,
@@ -64,8 +63,8 @@ class User {
       'uanswer': uanswer,
       'isAdmin': isAdmin,
       'ucart': ucart,
-      'allergies': allergies, // Serialize allergies field
-      'savedRecipes': savedRecipes, // Serialize saved recipes field
+      'allergies': allergies,
+      'savedRecipes': savedRecipes,
     };
   }
 }

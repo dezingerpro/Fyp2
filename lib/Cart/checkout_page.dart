@@ -234,7 +234,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       };
     }).toList();
 
-    bool success = await Api.placeOrder(userId, items);
+    bool success = await Api.placeOrder(userId, items,cartProvider.totalAmount.toString());
     if (success) {
       cartProvider.clear();
       Navigator.of(context).push(PageRouteBuilder(

@@ -4,9 +4,16 @@ class Order {
   final List<OrderItem> items;
   final DateTime createdAt;
   final String orderStatus;
+  final String orderTotal;
 
-
-  Order({required this.id, required this.userId, required this.items, required this.createdAt,required this.orderStatus});
+  Order({
+    required this.id,
+    required this.userId,
+    required this.items,
+    required this.createdAt,
+    required this.orderStatus,
+    this.orderTotal = '0.00', // Default value for orderTotal
+  });
 
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
@@ -15,6 +22,7 @@ class Order {
       items: List<OrderItem>.from(json['items'].map((item) => OrderItem.fromJson(item))),
       createdAt: DateTime.parse(json['createdAt']),
       orderStatus: json['orderStatus'],
+      orderTotal: json['orderTotal'] ?? '0.00', // Handle null value
     );
   }
 
@@ -23,6 +31,7 @@ class Order {
       'userId': userId,
       'items': items.map((item) => item.toJson()).toList(),
       'orderStatus': orderStatus,
+      'orderTotal': orderTotal,
     };
   }
 }

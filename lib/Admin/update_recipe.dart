@@ -26,7 +26,6 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
   List<String> mainIngredients = [];
   List<String> ingredients = [];
 
-
   @override
   void initState() {
     super.initState();
@@ -34,15 +33,13 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
     fetchMainIngredients();
     recipeNameController = TextEditingController(text: widget.recipe.rname);
     recipeMainIngController = TextEditingController(text: widget.recipe.rmainingredient);
-    recipeRatingController =
-        TextEditingController(text: widget.recipe.rratings.toString());
+    recipeRatingController = TextEditingController(text: widget.recipe.rratings.toString());
     recipeImageController = TextEditingController(text: widget.recipe.rimage);
     recipeLinkController = TextEditingController(text: widget.recipe.rlink);
 
     // Initialize ingredient text controllers and populate with existing values
     ingredientNameControllers = widget.recipe.ringredients
-        .map((ingredient) =>
-        TextEditingController(text: ingredient['ingredientName']))
+        .map((ingredient) => TextEditingController(text: ingredient['ingredientName']))
         .toList();
     ingredientQtyControllers = widget.recipe.ringredients
         .map((ingredient) => TextEditingController(text: ingredient['quantity']))
@@ -130,7 +127,13 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
     List<MainIngredient> mainIng = await Api.fetchMainIngredients();
     setState(() {
       mainIngredients = mainIng.map((main_ing) => main_ing.mname).toList();
-      print(mainIngredients);
+    });
+  }
+
+  Future<void> fetchIngredients() async {
+    List<Ingredient> Ing = await Api.fetchIngredients();
+    setState(() {
+      ingredients = Ing.map((ing) => ing.name).toList();
     });
   }
 
@@ -144,177 +147,199 @@ class _UpdateRecipeState extends State<UpdateRecipe> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Colors.purple,
-        title: const Text('Update Recipe'),
+        backgroundColor: Colors.transparent,
+        title: const Text(
+          "Update Recipe",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Recipe Name
-              TextFormField(
-                controller: recipeNameController,
-                decoration: const InputDecoration(labelText: 'Recipe Name'),
-              ),
-              const SizedBox(height: 20),
-
-              // Recipe Main Ingredient
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Form(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Main Ingredient"),
-                  SizedBox(
-                    width: 250,
-                    child: DropdownSearch(
-                      // recipe = Api.getRecipe();
-
-                      items: mainIngredients,
-                      dropdownBuilder: (context, selectedItem) {
-                        return Text(
-                          selectedItem ?? recipeMainIngController.text,
-                          style: const TextStyle(fontSize: 16),
-                        );
-                      },
-                      compareFn: (item1, item2) {
-                        return true;
-                      },
-                      onChanged: (value){
-                        recipeMainIngController.text = value;
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Main Ingredient is required';
-                        }
-                        return null;
-                      },
-                      popupProps: PopupProps.menu(
-                          isFilterOnline: true,
-                          showSearchBox: true,
-                          showSelectedItems: true,
-                          searchFieldProps: TextFieldProps(
-                            controller: recipeMainIngController,
-                          )),
+                  // Recipe Name
+                  TextFormField(
+                    controller: recipeNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Recipe Name',
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Recipe Rating
-              TextFormField(
-                controller: recipeRatingController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Recipe Rating'),
-              ),
-              const SizedBox(height: 20),
-
-              // Recipe Image Link
-              TextFormField(
-                controller: recipeImageController,
-                decoration: const InputDecoration(labelText: 'Recipe Image Link'),
-              ),
-              const SizedBox(height: 20),
-
-
-              // Recipe Link
-              TextFormField(
-                controller: recipeLinkController,
-                decoration: const InputDecoration(labelText: 'Recipe Link'),
-              ),
-              const SizedBox(height: 20),
-
-              // Ingredients section
-              const Text(
-                'Ingredients:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Column(
-                children: List.generate(
-                  ingredientNameControllers.length,
-                      (index) => Row(
+                  // Recipe Main Ingredient
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                       //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          const Text("Ingredient: "),
-                          SizedBox(
-                            width: 180,
-                            child: DropdownSearch(
-                              // recipe = Api.getRecipe();
-                              items: ingredients,
-                              dropdownBuilder: (context, selectedItem) {
-                                return Text(
-                                  selectedItem ?? ingredientNameControllers[index].text,
-                                  style: const TextStyle(fontSize: 16),
-                                );
-                              },
-                              compareFn: (item1, item2) {
-                                return true;
-                              },
-                              onChanged: (value){
-                                ingredientNameControllers[index].text = value;
-                              },
-                              popupProps: const PopupProps.menu(
-                                isFilterOnline: true,
-                                showSearchBox: true,
-                                showSelectedItems: true,
+                      SizedBox(
+                        width: 350,
+                        child: DropdownSearch<String>(
+                          items: mainIngredients,
+                          dropdownBuilder: (context, selectedItem) {
+                            return Text(
+                              selectedItem ?? recipeMainIngController.text,
+                              style: const TextStyle(fontSize: 16),
+                            );
+                          },
+                          onChanged: (value) {
+                            recipeMainIngController.text = value!;
+                          },
+                          dropdownDecoratorProps: DropDownDecoratorProps(
+                            dropdownSearchDecoration: InputDecoration(
+                              labelText: "Select Main Ingredient",
+                              contentPadding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
                           ),
-                        ],
-                      ),
-
-
-                      // Expanded(
-                      //   child: TextFormField(
-                      //     controller: ingredientNameControllers[index],
-                      //     decoration: InputDecoration(labelText: 'Ingredient Name'),
-                      //   ),
-                      // ),
-
-
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: TextFormField(
-                          controller: ingredientQtyControllers[index],
-                          decoration: const InputDecoration(labelText: 'Quantity'),
+                          popupProps: PopupProps.menu(
+                            isFilterOnline: true,
+                            showSearchBox: true,
+                            showSelectedItems: true,
+                            searchFieldProps: TextFieldProps(
+                              controller: recipeMainIngController,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ).toList(),
-              ),
+                  const SizedBox(height: 20),
 
-              // Update and Cancel buttons
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: updateRecipe,
-                    child: const Text('Update'),
+                  // Recipe Rating
+                  TextFormField(
+                    controller: recipeRatingController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Recipe Rating',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                  const SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Navigate back without updating
-                    },
-                    child: const Text('Cancel'),
+                  const SizedBox(height: 20),
+
+                  // Recipe Image Link
+                  TextFormField(
+                    controller: recipeImageController,
+                    decoration: const InputDecoration(
+                      labelText: 'Recipe Image Link',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Recipe Link
+                  TextFormField(
+                    controller: recipeLinkController,
+                    decoration: const InputDecoration(
+                      labelText: 'Recipe Link',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Ingredients section
+                  const Text(
+                    'Ingredients:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Column(
+                    children: List.generate(
+                      ingredientNameControllers.length,
+                          (index) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: DropdownSearch<String>(
+                                items: ingredients,
+                                dropdownBuilder: (context, selectedItem) {
+                                  return Text(
+                                    selectedItem ?? ingredientNameControllers[index].text,
+                                    style: const TextStyle(fontSize: 16),
+                                  );
+                                },
+                                onChanged: (value) {
+                                  ingredientNameControllers[index].text = value!;
+                                },
+                                dropdownDecoratorProps: DropDownDecoratorProps(
+                                  dropdownSearchDecoration: InputDecoration(
+                                    labelText: "Ingredient",
+                                    contentPadding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                  ),
+                                ),
+                                popupProps: PopupProps.menu(
+                                  isFilterOnline: true,
+                                  showSearchBox: true,
+                                  showSelectedItems: true,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: ingredientQtyControllers[index],
+                                decoration: const InputDecoration(
+                                  labelText: 'Quantity',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ).toList(),
+                  ),
+
+                  // Update and Cancel buttons
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: updateRecipe,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purple,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Update',style: TextStyle(
+                          color: Colors.white
+                        ),),
+                      ),
+                      const SizedBox(width: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Navigate back without updating
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Cancel'),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
-  }
-  Future<void> fetchIngredients() async {
-    List<Ingredient> Ing = await Api.fetchIngredients();
-    setState(() {
-      ingredients = Ing.map((ing) => ing.name).toList();
-      print(ingredients);
-    });
   }
 }

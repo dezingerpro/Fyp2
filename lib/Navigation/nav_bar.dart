@@ -48,26 +48,6 @@ class _navBarState extends State<navBar> {
         child: ListView(
           children: [
             ListTile(
-              title: const Text('Profile Setting' , style: TextStyle(color : Colors.black)),
-              leading: Icon(Icons.settings_outlined , color:primary[200],),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const UserProfilePage(),
-                    ));            },
-            ),
-            ListTile(
-              title: const Text('My Orders' , style: TextStyle(color : Colors.black)),
-              leading: Icon(Icons.settings_outlined , color:primary[200],),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MyOrdersPage(),
-                    ));            },
-            ),
-            ListTile(
               title: const Text("Logout"),
               leading: Icon(Icons.logout_rounded, color: primary[200]),
               onTap: () {

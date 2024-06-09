@@ -92,6 +92,34 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
     }
   }
 
+  void _showDownloadDialog(BuildContext context, String recipeId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Download Recipe"),
+          content: const Text("Your recipe is downloading in the background."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final service = FlutterBackgroundService();
+                service.invoke('downloadRecipe', {'recipeId': recipeId});
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,18 +215,14 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
                         icon: Icons.timer,
                         label: '45 mins',
                         tooltip: 'Prep Time'),
-                    const InfoCard(
-                        icon: Icons.star_rate, label: '4.5', tooltip: 'Rating'),
+                     InfoCard(
+                        icon: Icons.star_rate, label: widget.recipe.rratings.toString(), tooltip: 'Rating'),
                     InfoCard(
-                        icon: Icons.download_for_offline_outlined,
+                        icon: Icons.download,
                         label: 'Save',
                         isButton: true,
                         onTap: () {
-                          final service = FlutterBackgroundService();
-                          service.invoke(
-                              'downloadRecipe', {'recipeId': widget.recipe.id});
-                          print(
-                              'Like tapped'); // Implement your like functionality
+                          _showDownloadDialog(context, widget.recipe.id);
                         }),
                   ],
                 ),

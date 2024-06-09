@@ -9,7 +9,6 @@ class signUpScreen extends StatefulWidget {
 
   @override
   State<signUpScreen> createState() => _signUpScreenState();
-
 }
 
 class _signUpScreenState extends State<signUpScreen> {
@@ -26,7 +25,7 @@ class _signUpScreenState extends State<signUpScreen> {
   String error_pwd = "";
   String? errorMessage;
   bool _obscurePassword = true; // State for password visibility
-  final bool _obscuredconfirmpwd = true;
+  bool _obscuredconfirmpwd = true;
   List<String> questions = [];
 
   @override
@@ -34,6 +33,7 @@ class _signUpScreenState extends State<signUpScreen> {
     fetchQuestions();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +50,7 @@ class _signUpScreenState extends State<signUpScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 20.0,right: 20,bottom: 20),
+              padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 20),
               child: _buildSignUpButton(),
             ),
             Padding(
@@ -92,22 +92,24 @@ class _signUpScreenState extends State<signUpScreen> {
   Widget _buildFormFields() {
     return Column(
       children: [
-        _buildTextField(firstNameEditingController, 'Firstname', Icons.account_circle_rounded),
+        _buildTextField(firstNameEditingController, 'Firstname', Icons.account_circle_rounded, r'^[a-zA-Z\s]+$'),
         const SizedBox(height: 16),
-        _buildTextField(emailEditingController, 'Email', Icons.email_rounded),
+        _buildTextField(emailEditingController, 'Email', Icons.email_rounded, r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$'),
         const SizedBox(height: 16),
         _buildPasswordField(),
         const SizedBox(height: 16),
-        _buildTextField(mobileNumber, 'Mobile Number', Icons.phone_android),
+        _buildConfirmPasswordField(),
+        const SizedBox(height: 16),
+        _buildTextField(mobileNumber, 'Mobile Number (e.g., 03XXXXXXXXX)', Icons.phone_android, r'^03\d{9}$'),
         const SizedBox(height: 16),
         _buildSecurityQuestionField(),
         const SizedBox(height: 16),
-        _buildTextField(securityQuestionAnswerController, 'Security Question Answer', Icons.security_rounded),
+        _buildTextField(securityQuestionAnswerController, 'Security Question Answer', Icons.security_rounded, r'^[a-zA-Z0-9\s]+$'),
       ],
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hintText, IconData icon) {
+  Widget _buildTextField(TextEditingController controller, String hintText, IconData icon, String pattern) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -117,7 +119,14 @@ class _signUpScreenState extends State<signUpScreen> {
         filled: true,
         fillColor: Colors.grey[200],
       ),
-      validator: (value) => value != null && value.isNotEmpty ? null : '$hintText is required',
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return '$hintText is required';
+        } else if (!RegExp(pattern).hasMatch(value.trim())) {
+          return 'Invalid $hintText';
+        }
+        return null;
+      },
     );
   }
 
@@ -140,34 +149,56 @@ class _signUpScreenState extends State<signUpScreen> {
     );
   }
 
-  Widget _buildSecurityQuestionField() {
-    return DropdownButtonFormField<String>(
+  Widget _buildConfirmPasswordField() {
+    return TextFormField(
+      controller: confirmPasswordEditingController,
+      obscureText: _obscuredconfirmpwd,
       decoration: InputDecoration(
-        labelText: "Select Security Question", // You can add a label if needed
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
+        hintText: 'Confirm Password',
+        prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+        suffixIcon: IconButton(
+          icon: Icon(_obscuredconfirmpwd ? Icons.visibility_off : Icons.visibility, color: Colors.deepPurple),
+          onPressed: () => setState(() => _obscuredconfirmpwd = !_obscuredconfirmpwd),
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.deepPurple)),
         filled: true,
         fillColor: Colors.grey[200],
       ),
-      value: questions.isNotEmpty ? questions.first : null, // Set an initial value if list is not empty
-      items: questions.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: (value) {
-        // Update the selected security question
-        setState(() {
-          securityQuestions.text = value!;
-        });
-      },
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Security Question is required';
-        }
-        return null;
-      },
+      validator: (value) => value == passwordEditingController.text ? null : 'Passwords do not match',
+    );
+  }
+
+  Widget _buildSecurityQuestionField() {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: "Select Security Question", // You can add a label if needed
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+        value: questions.isNotEmpty ? questions.first : null, // Set an initial value if list is not empty
+        items: questions.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (value) {
+          // Update the selected security question
+          setState(() {
+            securityQuestions.text = value!;
+          });
+        },
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Security Question is required';
+          }
+          return null;
+        },
+      ),
     );
   }
 
@@ -199,63 +230,76 @@ class _signUpScreenState extends State<signUpScreen> {
   void signUp(String email, String password) async {
     if (_formSignUpKey.currentState!.validate()) {
       User user = User(
-          username:firstNameEditingController.text,
-          email: emailEditingController.text,
-          password: passwordEditingController.text,
-          usecurityQuestion: securityQuestions.text,
-          uanswer: securityQuestionAnswerController.text,
-          isAdmin: false,
-          mobileNumber: mobileNumber.text,
-          city: '',
-          streetAddress: '',
-          houseDetails: '',
-          ucart: []
+        username: firstNameEditingController.text,
+        email: emailEditingController.text,
+        password: passwordEditingController.text,
+        usecurityQuestion: securityQuestions.text,
+        uanswer: securityQuestionAnswerController.text,
+        isAdmin: false,
+        mobileNumber: mobileNumber.text,
+        city: '',
+        streetAddress: '',
+        houseDetails: '',
+        ucart: [],
+        allergies: [],
+        savedRecipes: [],
       );
-      int check = await Api.addUser(user);
-      if(check==205){
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Email Taken"),
-            content: const Text("Please enter another email"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("OK"),
-              ),
-            ],
+
+      print("User to be signed up: ${user.toJson()}");
+
+      try {
+        int check = await Api.addUser(user);
+
+        if (check == 205) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Email Taken"),
+                content: const Text("Please enter another email"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            },
           );
-        },
-      );
-    }if(check==200){
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Sign Up Successfull"),
-              content: const Text("You can sign in using your email"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const signInScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
+        } else if (check == 200) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Sign Up Successful"),
+                content: const Text("You can sign in using your email"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const signInScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          print("Unknown response code from API: $check");
+        }
+      } catch (e) {
+        print("Error during sign up: $e");
       }
     }
   }
+
   Future<void> fetchQuestions() async {
     List<securityQuestion> Question = await Api.fetchQuestions();
     setState(() {

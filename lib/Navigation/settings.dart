@@ -1,10 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fyp2/Navigation/user_profile.dart';
 import 'package:fyp2/Recipes/saved_recipe_screen.dart';
-
+import '../Authentication/signin_screen.dart';
 import 'my_orders.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool isGuest = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isGuest = prefs.getBool('isGuest') ?? true;
+    });
+  }
+
+  void _showLoginDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Login Required"),
+          content: const Text("You need to log in to access the profile page."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _navigateToLoginPage(context);
+              },
+              child: const Text("Login / Sign Up"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToLoginPage(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => signInScreen()),  // Replace with your sign-in screen
+          (Route<dynamic> route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +72,7 @@ class SettingsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
+            const Text(
               'Settings',
               style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
@@ -32,21 +88,29 @@ class SettingsPage extends StatelessWidget {
                       context,
                       icon: Icons.account_circle,
                       text: 'Profile',
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const UserProfilePage(),
-                          ))
+                      onTap: () {
+                        if (isGuest) {
+                          _showLoginDialog(context);
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const UserProfilePage(),
+                            ),
+                          );
+                        }
+                      },
                     ),
                     _settingsItem(
                       context,
                       icon: Icons.shopping_cart,
                       text: 'My Orders',
                       onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MyOrdersPage(),
-                          ))        ,
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MyOrdersPage(),
+                        ),
+                      ),
                     ),
                     _settingsItem(
                       context,
@@ -87,12 +151,12 @@ class SettingsPage extends StatelessWidget {
 
   Widget _settingsItem(BuildContext context,
       {required IconData icon,
-      required String text,
-      required VoidCallback onTap}) {
+        required String text,
+        required VoidCallback onTap}) {
     return ListTile(
       leading: Icon(icon),
       title: Text(text),
-      trailing: Icon(Icons.arrow_forward_ios),
+      trailing: const Icon(Icons.arrow_forward_ios),
       onTap: onTap,
     );
   }

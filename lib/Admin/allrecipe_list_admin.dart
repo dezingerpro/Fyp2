@@ -38,8 +38,10 @@ class _MyRecipeAppState extends State<MyRecipeApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.purple,
-          title: Text("Choose Recipe to Update"),
+          backgroundColor: Colors.transparent,
+          title: const Text("Update Recipe",style: TextStyle(
+            fontWeight: FontWeight.bold,fontSize: 28
+        ),),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {

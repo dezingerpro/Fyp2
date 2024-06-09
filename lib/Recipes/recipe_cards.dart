@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp2/Recipes/single_recipe_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../Models/recipe_model.dart';
 import '../provider/recipe_provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -131,12 +132,14 @@ class RecipeCard extends StatelessWidget {
                 children: [
                   const Icon(Icons.star, color: Colors.amber, size: 20),
                   const SizedBox(width: 4),
-                  Text("${recipe.rratings} (0)", style: TextStyle(color: Colors.grey[600])),
+                  Text("${recipe.rratings}", style: TextStyle(color: Colors.grey[600])),
                 ],
               ),
               IconButton(
                 icon: const Icon(Icons.share),
-                onPressed: () {}, // Placeholder for functionality
+                onPressed: () {
+                  _shareRecipe(recipe);
+                }, // Placeholder for functionality
               ),
             ],
           ),
@@ -144,6 +147,12 @@ class RecipeCard extends StatelessWidget {
       ),
     );
   }
+
+  void _shareRecipe(Recipe recipe) {
+    final String text = "FOOD SAVVY\nCheck out this recipe: ${recipe.rname}\n";
+    Share.share(text);
+  }
+
 }
 
 class RecipeCardShimmer extends StatelessWidget {
