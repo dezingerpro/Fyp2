@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +23,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   List<Allergen> allergies = [];
   late bool _isLoading; // Assume this is controlled by your data fetching logic
   List<String> selectedAllergies = [];
+  Map<String, dynamic> initialUserData = {};
   final Map<String, TextEditingController> _controllers = {
     'uname': TextEditingController(),
     'uemail': TextEditingController(),
@@ -52,8 +52,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     'ustreet': FocusNode(),
     'uhouse': FocusNode(),
     'allergies':  FocusNode(),
-
-    // Add more for each field you need
   };
 
   @override
@@ -94,6 +92,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     var userData = await Api.fetchUser(); // Assume this returns a Map<String, dynamic> of user data
     if (userData != null) {
       setState(() {
+        initialUserData = userData; // Store initial data
         _controllers['uname']?.text = userData['uname'] ?? '';
         _controllers['uemail']?.text = userData['uemail'] ?? '';
         _controllers['upass']?.text = userData['upass'] ?? '';
@@ -117,6 +116,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,34 +126,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Widget buildUserProfileContent() {
     return Padding(
-      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.03),
+      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.03),
       child: Scaffold(
         body: SingleChildScrollView(
           child: Column(
             children: [
-               Padding(
-                padding: EdgeInsets.all(16.0),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Row(
                     children: [
                       GestureDetector(
-                        onTap: (){
-                            Navigator.pop;
+                        onTap: () {
+                          Navigator.pop(context);
                         },
-                        child: Icon(
-                          Icons.arrow_back_ios_new
-                        ),
+                        child: const Icon(Icons.arrow_back_ios_new),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 20,
                       ),
-                      Text(
+                      const Text(
                         "Profile",
                         style: TextStyle(
-                          fontSize: 32,  // Large font size for emphasis
-                          fontWeight: FontWeight.bold,  // Bold for visual impact
-                          color: Colors.black,  // Thematic color consistency
+                          fontSize: 32, // Large font size for emphasis
+                          fontWeight: FontWeight.bold, // Bold for visual impact
+                          color: Colors.black, // Thematic color consistency
                         ),
                       ),
                     ],
@@ -268,20 +266,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           CustomElevatedButton(
                             text: 'Save Profile',
                             onPressed: () async {
-                              print(selectedAllergies);
                               if (_formKey.currentState!.validate()) {
-                                if (_formKey.currentState!.validate()) {
-                                  Map<String, dynamic> updatedUserData = _collectFormData();
-                                  updatedUserData = {
-                                    'allergies': selectedAllergies,
-                                  };
-                                  bool success = await Api.updateUserDetails(updatedUserData);
-                                  String message = success ? 'Profile updated successfully!' : 'Failed to update profile.';
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please correct the errors in the form.')));
-                                }
-                                // Collect form data and update
+                                Map<String, dynamic> updatedUserData = _collectFormData();
+                                updatedUserData['allergies'] = selectedAllergies;
+                                bool success = await Api.updateUserDetails(updatedUserData);
+                                String message = success ? 'Profile updated successfully!' : 'Failed to update profile.';
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please correct the errors in the form.')));
                               }
                             },
                           ),
@@ -293,8 +285,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                         ],
                       ),
-          
-          
                     ],
                   ),
                 ),
@@ -312,33 +302,43 @@ class _UserProfilePageState extends State<UserProfilePage> {
       await prefs.setBool('isAdmin', false);
       await prefs.setBool('isLoggedIn', false);
       await prefs.setString('userId', '');
-      final cartProvider = Provider.of<CartProvider>(context,listen: false);
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
       cartProvider.clear();
       MyApp.navigatorKey.currentState!.pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const signInScreen()),
             (Route<dynamic> route) => false,
       );
     } catch (e) {
-      print("Error logging out: $e");
     }
   }
 
   Map<String, dynamic> _collectFormData() {
-    // This function collects form data into a map
-    return _controllers.map((key, value) => MapEntry(key.substring(1), value.text));
+    // Collect only changed form data
+    Map<String, dynamic> updatedUserData = {};
+    _controllers.forEach((key, controller) {
+      String field = key; // Remove 'u' prefix
+      String currentValue = controller.text;
+      String initialValue = initialUserData[field] ?? '';
+      if (currentValue != initialValue) {
+        updatedUserData[field] = currentValue;
+      }
+    });
+    return updatedUserData;
   }
 }
 
 class UserProfileSkeleton extends StatelessWidget {
+  const UserProfileSkeleton({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.15),
+      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
       child: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
@@ -397,4 +397,3 @@ class UserProfileSkeleton extends StatelessWidget {
     );
   }
 }
-

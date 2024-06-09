@@ -84,7 +84,6 @@ class Api {
   static Future<bool> updateUserDetails(Map<String, dynamic> userData) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
-
     if (userId == null) {
       return false;
     }

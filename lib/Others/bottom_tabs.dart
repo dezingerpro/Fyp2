@@ -6,7 +6,7 @@ import '../grocery_screen.dart';
 import '../Main Page/landing_page.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   MainScreenState createState() => MainScreenState();
@@ -15,7 +15,7 @@ class MainScreen extends StatefulWidget {
 class MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   int _previousIndex = 0;
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   static MainScreenState? instance;
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
@@ -63,7 +63,7 @@ class MainScreenState extends State<MainScreen> {
     } else {
       _pageController.animateToPage(
         index,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -138,7 +138,7 @@ class TabNavigator extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final int tabItem;
 
-  const TabNavigator({required this.navigatorKey, required this.tabItem});
+  const TabNavigator({super.key, required this.navigatorKey, required this.tabItem});
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +152,7 @@ class TabNavigator extends StatelessWidget {
         child = const SearchPage();
         break;
       case 2:
-        child = GroceryItemsPage();
+        child = const GroceryItemsPage();
         break;
       case 3:
         child = const CartPage(); // Replace with your RecipePage widget

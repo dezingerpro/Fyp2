@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import '../Others/bottom_tabs.dart';
-import '../main.dart';
 
 class OrderSummaryPage extends StatelessWidget {
   final List<Map<String, dynamic>> orderItems;

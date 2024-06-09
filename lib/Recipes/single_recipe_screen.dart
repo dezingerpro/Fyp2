@@ -58,7 +58,6 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
         _isLoading = false;
       });
     } catch (e) {
-      print('Failed to fetch ratings: $e');
       setState(() {
         _isLoading = false;
       });
@@ -691,10 +690,10 @@ class InstructionCard extends StatelessWidget {
   final String instruction;
 
   const InstructionCard({
-    Key? key,
+    super.key,
     required this.stepNumber,
     required this.instruction,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -704,11 +703,11 @@ class InstructionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white, // Card background color
         borderRadius: BorderRadius.circular(10.0), // Rounded corners
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12, // Shadow color
             blurRadius: 6.0, // Blur intensity
-            offset: const Offset(0, 2), // Shadow offset
+            offset: Offset(0, 2), // Shadow offset
           ),
         ],
       ),

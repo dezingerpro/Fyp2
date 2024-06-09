@@ -12,7 +12,9 @@ class CartPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cart"),
+        title: const Text("Cart",style: TextStyle(
+          fontWeight: FontWeight.bold,fontSize: 28
+        ),),
         backgroundColor: Colors.transparent,
       ),
       body: Padding(
@@ -31,15 +33,15 @@ class CartPage extends StatelessWidget {
               children: [
                 Text(
                   'Menu',
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(
                   'Cart',
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(
                   'Checkout',
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ],
             ),
@@ -72,7 +74,7 @@ class CartPage extends StatelessWidget {
                         ),
                       ),
                       title: Text(cartItem.item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text("\Rs ${cartItem.item.price} x ${cartItem.quantity}"),
+                      subtitle: Text("Rs ${cartItem.item.price} x ${cartItem.quantity}"),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -98,16 +100,16 @@ class CartPage extends StatelessWidget {
                 color: Colors.deepPurple.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Estimated Delivery Time:',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     '30 - 45 min', // Example time, adjust based on your app's logic
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16),
                   ),
                 ],
               ),
@@ -119,9 +121,9 @@ class CartPage extends StatelessWidget {
         child: Container(
           height: 80,
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.deepPurple,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20.0)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

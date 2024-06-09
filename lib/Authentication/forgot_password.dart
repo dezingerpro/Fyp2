@@ -66,7 +66,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
                         errorMessage,
-                        style: TextStyle(color: Colors.red, fontSize: 16),
+                        style: const TextStyle(color: Colors.red, fontSize: 16),
                       ),
                     ),
                   // INPUT EMAIL
@@ -81,7 +81,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         controller: emailController,
                         enabled: !emailFound,
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.email, color: Colors.deepPurple),
+                          prefixIcon: const Icon(Icons.email, color: Colors.deepPurple),
                           hintText: 'Email',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -113,13 +113,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         children: [
                           Text(
                             securityQuestion,
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 10),
                           TextFormField(
                             controller: questionController,
                             decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.question_answer, color: Colors.deepPurple),
+                              prefixIcon: const Icon(Icons.question_answer, color: Colors.deepPurple),
                               hintText: 'Answer',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -154,7 +154,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             controller: newPasswordController,
                             obscureText: true,
                             decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.lock, color: Colors.deepPurple),
+                              prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
                               hintText: 'New Password',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -201,7 +201,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
                             child: const Text("Submit",style: TextStyle(
                               color: Colors.white
@@ -226,7 +226,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
                             child: const Text("Check Answer",style: TextStyle(
                               color: Colors.white
@@ -248,7 +248,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   void checkAnswer() async {
     try {
       bool isAnswerCorrect = await Api.checkAnswer(emailController.text, questionController.text);
-      print(isAnswerCorrect);
       if (!mounted) return;
       if (isAnswerCorrect) {
         setState(() {
@@ -378,7 +377,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => signInScreen(),
+                      builder: (context) => const signInScreen(),
                     ),
                   );
                 },

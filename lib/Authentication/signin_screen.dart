@@ -296,7 +296,7 @@ class _signInScreenState extends State<signInScreen> {
           saveLoginState();
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setBool('isGuest',false);
-          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen())); // Navigate to MainScreen if logged in
+          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainScreen())); // Navigate to MainScreen if logged in
         }
       } else {
         // Handle login failure

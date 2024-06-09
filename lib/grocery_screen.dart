@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:fyp2/provider/grocery_provider.dart';
 import '../Models/ingredients_model.dart';
+import '../Authentication/signin_screen.dart'; // Import sign-in screen
 
 class GroceryItemsPage extends StatefulWidget {
   const GroceryItemsPage({super.key});
@@ -23,6 +25,44 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
   void _refreshGroceries() {
     final groceryProvider = Provider.of<GroceryProvider>(context, listen: false);
     groceryProvider.fetchGroceries();
+  }
+
+  Future<bool> _isGuest() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isGuest') ?? true;
+  }
+
+  Future<void> _checkAndShowLoginPrompt(BuildContext context, Ingredient item, CartProvider cartProvider) async {
+    if (await _isGuest()) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Please Sign In"),
+            content: const Text("You need to sign in to add items to the cart."),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(), // Dismiss the dialog
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Dismiss the dialog
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const signInScreen()),
+                        (Route<dynamic> route) => false,
+                  );
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      _showQuantityDialog(context, item, cartProvider);
+    }
   }
 
   @override
@@ -129,13 +169,13 @@ class _GroceryItemsPageState extends State<GroceryItemsPage> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   Text(
-                                    "\$${item.price.toStringAsFixed(2)}",
+                                    "Rs ${item.price.toStringAsFixed(2)}",
                                     style: TextStyle(color: Colors.grey[600], fontSize: 16),
                                   ),
                                   Align(
                                     alignment: Alignment.centerRight, // Center the button horizontally in the available space
                                     child: GestureDetector(
-                                      onTap: () => _showQuantityDialog(context, item, cartProvider),
+                                      onTap: () => _checkAndShowLoginPrompt(context, item, cartProvider),
                                       child: Container(
                                         padding: const EdgeInsets.all(12), // Increase padding for a larger touch area
                                         decoration: BoxDecoration(

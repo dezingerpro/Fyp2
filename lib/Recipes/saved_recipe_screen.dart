@@ -42,7 +42,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
     final List<Map<String, dynamic>> recipeMaps = await db.query('Recipes');
 
     if (recipeMaps.isEmpty) {
-      print("No recipes found in the database.");
       return [];
     }
 
@@ -69,7 +68,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
       final instructions = instructionsMaps.map((m) => m['instruction']?.toString() ?? '').toList();
 
       // Print instructions to console for debugging
-      print("Instructions for recipe ${recipeMap['rname']}:");
       instructions.forEach(print);
 
       recipes.add(Recipe(
@@ -86,7 +84,6 @@ class _RecipeScreenState extends State<RecipeScreen> {
       ));
     }
 
-    print("Loaded ${recipes.length} recipes from the database.");
     return recipes;
   }
 
@@ -118,7 +115,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   contentPadding: const EdgeInsets.all(15),
                   title: Text(
                     recipe.rname,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text('Main ingredient: ${recipe.rmainingredient}'),
                   trailing: recipe.rimage.isNotEmpty
@@ -161,11 +158,11 @@ class SingleRecipeScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(recipe.rname,style: TextStyle(
+          title: Text(recipe.rname,style: const TextStyle(
             fontSize: 28,fontWeight: FontWeight.bold
           ),),
           backgroundColor: Colors.transparent,
-          bottom: TabBar(
+          bottom: const TabBar(
             tabs: [
               Tab(text: 'Ingredients'),
               Tab(text: 'Instructions'),
@@ -208,28 +205,28 @@ class IngredientsTab extends StatelessWidget {
             ),
           )
               : const Icon(Icons.image_not_supported, size: 150, color: Colors.grey),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             recipe.rname,
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             children: [
-              Icon(Icons.star, color: Colors.amber),
-              SizedBox(width: 5),
+              const Icon(Icons.star, color: Colors.amber),
+              const SizedBox(width: 5),
               Text(
                 recipe.rratings.toString(),
                 style: TextStyle(fontSize: 18, color: Colors.grey[700]),
               ),
             ],
           ),
-          SizedBox(height: 20),
-          Text(
+          const SizedBox(height: 20),
+          const Text(
             'Ingredients',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepPurple),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           ...recipe.ringredients.map((ingredient) {
             return Card(
               margin: const EdgeInsets.symmetric(vertical: 5),
@@ -238,15 +235,15 @@ class IngredientsTab extends StatelessWidget {
               ),
               elevation: 3,
               child: ListTile(
-                leading: Icon(Icons.check_circle, color: Colors.deepPurple),
+                leading: const Icon(Icons.check_circle, color: Colors.deepPurple),
                 title: Text(
                   ingredient['ingredientName'],
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text('Quantity: ${ingredient['quantity']}'),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -278,28 +275,28 @@ class InstructionsTab extends StatelessWidget {
             ),
           )
               : const Icon(Icons.image_not_supported, size: 150, color: Colors.grey),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             recipe.rname,
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             children: [
-              Icon(Icons.star, color: Colors.amber),
-              SizedBox(width: 5),
+              const Icon(Icons.star, color: Colors.amber),
+              const SizedBox(width: 5),
               Text(
                 recipe.rratings.toString(),
                 style: TextStyle(fontSize: 18, color: Colors.grey[700]),
               ),
             ],
           ),
-          SizedBox(height: 20),
-          Text(
+          const SizedBox(height: 20),
+          const Text(
             'Instructions',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepPurple),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           ...recipe.rinstructions.map((instruction) {
             return Card(
               margin: const EdgeInsets.symmetric(vertical: 5),
@@ -308,14 +305,14 @@ class InstructionsTab extends StatelessWidget {
               ),
               elevation: 3,
               child: ListTile(
-                leading: Icon(Icons.check_circle, color: Colors.deepPurple),
+                leading: const Icon(Icons.check_circle, color: Colors.deepPurple),
                 title: Text(
                   instruction,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

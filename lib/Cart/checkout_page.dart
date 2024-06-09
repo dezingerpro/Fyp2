@@ -42,7 +42,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
         setState(() {
           _controllers['name']?.text = userData['uname'] ?? '';
           _controllers['phoneNumber']?.text = userData['umobile'] ?? '';
-          _controllers['address']?.text = "${userData['ustreet'] ?? ''}, ${userData['ucity'] ?? ''}, ${userData['uhouse'] ?? ''}";
+          String street = userData['ustreet'] ?? '';
+          String city = userData['ucity'] ?? '';
+          String house = userData['uhouse'] ?? '';
+          if (street.isEmpty || city.isEmpty || house.isEmpty) {
+            _controllers['address']?.text = '';
+          } else {
+            _controllers['address']?.text = "$street, $city, $house";
+          }
         });
       }
     }
@@ -50,6 +57,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       _isLoading = false;
     });
   }
+
 
   @override
   void dispose() {
@@ -61,12 +69,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Checkout',style: TextStyle(
-          fontSize: 28,fontWeight: FontWeight.bold
-        ),),
+        title: const Text('Checkout',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
       ),
-      body: _isLoading ? Center(child: CircularProgressIndicator()) : _isLoggedIn ? buildCheckoutForm() : _buildSignInPrompt(),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _isLoggedIn
+              ? buildCheckoutForm()
+              : _buildSignInPrompt(),
     );
   }
 
@@ -76,82 +87,107 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Order Summary',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            // List of products
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: cartProvider.items.length,
-              itemBuilder: (context, index) {
-                final cartItemKey = cartProvider.items.keys.elementAt(index);
-                final cartItem = cartProvider.items[cartItemKey];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        cartItem!.item.image,
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Order Summary',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              // List of products
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: cartProvider.items.length,
+                itemBuilder: (context, index) {
+                  final cartItemKey = cartProvider.items.keys.elementAt(index);
+                  final cartItem = cartProvider.items[cartItemKey];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Image.network(
+                          cartItem!.item.image,
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.error),
+                        ),
                       ),
+                      title: Text(cartItem.item.name,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      subtitle: Text(
+                          'Rs ${cartItem.item.price} x ${cartItem.quantity}',
+                          style: const TextStyle(fontSize: 14)),
+                      trailing: Text(
+                          'Rs ${(cartItem.item.price * cartItem.quantity).toStringAsFixed(2)}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
-                    title: Text(cartItem.item.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    subtitle: Text('Rs ${cartItem.item.price} x ${cartItem.quantity}', style: const TextStyle(fontSize: 14)),
-                    trailing: Text('Rs ${(cartItem.item.price * cartItem.quantity).toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  );
+                },
+              ),
+              const Divider(),
+              // Summary
+              _buildSummaryTile(context, 'Total',
+                  'Rs ${cartProvider.totalAmount.toStringAsFixed(2)}'),
+              _buildSummaryTile(context, 'Discount',
+                  '-Rs ${cartProvider.discountAmount.toStringAsFixed(2)}'),
+              _buildSummaryTile(context, 'Delivery Charges',
+                  'Rs ${cartProvider.deliveryCharge.toStringAsFixed(2)}'),
+              _buildSummaryTile(context, 'Final Price',
+                  'Rs ${cartProvider.finalPrice.toStringAsFixed(2)}'),
+              const Divider(),
+              // Payment Method
+              const ListTile(
+                title: Text('Mode of Payment',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                subtitle: Text('Cash On Delivery (COD)',
+                    style: TextStyle(fontSize: 14)),
+              ),
+              // Voucher/Coupon
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Add Voucher/Coupon',
+                    prefixIcon: Icon(Icons.card_giftcard),
                   ),
-                );
-              },
-            ),
-            const Divider(),
-            // Summary
-            _buildSummaryTile(context, 'Total', 'Rs ${cartProvider.totalAmount.toStringAsFixed(2)}'),
-            _buildSummaryTile(context, 'Discount', '-Rs ${cartProvider.discountAmount.toStringAsFixed(2)}'),
-            _buildSummaryTile(context, 'Delivery Charges', 'Rs ${cartProvider.deliveryCharge.toStringAsFixed(2)}'),
-            _buildSummaryTile(context, 'Final Price', 'Rs ${cartProvider.finalPrice.toStringAsFixed(2)}'),
-            const Divider(),
-            // Payment Method
-            const ListTile(
-              title: Text('Mode of Payment', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              subtitle: Text('Cash On Delivery (COD)', style: TextStyle(fontSize: 14)),
-            ),
-            // Voucher/Coupon
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Add Voucher/Coupon',
-                  prefixIcon: Icon(Icons.card_giftcard),
                 ),
               ),
-            ),
-            // Customer Details
-            _buildTextField('Name', _controllers['name']!, TextInputType.text, editable: !_isLoggedIn),
-            _buildTextField('Phone Number', _controllers['phoneNumber']!, TextInputType.phone, editable: !_isLoggedIn),
-            _buildTextField('Address', _controllers['address']!, TextInputType.text, maxLines: 3, editable: !_isLoggedIn),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => _confirmOrder(context),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50), // double.infinity is the width and 50 is the height
-                backgroundColor: Colors.deepPurple,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+              // Customer Details
+              _buildTextField('Name', _controllers['name']!, TextInputType.text,
+                  editable: false),
+              _buildTextField('Phone Number', _controllers['phoneNumber']!,
+                  TextInputType.phone,
+                  editable: false),
+              _buildTextField(
+                  'Address', _controllers['address']!, TextInputType.text,
+                  maxLines: 3, editable: false),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => _confirmOrder(context),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity,
+                      50), // double.infinity is the width and 50 is the height
+                  backgroundColor: Colors.deepPurple,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
                 ),
+                child: const Text('Confirm Order',
+                    style: TextStyle(color: Colors.white)),
               ),
-              child: const Text('Confirm Order', style: TextStyle(color: Colors.white)),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -159,12 +195,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildSummaryTile(BuildContext context, String title, String value) {
     return ListTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-      trailing: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+      title: Text(title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+      trailing: Text(value,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, TextInputType keyboardType, {int maxLines = 1, bool editable = true}) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      TextInputType keyboardType,
+      {int maxLines = 1, bool editable = true}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
@@ -207,15 +247,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const signInScreen()));
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          signInScreen()), // Replace with your sign-in screen
+                  (Route<dynamic> route) => false,
+                );
               },
               child: const Text('Sign In'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
               ),
             ),
           ],
@@ -226,6 +273,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   void _confirmOrder(BuildContext context) async {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    if (_controllers['name']!.text.isEmpty ||
+        _controllers['phoneNumber']!.text.isEmpty ||
+        _controllers['address']!.text.isEmpty ||
+        _controllers['address']!.text == '\'\'') {
+      _showProfileIncompleteDialog();
+      return;
+    }
+
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId') as String;
 
@@ -237,7 +292,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       };
     }).toList();
 
-    bool success = await Api.placeOrder(userId, items,cartProvider.totalAmount.toString());
+    bool success = await Api.placeOrder(
+        userId, items, cartProvider.totalAmount.toString());
     if (success) {
       cartProvider.clear();
       Navigator.of(context).push(PageRouteBuilder(
@@ -251,8 +307,36 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ),
       ));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to place order')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Failed to place order')));
     }
   }
 
+  void _showProfileIncompleteDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Complete Your Profile'),
+          content: const Text(
+              'Please complete your profile to proceed with the checkout.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.pop(context); // Go back to the previous screen (cart page)
+              },child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+                // Navigate to the profile completion page or make the fields editable
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
