@@ -46,17 +46,18 @@ class CartProvider with ChangeNotifier {
       // Update the quantity if item already exists
       _items.update(
         item.id,
-        (existingCartItem) => CartItem(
+            (existingCartItem) => CartItem(
           item: existingCartItem.item,
           quantity: existingCartItem.quantity + quantity,
         ),
       );
     } else {
-      // Add item if it does not exist
+      // Add item if it does not exist with the specified quantity
       _items.putIfAbsent(
         item.id,
-        () => CartItem(
+            () => CartItem(
           item: item,
+          quantity: quantity,
         ),
       );
     }

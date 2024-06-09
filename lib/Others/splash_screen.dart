@@ -25,7 +25,7 @@ class _Splash_ScreenState extends State<Splash_Screen> {
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
     if (isLoggedIn) {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) =>  MainScreen(key:MyApp.mainScreenKey))); // Navigate to MainScreen if logged in
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) =>  MainScreen())); // Navigate to MainScreen if logged in
     } else {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const signInScreen())); // Navigate to signInScreen if not logged in
     }

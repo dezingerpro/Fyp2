@@ -182,48 +182,56 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     children: [
                       Visibility(
                         visible: _button1,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                errorMessage = '';
-                              });
-                              if (_done) {
-                                forgotPasswordUpdate(emailController.text, newPasswordController.text);
-                              } else {
-                                forgotPasswordCheck(emailController.text);
+                        child: Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                setState(() {
+                                  errorMessage = '';
+                                });
+                                if (_done) {
+                                  forgotPasswordUpdate(emailController.text, newPasswordController.text);
+                                } else {
+                                  forgotPasswordCheck(emailController.text);
+                                }
                               }
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurple,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            child: const Text("Submit",style: TextStyle(
+                              color: Colors.white
+                            ),),
                           ),
-                          child: const Text("Submit"),
                         ),
                       ),
                       Visibility(
                         visible: _button2,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                errorMessage = '';
-                              });
-                              checkAnswer();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        child: Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                setState(() {
+                                  errorMessage = '';
+                                });
+                                checkAnswer();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurple,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            child: const Text("Check Answer",style: TextStyle(
+                              color: Colors.white
+                            ),),
                           ),
-                          child: const Text("Check Answer"),
                         ),
                       ),
                     ],

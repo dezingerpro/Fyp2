@@ -72,7 +72,7 @@ class CartPage extends StatelessWidget {
                         ),
                       ),
                       title: Text(cartItem.item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text("\$${cartItem.item.price} x ${cartItem.quantity}"),
+                      subtitle: Text("\Rs ${cartItem.item.price} x ${cartItem.quantity}"),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -127,7 +127,7 @@ class CartPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total: \$${cartProvider.totalAmount.toStringAsFixed(2)}',
+                'Total: Rs ${cartProvider.totalAmount.toStringAsFixed(2)}',
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               ElevatedButton.icon(

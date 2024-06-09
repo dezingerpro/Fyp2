@@ -47,10 +47,20 @@ class DatabaseHelper {
           FOREIGN KEY (recipeId) REFERENCES Recipes(id)
         );
       ''');
+
+      // Create the instructions table
+      await db.execute('''
+        CREATE TABLE Instructions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          recipeId TEXT,
+          instruction TEXT,
+          FOREIGN KEY (recipeId) REFERENCES Recipes(id)
+        );
+      ''');
     });
   }
 
-  Future<bool> insertRecipe(Map<String, dynamic> recipe, List<Map<String, dynamic>> ingredients, List<String> allergens) async {
+  Future<bool> insertRecipe(Map<String, dynamic> recipe, List<Map<String, dynamic>> ingredients, List<String> allergens, List<String> instructions) async {
     final db = await database;
     try {
       await db.transaction((txn) async {
@@ -68,6 +78,12 @@ class DatabaseHelper {
             'allergen': allergen,
           });
         }
+        for (var instruction in instructions) {
+          await txn.insert('Instructions', {
+            'recipeId': recipe['id'],
+            'instruction': instruction,
+          });
+        }
       });
       return true; // Return true if all inserts are successful
     } catch (e) {
@@ -76,12 +92,9 @@ class DatabaseHelper {
     }
   }
 
-
   Future<List<Map<String, dynamic>>> getRecipes() async {
     final db = await database;
-    print("HELLO");
     List<Map<String, dynamic>> recipes = await db.query('Recipes');
-    print("HELLO44");
     for (var recipe in recipes) {
       // Clone the map to ensure it's mutable
       var mutableRecipe = Map<String, dynamic>.from(recipe);
@@ -90,8 +103,10 @@ class DatabaseHelper {
       try {
         final ingredients = await db.query('Ingredients', where: 'recipeId = ?', whereArgs: [mutableRecipe['id']]);
         final allergens = await db.query('Allergens', where: 'recipeId = ?', whereArgs: [mutableRecipe['id']]);
+        final instructions = await db.query('Instructions', where: 'recipeId = ?', whereArgs: [mutableRecipe['id']]);
         mutableRecipe['ringredients'] = ingredients;
         mutableRecipe['allergens'] = allergens.map((a) => a['allergen']).toList();
+        mutableRecipe['rinstructions'] = instructions.map((i) => i['instruction']).toList();
       } catch (e) {
         print("Failed processing recipe ID: ${mutableRecipe['id']} with error: $e");
       }
@@ -100,5 +115,4 @@ class DatabaseHelper {
     print("All recipes processed.");
     return recipes;
   }
-
 }

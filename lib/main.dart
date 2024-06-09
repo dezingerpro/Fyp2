@@ -59,18 +59,22 @@ Future<bool> downloadAndSaveRecipe(String recipeId) async {
     if (recipeData.isNotEmpty) {
       List<Map<String, dynamic>> ingredients = [];
       List<String> allergens = [];
+      List<String> instructions = [];
 
-      // Extract ingredients and allergens if they exist in the fetched data
+      // Extract ingredients, allergens, and instructions if they exist in the fetched data
       if (recipeData['ringredients'] != null) {
         ingredients = (recipeData['ringredients'] as List)
             .map((ingredient) => {
           'ingredientName': ingredient['ingredientName'],
-          'quantity': ingredient['quantity']
+          'quantity': ingredient['quantity'],
         })
             .toList();
       }
       if (recipeData['allergens'] != null) {
         allergens = List<String>.from(recipeData['allergens']);
+      }
+      if (recipeData['rinstructions'] != null) {
+        instructions = List<String>.from(recipeData['rinstructions']);
       }
 
       // Prepare the main recipe data for insertion
@@ -84,29 +88,29 @@ Future<bool> downloadAndSaveRecipe(String recipeId) async {
         'rtype': recipeData['rtype'],
       };
 
-
       // Insert the recipe and its components into the database
-      bool inserted = await db.insertRecipe(recipe, ingredients, allergens);
-      if (inserted) {
-      }
+      bool inserted = await db.insertRecipe(recipe, ingredients, allergens, instructions);
       return inserted;
     } else {
+      print("No recipe data found");
     }
   } catch (error) {
+    print("Failed to download and save recipe: $error");
     return false;
   }
   return false;
 }
 
 
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  static final GlobalKey<MainScreenState> mainScreenKey = GlobalKey<MainScreenState>();
 
   @override
   Widget build(BuildContext context) {
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CartProvider()),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fyp2/Navigation/about_page.dart';
+import 'package:fyp2/Navigation/support_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fyp2/Navigation/user_profile.dart';
 import 'package:fyp2/Recipes/saved_recipe_screen.dart';
@@ -131,13 +133,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       context,
                       icon: Icons.help_outline,
                       text: 'Support & Feedback',
-                      onTap: () => print('Help and Support'),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SupportFeedbackPage()),
+                      ),
                     ),
                     _settingsItem(
                       context,
                       icon: Icons.info_outline,
                       text: 'About',
-                      onTap: () => print('About'),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AboutPage()),
+                      ),
                     ),
                   ],
                 ).toList(),

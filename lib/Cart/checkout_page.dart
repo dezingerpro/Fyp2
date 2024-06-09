@@ -19,6 +19,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = true;
   bool _isLoggedIn = false;
+  late double totalPrice;
   Map<String, TextEditingController> _controllers = {
     'name': TextEditingController(),
     'phoneNumber': TextEditingController(),
@@ -60,8 +61,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Checkout'),
-        backgroundColor: Colors.deepPurple,
+        title: const Text('Checkout',style: TextStyle(
+          fontSize: 28,fontWeight: FontWeight.bold
+        ),),
+        backgroundColor: Colors.transparent,
       ),
       body: _isLoading ? Center(child: CircularProgressIndicator()) : _isLoggedIn ? buildCheckoutForm() : _buildSignInPrompt(),
     );
@@ -69,7 +72,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget buildCheckoutForm() {
     final cartProvider = Provider.of<CartProvider>(context);
-
+    totalPrice = cartProvider.totalAmount;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -103,18 +106,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ),
                     ),
                     title: Text(cartItem.item.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    subtitle: Text('\$${cartItem.item.price} x ${cartItem.quantity}', style: const TextStyle(fontSize: 14)),
-                    trailing: Text('\$${(cartItem.item.price * cartItem.quantity).toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    subtitle: Text('Rs ${cartItem.item.price} x ${cartItem.quantity}', style: const TextStyle(fontSize: 14)),
+                    trailing: Text('Rs ${(cartItem.item.price * cartItem.quantity).toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
                 );
               },
             ),
             const Divider(),
             // Summary
-            _buildSummaryTile(context, 'Total', '\$${cartProvider.totalAmount.toStringAsFixed(2)}'),
-            _buildSummaryTile(context, 'Discount', '-\$${cartProvider.discountAmount.toStringAsFixed(2)}'),
-            _buildSummaryTile(context, 'Delivery Charges', '\$${cartProvider.deliveryCharge.toStringAsFixed(2)}'),
-            _buildSummaryTile(context, 'Final Price', '\$${cartProvider.finalPrice.toStringAsFixed(2)}'),
+            _buildSummaryTile(context, 'Total', 'Rs ${cartProvider.totalAmount.toStringAsFixed(2)}'),
+            _buildSummaryTile(context, 'Discount', '-Rs ${cartProvider.discountAmount.toStringAsFixed(2)}'),
+            _buildSummaryTile(context, 'Delivery Charges', 'Rs ${cartProvider.deliveryCharge.toStringAsFixed(2)}'),
+            _buildSummaryTile(context, 'Final Price', 'Rs ${cartProvider.finalPrice.toStringAsFixed(2)}'),
             const Divider(),
             // Payment Method
             const ListTile(
@@ -242,11 +245,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
           opacity: animation,
           child: OrderSummaryPage(
             orderItems: items,
-            totalPrice: cartProvider.totalAmount,
+            totalPrice: totalPrice,
             orderStatus: 'Processing',
-            onContinueShopping: () {
-              mainScreenKey.currentState?.selectTab(2); // Navigate to the Grocery tab
-            },
           ),
         ),
       ));

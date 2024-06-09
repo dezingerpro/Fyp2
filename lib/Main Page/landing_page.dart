@@ -2,13 +2,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../API/api.dart';
 import '../Models/ingredients_model.dart';
 import '../Models/recipe_model.dart';
 import '../Others/bottom_tabs.dart';
 import '../Recipes/single_recipe_screen.dart';
+import '../SQFLite DB/database_sqflite.dart';
 import '../provider/recipe_provider.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -48,11 +48,24 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     //fetchRecipes();
     fetchGroceries();
+    createInstructionsTable();
+  }
+
+  Future<void> createInstructionsTable() async {
+    final db = await DatabaseHelper().database;
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS Instructions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        recipeId TEXT,
+        instruction TEXT,
+        FOREIGN KEY (recipeId) REFERENCES Recipes(id)
+      );
+    ''');
   }
 
   @override
   Widget build(BuildContext context) {
-    final recipeProvider = Provider.of<RecipeProvider>(context,listen:false);
+    Provider.of<RecipeProvider>(context,listen:false);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor, // Consider using a gradient or a vibrant solid color
@@ -65,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: GestureDetector(
             onTap: () {
               // Trigger search or navigation
-              mainScreenKey.currentState?.selectTab(2);  // 1 should be the index of the Search tab
+              MainScreenState.instance?.resetAndSwitchTab(1); // Reset current tab's stack and switch to Cart tab
               //Navigator.of(context).push(slideFromBottomTransition(const SearchPage()));
               //Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SearchPage()));
             },
@@ -217,6 +230,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: "Food Recipes",
                       imagePath: 'assets/food-recipe.png',
                       onTap: () {
+                        MainScreenState.instance?.resetAndSwitchTab(1); // Reset current tab's stack and switch to Cart tab
+
                       },
                     ),
                   ),
@@ -229,7 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       // endColor: Colors.teal,
                       onTap: () {
 
-                        print(Api.baseUrl);
+                        MainScreenState.instance?.resetAndSwitchTab(2); // Reset current tab's stack and switch to Cart tab
                         // Navigator.push(
                         //   context,
                         //   MaterialPageRoute(
@@ -243,48 +258,54 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-        Consumer<RecipeProvider>(
-            builder: (context, recipeProvider, child) {
-              return Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 10.0),
-                      child: Text(
-                        "Recommended Recipes",
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors
-                              .deepPurple, // Adjust the color according to your theme
-                        ),
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: List.generate(
-                          recipeProvider.filteredRecipes.length,
-                              (index) =>
-                              RecipeCard(
-                                recipe: recipeProvider.filteredRecipes[index],
-                                recipeName: recipeProvider.filteredRecipes[index].rname,
-                                imageUrl: recipeProvider.filteredRecipes[index].rimage,
-                                rating: recipeProvider.filteredRecipes[index].rratings
-                                    .toDouble(),
-                              ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-                ,
-              );
-            }
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 10.0),
+                child: Text(
+                  "Recommended Recipes",
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors
+                        .deepPurple, // Adjust the color according to your theme
+                  ),
+                ),
               ),
+            ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Consumer<RecipeProvider>(
+              builder: (context, recipeProvider, child) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 20.0, right: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: List.generate(
+                            recipeProvider.filteredRecipes.length,
+                                (index) =>
+                                RecipeCard(
+                                  recipe: recipeProvider.filteredRecipes[index],
+                                  recipeName: recipeProvider.filteredRecipes[index].rname,
+                                  imageUrl: recipeProvider.filteredRecipes[index].rimage,
+                                  rating: recipeProvider.filteredRecipes[index].rratings
+                                      .toDouble(),
+                                ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                  ,
+                );
+              }
+                ),
+        ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
               child: Column(
@@ -322,9 +343,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ReferAFriendCTA(
               onReferPressed: () {
-                // Implement what happens when the button is pressed
-                // For example, showing a share dialog
-                print('Refer a friend pressed');
               },
             ),
           ],

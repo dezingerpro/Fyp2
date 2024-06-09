@@ -2,26 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:lottie/lottie.dart';
 import '../Others/bottom_tabs.dart';
+import '../main.dart';
 
 class OrderSummaryPage extends StatelessWidget {
   final List<Map<String, dynamic>> orderItems;
   final double totalPrice;
   final String orderStatus;
-  final VoidCallback onContinueShopping;
 
   const OrderSummaryPage({
     super.key,
     required this.orderItems,
     required this.totalPrice,
     required this.orderStatus,
-    required this.onContinueShopping,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order Summary'),
+        title: const Text('Order Summary',style: TextStyle(
+          fontSize: 28,fontWeight: FontWeight.bold
+        ),),
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
       ),
@@ -81,7 +82,7 @@ class OrderSummaryPage extends StatelessWidget {
                             ),
                             title: Text(item['itemName'], style: const TextStyle(fontWeight: FontWeight.bold)),
                             subtitle: Text('Quantity: ${item['quantity']}'),
-                            trailing: Text('\$${item['price']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            trailing: Text('Rs ${item['price']}', style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 16)),
                           ),
                         ),
                       ),
@@ -109,14 +110,16 @@ class OrderSummaryPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         const Text('Total Price', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('\$${totalPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18, color: Colors.deepPurple)),
+                        Text('Rs ${totalPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 18, color: Colors.deepPurple)),
                       ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: onContinueShopping,
+                  onPressed: (){
+                    MainScreenState.instance?.resetAndSwitchTab(0); // Reset current tab's stack and switch to Cart tab
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
                     shape: RoundedRectangleBorder(

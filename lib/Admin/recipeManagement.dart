@@ -97,7 +97,7 @@ class _recipeManagmentState extends State<recipeManagment> {
           Api.reanalyzeRecipes(); // Call the function when the button is pressed
         },
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white, backgroundColor: Colors.blue, // Set the text color to white
+          foregroundColor: Colors.white, backgroundColor: Colors.purple, // Set the text color to white
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8), // Rounded corners
           ),
