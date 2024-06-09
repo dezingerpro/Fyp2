@@ -169,36 +169,38 @@ class _signUpScreenState extends State<signUpScreen> {
   }
 
   Widget _buildSecurityQuestionField() {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          labelText: "Select Security Question", // You can add a label if needed
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
-          filled: true,
-          fillColor: Colors.grey[200],
-        ),
-        value: questions.isNotEmpty ? questions.first : null, // Set an initial value if list is not empty
-        items: questions.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-        onChanged: (value) {
-          // Update the selected security question
-          setState(() {
-            securityQuestions.text = value!;
-          });
-        },
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Security Question is required';
-          }
-          return null;
-        },
+    return DropdownButtonFormField<String>(
+      decoration: InputDecoration(
+        labelText: "Select Security Question",
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        fillColor: Colors.grey[200],
+        filled: true,
+        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12), // Adjust padding as needed
       ),
+      value: null,
+      items: questions.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(
+            value,
+            overflow: TextOverflow.clip,
+          ),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          securityQuestions.text = value!;
+        });
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Security Question is required';
+        }
+        return null;
+      },
+      icon: SizedBox.shrink(), // Adjust the color and size if needed
+      iconEnabledColor: Colors.grey,
+      dropdownColor: Colors.white,
     );
   }
 
