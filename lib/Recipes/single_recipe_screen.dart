@@ -363,7 +363,7 @@ class _RecipeIngredientsState extends State<RecipeIngredients>
                         _showQuantityDialog(context, detailedIngredient, cartProvider);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Error fetching ingredient details'))
+                            const SnackBar(content: Text('This ingredient is not available'))
                         );
                       }
                     },
