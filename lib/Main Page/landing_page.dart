@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp2/provider/cart_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../API/api.dart';
 import '../Models/ingredients_model.dart';
@@ -258,54 +259,58 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 10.0),
-                child: Text(
-                  "Recommended Recipes",
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors
-                        .deepPurple, // Adjust the color according to your theme
-                  ),
-                ),
-              ),
-            ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Consumer<RecipeProvider>(
+            Consumer<RecipeProvider>(
               builder: (context, recipeProvider, child) {
-                return Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20),
-                  child: Column(
+                if (recipeProvider.filteredRecipes.isEmpty) {
+                  return SizedBox.shrink(); // Or you can use Container() or any other placeholder widget
+                } else {
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: List.generate(
-                            recipeProvider.filteredRecipes.length,
-                                (index) =>
-                                RecipeCard(
-                                  recipe: recipeProvider.filteredRecipes[index],
-                                  recipeName: recipeProvider.filteredRecipes[index].rname,
-                                  imageUrl: recipeProvider.filteredRecipes[index].rimage,
-                                  rating: recipeProvider.filteredRecipes[index].rratings
-                                      .toDouble(),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                          child: Text(
+                            "Recommended Recipes",
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple, // Adjust the color according to your theme
+                            ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0, right: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: List.generate(
+                                    recipeProvider.filteredRecipes.length,
+                                        (index) => RecipeCard(
+                                      recipe: recipeProvider.filteredRecipes[index],
+                                      recipeName: recipeProvider.filteredRecipes[index].rname,
+                                      imageUrl: recipeProvider.filteredRecipes[index].rimage,
+                                      rating: recipeProvider.filteredRecipes[index].rratings.toDouble(),
+                                    ),
+                                  ),
                                 ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
-                  )
-                  ,
-                );
-              }
-                ),
-        ),
+                  );
+                }
+              },
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
               child: Column(
@@ -343,12 +348,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ReferAFriendCTA(
               onReferPressed: () {
+                _shareRecipe();
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _shareRecipe() {
+    const String text = "FOOD SAVVY\nCheck out this amazing app to check for recipes and order ingredients!";
+    Share.share(text);
   }
 
   List<Ingredient> groceries = [];
