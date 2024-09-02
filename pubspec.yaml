@@ -64,6 +64,9 @@ flutter:
     - assets/grocery-image.png
     - assets/logo.png
     - assets/animations/order_success.json
+    - assets/visa.jpg
+    - assets/mastercard.jpg
+    - assets/unionpay.jpg
 
   uses-material-design: true
 

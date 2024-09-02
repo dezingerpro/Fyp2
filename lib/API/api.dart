@@ -17,7 +17,7 @@ class Api {
 
 
   static bool? adminStatus;
-  static String baseUrl = "http://192.168.18.178:2000/api/";
+  static String baseUrl = "http://192.168.0.103:2000/api/";
 
   // USER REGISTRATION
   static Future<int> addUser(User user) async {

@@ -62,65 +62,117 @@ class _MyOrdersPageState extends State<MyOrdersPage> with SingleTickerProviderSt
 
   Widget buildOrderCard(Order order) {
     final orderId = 'FS${generateUniqueCode(order.id)}';
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ExpansionTile(
-        tilePadding: EdgeInsets.zero,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Order ID: $orderId',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Status: ${order.orderStatus}',
-              style: const TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Date: ${formatDate(order.createdAt)}',
-              style: const TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          ],
-        ),
-        childrenPadding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
-        children: [
-          ...order.items.map<Widget>((item) {
-            return ListTile(
-              title: Text(
-                item.itemName,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+    bool isExpanded = false;
+
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3),
               ),
-              trailing: Text(
-                'Quantity: ${item.quantity}',
-                style: const TextStyle(fontSize: 14),
-              ),
-            );
-          }).toList(),
-          const Divider(),
-          ListTile(
-            title: const Text('Total Price', style: TextStyle(fontWeight: FontWeight.bold)),
-            //trailing: Text('\$${order.price}', style: const TextStyle(fontWeight: FontWeight.bold)),
+            ],
           ),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                title: Text(
+                  'Order ID: $orderId',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Status: ${order.orderStatus}',
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                    Text(
+                      'Date: ${formatDate(order.createdAt)}',
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                  ],
+                ),
+                trailing: IconButton(
+                  icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                  onPressed: () {
+                    setState(() {
+                      isExpanded = !isExpanded;
+                    });
+                  },
+                ),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                child: isExpanded
+                    ? Column(
+                  children: [
+                    ...order.items.map<Widget>((item) {
+                      return ListTile(
+                        title: Text(
+                          item.itemName,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        trailing: Text(
+                          'Quantity: ${item.quantity}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      );
+                    }).toList(),
+                    ListTile(
+                      title: const Text('Total Price', style: TextStyle(fontWeight: FontWeight.bold)),
+                      trailing: Text('\$${order.orderTotal}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    if (order.orderStatus == 'Pending')
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            await _cancelOrder(order.id);
+                          },
+                          child: const Text('Cancel Order'),
+                        ),
+                      ),
+                  ],
+                )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
+
+  Future<void> _cancelOrder(String orderId) async {
+    bool success = await Api.updateOrderStatus(orderId, 'Cancelled');
+    if (success) {
+      // Update local UI
+      setState(() {
+        // Remove or update the canceled order from the local state
+        // If you fetched orders from the server, you'd need to refetch them
+        fetchOrders(); // Refetch the orders
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Order has been cancelled.')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to cancel order. Please try again.')),
+      );
+    }
+  }
+
 
 
   @override
