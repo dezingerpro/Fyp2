@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp2/provider/cart_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -50,6 +51,13 @@ class _MyHomePageState extends State<MyHomePage> {
     //fetchRecipes();
     fetchGroceries();
     createInstructionsTable();
+    requestNotificationPermission();
+  }
+  Future<void> requestNotificationPermission() async {
+    var status = await Permission.notification.status;
+    if (status.isDenied) {
+      await Permission.notification.request();
+    }
   }
 
   Future<void> createInstructionsTable() async {

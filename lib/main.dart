@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fyp2/Others/Splash_Screen.dart';
 import 'package:fyp2/Others/colors.dart';
@@ -11,10 +12,40 @@ import 'API/api.dart';
 import 'Others/bottom_tabs.dart';
 import 'SQFLite DB/database_sqflite.dart';
 
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeNotifications();
   await initializeService();
   runApp(const MyApp());
+}
+
+Future<void> initializeNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const DarwinInitializationSettings initializationSettingsIOS =
+  DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
+  );
+
+  final bool? initialized = await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+  );
+
+  if (initialized != null && initialized) {
+    print('Notifications successfully initialized.');
+  } else {
+    print('Failed to initialize notifications.');
+  }
 }
 
 Future<void> initializeService() async {
@@ -38,16 +69,16 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) {
-    service.on('downloadRecipe').listen((event) async {
-      bool success = await downloadAndSaveRecipe(event!['recipeId']);
-      service.invoke(
-        'notifyUser',
-        {
-          'title': 'Recipe Download',
-          'body': success ? 'Download completed!' : 'Download failed.',
-        },
-      );
-    });
+  service.on('downloadRecipe').listen((event) async {
+    bool success = await downloadAndSaveRecipe(event!['recipeId']);
+    service.invoke(
+      'notifyUser',
+      {
+        'title': 'Recipe Download',
+        'body': success ? 'Download completed!' : 'Download failed.',
+      },
+    );
+  });
 }
 
 Future<bool> downloadAndSaveRecipe(String recipeId) async {
@@ -101,8 +132,6 @@ Future<bool> downloadAndSaveRecipe(String recipeId) async {
   return false;
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -110,7 +139,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CartProvider()),

@@ -5,6 +5,7 @@ class Order {
   final DateTime createdAt;
   final String orderStatus;
   final String orderTotal;
+  final String paidStatus;
 
   Order({
     required this.id,
@@ -12,6 +13,7 @@ class Order {
     required this.items,
     required this.createdAt,
     required this.orderStatus,
+    required this.paidStatus,
     this.orderTotal = '0.00', // Default value for orderTotal
   });
 
@@ -23,6 +25,7 @@ class Order {
       createdAt: DateTime.parse(json['createdAt']),
       orderStatus: json['orderStatus'],
       orderTotal: json['orderTotal'] ?? '0.00', // Handle null value
+      paidStatus: json['paidStatus'] ?? 'Unpaid', // Handle null value
     );
   }
 
@@ -32,6 +35,7 @@ class Order {
       'items': items.map((item) => item.toJson()).toList(),
       'orderStatus': orderStatus,
       'orderTotal': orderTotal,
+      'paidStatus': paidStatus,
     };
   }
 }

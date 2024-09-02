@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../API/api.dart';
 import '../Authentication/signin_screen.dart';
+import '../Others/notifications.dart';
+import '../main.dart';
 import '../provider/cart_provider.dart';
 import 'order_summary.dart';
 
@@ -33,6 +37,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
     _checkLoginStatusAndFetchUserDetails();
     _loadSavedCardDetails(); // Load saved card details
   }
+
+
 
   void _loadSavedCardDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -593,6 +599,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
+  void showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'high_importance_channel', // Make sure this matches your channel ID
+      'High Importance Notifications',
+      channelDescription: 'This channel is used for important notifications.',
+      importance: Importance.high,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID (you can use different IDs to handle multiple notifications)
+      title, // Dynamic notification title
+      body, // Dynamic notification body
+      platformChannelSpecifics,
+      payload: 'item x', // Optional payload
+    );
+  }
+
+
 
   Future<void> _confirmOrder(BuildContext context) async {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
@@ -603,6 +631,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
       _showProfileIncompleteDialog();
       return;
     }
+
+    String paymentStatus = _paymentMethod == 'Card' ? 'Paid' : 'Unpaid';
+
 
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId') as String;
@@ -616,8 +647,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }).toList();
 
     bool success = await Api.placeOrder(
-        userId, items, cartProvider.totalAmount.toString());
+        userId, items, cartProvider.totalAmount.toString(),paymentStatus);
     if (success) {
+      showNotification('Order Placed', 'Your order has been placed successfully.');
       cartProvider.clear();
       Navigator.of(context).push(PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(

@@ -36,7 +36,6 @@ class _MyOrdersPageState extends State<MyOrdersPage> with SingleTickerProviderSt
     return code.abs().toString().padLeft(4, '0'); // Ensure it's 4 digits, and handle negative hashes
   }
 
-
   Future<void> fetchOrders() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId')!;
@@ -100,6 +99,10 @@ class _MyOrdersPageState extends State<MyOrdersPage> with SingleTickerProviderSt
                       'Date: ${formatDate(order.createdAt)}',
                       style: const TextStyle(color: Colors.grey, fontSize: 14),
                     ),
+                    Text(
+                      'Payment Status: ${order.paidStatus}', // Add payment status
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
                   ],
                 ),
                 trailing: IconButton(
@@ -156,10 +159,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> with SingleTickerProviderSt
   Future<void> _cancelOrder(String orderId) async {
     bool success = await Api.updateOrderStatus(orderId, 'Cancelled');
     if (success) {
-      // Update local UI
       setState(() {
-        // Remove or update the canceled order from the local state
-        // If you fetched orders from the server, you'd need to refetch them
         fetchOrders(); // Refetch the orders
       });
 
@@ -172,8 +172,6 @@ class _MyOrdersPageState extends State<MyOrdersPage> with SingleTickerProviderSt
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -207,9 +205,14 @@ class _MyOrdersPageState extends State<MyOrdersPage> with SingleTickerProviderSt
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text("No orders found"));
           }
-          List<Order> completedOrders = filterOrders(snapshot.data!, 'Completed');
-          List<Order> processingOrders = filterOrders(snapshot.data!, 'Pending');
-          List<Order> cancelledOrders = filterOrders(snapshot.data!, 'Cancelled');
+
+          // Sort orders by date (latest first)
+          List<Order> sortedOrders = snapshot.data!
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+          List<Order> completedOrders = filterOrders(sortedOrders, 'Completed');
+          List<Order> processingOrders = filterOrders(sortedOrders, 'Pending');
+          List<Order> cancelledOrders = filterOrders(sortedOrders, 'Cancelled');
 
           return TabBarView(
             controller: _tabController,

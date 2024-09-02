@@ -190,17 +190,12 @@ class _OrderManageState extends State<OrderManage> with SingleTickerProviderStat
                   children: [
                     Text('Order ID: ${order.id}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
                     const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text('User: ${order.userId}', style: TextStyle(fontSize: 14, color: Colors.black54)),
-                        ),
-                        Text('Total: \$${order.orderTotal}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green)),
-                      ],
-                    ),
+                    Text('Total: Rs ${order.orderTotal}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green)),
                     const SizedBox(height: 5),
                     Text('Date Placed: ${DateFormat('dd MMM yyyy').format(order.createdAt)}', style: TextStyle(color: Colors.black54)),
+                    const SizedBox(height: 5),
+                    // Add Payment Status Display
+                    Text('Payment Status: ${order.paidStatus}', style: TextStyle(color: Colors.black54)),
                     const SizedBox(height: 5),
                     _statusDropdown(order),
                   ],

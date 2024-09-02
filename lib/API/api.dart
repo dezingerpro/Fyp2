@@ -70,15 +70,18 @@ class Api {
   }
 
   static Future<User> fetchUserById(String userId) async {
-    final response = await http.get(Uri.parse('${baseUrl}users/$userId'));
-    print("hello");
+    final response = await http.get(Uri.parse('${baseUrl}user/$userId'));
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}");
+
     if (response.statusCode == 200) {
       print("hello");
       return User.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to load user');
+      throw Exception('Failed to load user: ${response.statusCode}');
     }
   }
+
 
   //UPDATE USER
   static Future<bool> updateUserDetails(Map<String, dynamic> userData) async {
@@ -524,7 +527,7 @@ class Api {
   }
 
   //place orders
-  static Future<bool> placeOrder(String userId, List<Map<String, dynamic>> items, String orderTotal, {String? voucher}) async {
+  static Future<bool> placeOrder(String userId, List<Map<String, dynamic>> items, String orderTotal, String paidStatus, {String? voucher}) async {
     final url = Uri.parse('${baseUrl}orders');
     final response = await http.post(
       url,
@@ -535,6 +538,7 @@ class Api {
         'userId': userId,
         'items': items,
         'orderTotal' : orderTotal,
+        'paidStatus' : paidStatus,
       }),
     );
 

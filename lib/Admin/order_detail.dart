@@ -75,7 +75,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order Details', style: TextStyle(color: Colors.black,fontSize: 28,fontWeight: FontWeight.bold)),
+        title: const Text('Order Details', style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
       ),
       body: Padding(
@@ -120,15 +120,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           children: [
             Text('Order ID: ${widget.order.id}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
             const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text('User: ${widget.order.userId}', style: const TextStyle(fontSize: 16, color: Colors.black54)),
-                ),
-                Text('Total: \$${widget.order.orderTotal}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
-              ],
-            ),
+            Text('Total: Rs ${widget.order.orderTotal}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+
             const SizedBox(height: 10),
             Text('Date Placed: ${DateFormat('dd MMM yyyy').format(widget.order.createdAt)}', style: const TextStyle(color: Colors.black54)),
             const SizedBox(height: 10),
@@ -136,6 +129,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               children: [
                 const Text('Status: ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
                 Text(widget.order.orderStatus, style: const TextStyle(fontSize: 16, color: Colors.black54)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // Add Payment Status
+            Row(
+              children: [
+                const Text('Payment Status: ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+                Text(widget.order.paidStatus, style: const TextStyle(fontSize: 16, color: Colors.black54)),
               ],
             ),
           ],
